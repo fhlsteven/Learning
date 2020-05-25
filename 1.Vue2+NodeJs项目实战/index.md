@@ -24,5 +24,26 @@
    * 服务器端渲染
    * 易于集成路由工具，打包工具以及状态管理工具
    * 优秀的支持和社区
-   
+
+### 1.2前端框架回顾
+   * [DOJO](https://github.com/dojo)![dojo](/source/1/dojo-logo.svg)
+   * Spine
+   * emben
+   * prototype
+   * backbone.js
+   * React
+   * Vue
+
+   + 模块化的开发框架  require.js 异步加载JS
+   + 基于DOM操作的函数库 JQuery
+   + 基于MVC模式的Spine框架
+      - Model和View解耦
+      - Controller控制DOM
+      - 完全照搬MVC模式
+   + 基于MV*模式的Vue框架
+     - Model绑定View
+     - 没有控制器概念
+     - 数据驱动，状态管理
+     
+ 
 
