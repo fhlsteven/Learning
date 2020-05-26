@@ -27,12 +27,12 @@
 
 ### 1.2前端框架回顾
    * [DOJO](https://github.com/dojo)![dojo](/source/1/dojo-logo.svg)
-   * Spine
-   * emben
-   * prototype
-   * backbone.js
-   * React
-   * Vue
+   * [SpineJS](http://spinejs.com/)
+   * [EmberJS](https://emberjs.com)![EmberJS](/source/1/ember-logo.svg)
+   * [prototype](http://prototypejs.org)
+   * [backbone.js](https://www.backbonejs.com.cn)
+   * [React](https://react.docschina.org)
+   * [Vue](https://vuejs.org)
 
    + 模块化的开发框架  require.js 异步加载JS
    + 基于DOM操作的函数库 JQuery
@@ -44,6 +44,35 @@
      - Model绑定View
      - 没有控制器概念
      - 数据驱动，状态管理
-     
- 
 
+### 1.3 Vue概括核心思想
+Vue本身并不是一个框架
+Vue结合周边生态构成一个灵活的、渐进式的框架
+声明式渲染(Declarative Rendering)-->组件系统(Component System)-->客户端路由(Client-Side Routing)-->大规模状态管理(Large Scale State Management)-->构建工具(Build System)
+
+核心思想
+* 数据驱动：数据绑定，不需要关注Dom操作
+* 组件化
+
+通过MVVM的数据绑定实现自动同步</br>
+View(DOM)  ViewModel(Vue)   Model(POJO:原生JS对象) 
+
+Vue组件化
+
+Vue组件树
+
+Vue如何实现双向数据绑定？ Object.defineProperty()
+
+### 1.4 Vue的优点对比
+  
+ * 前端
+   + 视图层：商品列表 购物车 地址列表 商品结算 订单成功
+   + Vue.js - MVVM(公共组件；Vue-Router；Axios；Vuex；Util；依赖)
+   + 工具支持 （vue-cli webpack）
+ * 后端 (Node Express)
+ * 数据库 (MongoDB)
+
+ 前置知识：**Html/CSS/JS** ;**Vue** ; **ES6**; **Node** ; **Npm** ; **Webpack**
+
+
+## 2 Vue基础
