@@ -167,7 +167,7 @@ webpack 项目
 
 1. build  -- 打包的配置文件
    * build.js  -- 打生产的包
-   * check-versions.js
+   * check-versions.js  
    * utils.js
    * vue-loader.conf.js
    * webpack.base.conf.js  -- 重点关注
@@ -190,4 +190,28 @@ webpack 项目
 8. index.html     -- 单页面应用程序入口 SPA
 9. package.json   -- 基础配置
 10. README.md     
- 
+
+Vue 不同版本的规范 veu.js;vue.common.js;vue.esm.js
+
+
+### 2.4 Vue基础语法介绍
+ 模板语法
+ * Mustache语法：`{{ msg }}`
+ * Html赋值：`v-html=""`
+ * 绑定属性：`v-bind:id=""`
+ * 使用表达式：`{{ ok ？'YES':'NO'}}`
+ * 文本赋值：`v-text=""`
+ * 指令：`v-if=""`
+ * 过滤器：`{{ message | capitalize }}`和`v-bind:id="rawId | formatId"`
+
+Class和Style绑定
+* 对象语法： `v-bind:class="{ active:isActive,'text-danger':{hasError }">`
+* 数组语法：
+ ```html
+ <div v-bind:class="{activeClass,errorClass}">
+ data:{
+   activeClass:'active',
+   errorClass:'text-danger'
+ }
+ ```
+ * style绑定-对象语法：`v-bind:style="{color:activeColor,fontSize:fontSize+'px'}"` 

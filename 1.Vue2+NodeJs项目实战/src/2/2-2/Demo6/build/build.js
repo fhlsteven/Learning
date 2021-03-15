@@ -6,13 +6,13 @@ process.env.NODE_ENV = 'production'
 const ora = require('ora')
 const rm = require('rimraf')
 const path = require('path')
-const chalk = require('chalk')
-const webpack = require('webpack')
-const config = require('../config')
+const chalk = require('chalk')     // 颜色
+const webpack = require('webpack')  // 打包插件
+const config = require('../config') // 配置文件
 const webpackConfig = require('./webpack.prod.conf')
 
 const spinner = ora('building for production...')
-spinner.start()
+spinner.start()  // 日志插件
 
 rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
   if (err) throw err
