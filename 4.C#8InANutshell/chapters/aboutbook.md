@@ -251,7 +251,171 @@ Joseph Albahari & Eric Johannsen
        1. Operator Functions
        2. Overloading Equality and Comparison Operators
        3. Custom Implicit and Explicit Conversions
-       4. 
+       4. Overloading true and false
+   17. Unsafe Code and Pointers
+       1. Pointer Basics
+       2. Unsafe Code
+       3. The fixed Statement
+       4. The Pointer-to-Member Operator
+       5. The stackalloc Keyword
+       6. Fixed-Size Buffers
+       7. void*
+       8. Pointers to Unmanaged Code
+   18. Preprocessor Directives
+       1. Conditional Attributes
+       2. pragma warining
+   19. XML Documentation
+       1. Standard XML Documentation Tags
+       2. User-Defined Tags
+       3. Type or Member Cross-References
+6. Framework Overview
+   1. .NET Standard
+       1. .NET Standard 2.0
+       2. .NET Standard 2.1
+       3. Older .NET Standards
+       4. .NET Framework and .NET Core Compatibility
+   2. Framework and C# Language Versions
+   3. Reference Assemblies
+   4. The CLR and BCL
+       1. System Types
+       2. Text Processing
+       3. Collections
+       4. Querying
+       5. XML and JSON
+       6. Diagnostics
+       7. Concurrency and Asynchrony
+       8. Streams and I/O
+       9. Networking
+       10. Serialization
+       11. Assemblies,Reflection,and Attributes
+       12. Dynamic Programming
+       13. Cryptography
+       14. Advanced Threading
+       15. Parallel Programming
+       16. Span<T> and Memory<T>
+       17. Native and COM Interoprability
+       18. Regular Expressions
+       19. The Roslyn Compiler
+   5. Application Frameworks
+       1. ASP.NET Core
+       2. Windows Desktop
+       3. UWP
+       4. Xamarin
+7. Framework Fundamentals
+   1. String and Text Handling
+       1. char
+       2. string
+       3. Comparing Strings
+       4. StringBuilder
+       5. Text Encodings and Unicode
+   2. Dates and Times
+       1. TimeSpan
+       2. DateTime and DateTimeOffset
+   3. Dates and Time Zones
+       1. DateTime and Time Zones
+       2. DateTimeOffset and Time Zones
+       3. TimeZone and TimeZoneInfo
+       4. Daylight Saving Time and DateTime
+   4. Formatting and Parsing
+       1. ToString and Parse
+       2. Format Providers
+   5. Standard Format Strings and Parsing Flags
+       1. Numeric Format Strings
+       2. NumberStyles
+       3. Date/Time Format Strings
+       4. DateTimeStyles
+       5. Enum Format Strings
+    6. Other Conversion Mechanisms
+       1. Convert
+       2. XmlConvert
+       3. Type Converters
+       4. BitConverter
+    7. Globalization 
+       1. Globalization Checklist
+       2. Testing
+    8. Working with Numbers
+       1. Conversions
+       2. Math
+       3. BigInteger
+       4. Complex
+       5. Random
+    9. Enums
+       1. Enum Conversions
+       2. Enumerating Enum Values
+       3. How Enums Work
+   10. The Guid Struct
+   11. Equality Comparison
+       1. Value Versus Referential Equality
+       2. Standard Equality Protocols
+       3. Equality and Custom Types
+   12. Order Comparison
+       1. IComparable
+       2. < and >
+       3. Implementing the IComparable Interfaces
+   13. Utility Classes
+       1. Console
+       2. Environment
+       3. Process
+       4. AppContext
+8. Collections
+   1. Enumeration
+       1. IEnumerable and IEnumerator
+       2. IEnumerable\<T> and IEnumerator\<T>
+       3. Implementing the Enumeration Interfaces
+   2. The ICollection and IList Interfaces
+       1. ICollection\<T> and ICollection
+       2. IList\<T> and IList
+       3. IReadOnlyCollection\<T> and IReadOnlyList\<T>
+   3. The Array Class 
+       1. Construction and Indexing
+       2. Enumeration
+       3. Length and Rank
+       4. Searching
+       5. Sorting
+       6. Reversing Elements
+       7. Copying
+       8. Converting and Resizing
+   4. Lists,Queues,Stacks,and Sets
+       1. List\<T> and ArrayList
+       2. LinkedList\<T>
+       3. Queue\<T> and Queue
+       4. Stack\<T> and Stack
+       5. BitArray
+       6. HashSet\<T> and SortedSet\<T>
+   5. Dictionaries
+       1. IDictionary\<TKey, TValue>
+       2. IDictionary
+       3. Dictionary\<Tkey, TValue> and Hashtable
+       4. OrderedDictionary
+       5. ListDictionary and HybridDictionary
+       6. Sorted Dictionaries
+   6. Customizable Collections
+       1. Collection\<T> and CollectionBase
+       2. KeyedCollection\<TKey,TItem> and DictionaryBase
+       3. ReadOnlyCollection\<T>
+   7. Immutable Collections
+       1. Creating Immutable Collections
+       2. Manipulating Immutable Collections
+       3. Builders
+       4. Immutable Collections and Performance
+   8. Plugging in Equality and Order
+       1. IEqualityComparer and EqualityComparer
+       2. IComparer and Comparer
+       3. StringComparer
+       4. IStructuralEquatable and IStructualComparable
+9. LINQ Querues
+   1. Getting Started
+   2. Fluent Syntax
+       1. Chaining Query Operators
+       2. Composing Lambda Expressions
+       3. Natural Ordering
+       4. Other Operators
+   3. Query Expressions
+       1. Range Variables
+       2. Query Syntax Versus SQL Syntax
+       3. Query Syntax Versus Fluent Syntax
+       4. Mixed-Syntax Queries
+   4.  
         
         
 
