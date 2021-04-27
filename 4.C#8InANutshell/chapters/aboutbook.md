@@ -219,7 +219,39 @@ Joseph Albahari & Eric Johannsen
    10. Anonymous Types
    11. Tuples
        1. Naming Tuple Elements
-       2. 
+       2. ValueTuple.Create
+       3. Deconstructing Tuples
+       4. Equality Comparison
+       5. The System.Tuple classes
+   12. Patterns
+       1. Property Patterns (C# 8)
+       2. Tuple Patterns (C# 8)
+       3. Positional Patterns (C# 8)
+       4. var Pattern
+       5. Constant Pattern
+   13. Attributes
+       1. Attribute Classes
+       2. Named and Positional Attribute Parameters
+       3. Applying Attributes to Assemblies and Backing
+       4. Specifying Multiple Attributes
+   14. Caller Info Attributes
+   15. Dynamic Binding
+       1. Static Binding versus Dynamic Binding
+       2. Custom Binding
+       3. Language Binding
+       4. RuntimeBinderException
+       5. Runtime Representation of dynamic
+       6. Dynamic Conversions
+       7. var Versus dynamic
+       8. Dynamic Expressions
+       9. Dynamic Calls Without Dynamic Receivers
+       10. Static Types in Dynamic Expressions
+       11. Uncallable Functions
+   16. Operator Overloading
+       1. Operator Functions
+       2. Overloading Equality and Comparison Operators
+       3. Custom Implicit and Explicit Conversions
+       4. 
         
         
 
