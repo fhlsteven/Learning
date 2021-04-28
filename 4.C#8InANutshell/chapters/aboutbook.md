@@ -415,7 +415,169 @@ Joseph Albahari & Eric Johannsen
        2. Query Syntax Versus SQL Syntax
        3. Query Syntax Versus Fluent Syntax
        4. Mixed-Syntax Queries
-   4.  
+   4. Deferred Execution
+       1. Reevaluation
+       2. Captured Variables
+       3. How Deferred Execution Works
+       4. Chaining Decorators
+       5. How Queries Are Executed
+   5. Subqueries
+       1. Subqueries and Deferred Execution
+   6. Composition Strategies
+       1. Progressive Query Building
+       2. The into Keyword
+       3. Wrapping Queries
+   7. Projection Strategies
+       1. Object Initializers
+       2. Anonymous Types
+       3. The let Keyword
+   8. Interpreted Queries
+       1. How Interpreted Queries Work
+       2. Combining Interpreted and Local Queries
+       3. AsEnumerable
+   9. EF Core
+       1. EF Core Entity Classes
+       2. DbContext
+       3. Object Tracking
+       4. Change Tracking
+       5. Navigation Properties
+       6. Deferred Execution
+   10. Building Query Expressions
+       1. Delegates Versus Expression Trees
+       2. Expression Trees
+10. LINQ Operators
+    1. Overview
+       1. Sequence → Sequence
+       2. Sequence → Element or Value
+       3. Void → Sequence
+    2. Filtering
+       1. Where
+       2. Take and Skip 
+       3. TakeWhile and SkipWhile
+       4. Distinct
+    3. Projecting
+       1. Select
+       2. SelectMany
+    4. Joining
+       1. Join and GrooupJoin
+       2. The Zip Operator
+    5. Ordering
+       1. OrderBy, OrderByDescending, ThenBy, and ThenByDescending
+    6. Grouping
+       1. GroupBy
+    7. Set Operators
+       1. Concat and Union
+       2. Intersect and Except
+    8. Conversion Methods
+       1. OfType and Cast
+       2. ToArray, ToList, ToDictionary, ToHashSet, and ToLookup
+       3. AsEnumerable and AsQueryable
+    9. Element Operators
+       1. First, Last, and Single
+       2. ElementAt
+       3. DefaultIfEmpty
+   10. Aggregation Methods
+       1. Count and LongCount
+       2. Min and Max
+       3. Sum and Average
+       4. Aggregate
+   11. Quantifiers
+       1. Contains and Any
+       2. All and SequenceEqual
+   12. Generation Methods
+       1. Empty
+       2. Range and Repeat
+11. LINQ to XML
+    1. Architectural Overview
+       1. What is a DOM?
+       2. The LINQ to XML DOM
+    2. X-DOM Overview
+       1. Loading and Parsing
+       2. Saving and Serializing
+    3. Instantiating an X-DOM
+       1. Functional Construction
+       2. Specifying Content
+       3. Automatic Deep Cloning
+    4. Navigating and Querying 
+       1. Child Node Navigation
+       2. Parent Navigation
+       3. Peer Node Navigation 
+       4. Attribute Navigation
+    5. Updating an X-DOM
+       1. Simple Value Updates
+       2. Updating Child Nodes and Attributes
+       3. Updating Through the Parent
+    6. Working with Values
+       1. Setting Values
+       2. Getting Values
+       3. Values and Mixed Content Nodes
+       4. Automatic XText Concatenation
+    7. Documents and Declarations
+       1. XDocument
+       2. XML Declarations
+    8. Names and Namespaces
+       1. Namespaces in XML
+       2. Specifying Namespaces in the X-DOM
+       3. The X-DOM and Default Namespaces
+       4. Prefixes
+    9. Annotations
+    10. Projecting into an X-DOM
+        1. Eliminating Empty Elements
+        2. Streaming a Projection
+12. Other XML and JSON Technologies
+    1. XmlReader
+        1. Reading Nodes
+        2. Reading Elements
+        3. Reading Attributes
+        4. Namespaces and Prefixes
+    2. XmlWriter
+        1. Writing Attributes
+        2. Writing Other Node Types
+        3. Namespaces and Prefixes
+    3. Patterns for Using XmlReader/XmlWriter
+        1. Working with Hierarchical Data
+        2. Mixing XmlReader/XmlWriter with an X-DOM
+    4. Working with JSON
+        1. Utf8JsonReader
+        2. Utf8JsonWriter
+        3. JsonDocument
+13. Disposal and Garbage Collection
+    1. IDisposable, Dispose, and Close
+        1. Standard Disposal Semantics
+        2. When to Dispose
+        3. Clearing Fields in Disposal
+        4. Anonymous Disposal
+    2. Automatic Garbage Collection
+        1. Roots
+        2. Garbage Collection and WinRT
+    3. Finalizers
+        1. Calling Dispose from a Finalizer
+        2. Resurrection
+    4. How the GC Works
+        1. Optimization Techniques
+        2. Forcing Garbage Collection
+        3. Tuing Garbage Collection at Runtime
+        4. Memory Pressure
+        5. Array Pooling
+    5. Managed Memory Leaks
+        1. Timers
+        2. Diagnosing Memory Leaks
+    6. Weak References
+        1. Weak References and Caching
+        2. Weak References and Events
+14. Diagnostics
+    1. Conditional Compilation
+        1. Conditional Compilation Versus Static Variable Flags
+        2. The Conditional Attribute
+    2. Debug and Trace Classes
+        1. Fail and Assert
+        2. TraceListener
+        3. Flushing and Closing Listeners
+    3. Debugger Integration 
+        1. Attaching and Breaking
+        2. Debugger Attributes
+    4. Processes and Process Threads
+
         
         
 
