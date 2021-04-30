@@ -5,13 +5,13 @@ Joseph Albahari & Eric Johannsen
 ---
 
 1. [Preface](./1_Preface.md)  
-   1. Intended Audience 
+   1. Intended Audience
    2. How This Book Is Organized
    3. What You Need to Use This Book
    4. Conventions Used in This Book
    5. Using Code Examples
    6. O'Reilly Online Learning
-   7. We'd Like To Hear from You 
+   7. We'd Like To Hear from You
    8. Acknowledgments
         1. Joseph Albahari
         2. Eric Johannsen
@@ -45,7 +45,7 @@ Joseph Albahari & Eric Johannsen
        3. Conversions
        4. Value Types versus Reference Types
        5. Predefined Type Taxonomy
-    4. Numeric Types
+   4. Numeric Types
        1. Numeric Literals
        2. Numeric Conversions
        3. Arithmetic Operators
@@ -55,20 +55,20 @@ Joseph Albahari & Eric Johannsen
        7. Special Float and Double Values
        8. double Versus decimal
        9. Real-Number Rounding Errors
-    5. Boolean Type and Oprators  
+   5. Boolean Type and Oprators  
        1. bool Conversions  
        2. Equality and Comparison Operators  
        3. Conditional Operators  
-    6. Strings and Characters  
+   6. Strings and Characters  
        1. char Conversions
        2. String Type
-    7. Arrays  
+   7. Arrays  
        1. Default Element Initialization
        2. Indices and Ranges(C# 8)
        3. Multidimensional Arrays
        4. Simplified Array Initialization Expressions
        5. Bounds Checking
-    8. Variables and Parameters
+   8. Variables and Parameters
        1. The Stack and the Heap
        2. Definite Assignment
        3. Default Values
@@ -76,24 +76,24 @@ Joseph Albahari & Eric Johannsen
        5. Ref Locals
        6. Ref Returns
        7. var —— Implicitly Typed Local Variables
-    9. Expressions and Operators
+   9. Expressions and Operators
        1. Primary Expressions
        2. Void Expressions
        3. Assignment Expressions
        4. Operator Precedence and Associativity
        5. Operator Table
-    10. Null Operators  
+   10. Null Operators  
        1. Null-Coalescing Operator  
        2. Null-Coalescing Assignment Operator(C# 8)  
        3. Null-Conditional Operator  
-    11. Statements  
+   11. Statements  
        1. Declaration Statements  
        2. Expression Statements  
        3. Selection Statements  
        4. Iteration Statements  
        5. Jump Statements  
        6. Miscellaneous Statements  
-    12. Namespaces  
+   12. Namespaces  
        1. The using Directive  
        2. using static  
        3. Rules Within a Namespace  
@@ -135,16 +135,16 @@ Joseph Albahari & Eric Johannsen
        1. Struct Construction Semantics
        2. Read-only Structs and Functions  
        3. Ref Structs  
-   5.  Access Modifiers 
+   5. Access Modifiers
        1. Examples  
        2. Friend Assemblies
        3. Accessibility Capping
        4. Restrictions on Access Modifiers
    6. Interfaces  
        1. Extending an Interface  
-       2. Explicit Interface Implementation 
+       2. Explicit Interface Implementation
        3. Implementing Interface Members Virtually  
-       4. Reimplementing an Interface in a Subclass 
+       4. Reimplementing an Interface in a Subclass
        5. Interfaces and Boxing  
        6. Default Interface Members(C# 8)
    7. Enums  
@@ -161,7 +161,7 @@ Joseph Albahari & Eric Johannsen
        5. typeof and Unbound Generic Types
        6. The default Generic Value
        7. Generic Constraints  
-       8. Subclassing Generic Types 
+       8. Subclassing Generic Types
        9. Self-Referencing Generic Declarations
        10. Static Data
        11. Type Parameters and Conversions
@@ -177,7 +177,7 @@ Joseph Albahari & Eric Johannsen
        5. The Func and Action Delegates
        6. Delegates Versus Interfaces
        7. Delegates Compatibility
-   2. Events 
+   2. Events
        1. Standard Event Pattern
        2. Event Accessors
        3. Event Modifiers
@@ -195,13 +195,13 @@ Joseph Albahari & Eric Johannsen
        6. The Try XXX Method Pattern
        7. Alternatices to Exceptions
    6. Enumeration and Iterators
-       1. Enumeration 
+       1. Enumeration
        2. Collection Initializers
        3. Iterators
        4. Iterator Semantics
        5. Composing Sequences
    7. Nullable Value Types
-       1. Nullable<T> Struct
+       1. Nullable\<T> Struct
        2. Implicit and Explicit Nullable Conversions
        3. Boxing and Unboxing Nullable Values
        4. Operator Lifting
@@ -213,7 +213,7 @@ Joseph Albahari & Eric Johannsen
        1. The Null-Forgiving Operator
        2. Separating the Annotation and Warning Contexts
        3. Treating Nullable Warnings as Errors
-   9. Extension Methods 
+   9. Extension Methods
        1. Extension Method Chaining
        2. Ambiguity and Resolution
    10. Anonymous Types
@@ -292,7 +292,7 @@ Joseph Albahari & Eric Johannsen
        13. Cryptography
        14. Advanced Threading
        15. Parallel Programming
-       16. Span<T> and Memory<T>
+       16. Span\<T> and Memory\<T>
        17. Native and COM Interoprability
        18. Regular Expressions
        19. The Roslyn Compiler
@@ -325,21 +325,21 @@ Joseph Albahari & Eric Johannsen
        3. Date/Time Format Strings
        4. DateTimeStyles
        5. Enum Format Strings
-    6. Other Conversion Mechanisms
+   6. Other Conversion Mechanisms
        1. Convert
        2. XmlConvert
        3. Type Converters
        4. BitConverter
-    7. Globalization 
+   7. Globalization
        1. Globalization Checklist
        2. Testing
-    8. Working with Numbers
+   8. Working with Numbers
        1. Conversions
        2. Math
        3. BigInteger
        4. Complex
        5. Random
-    9. Enums
+   9. Enums
        1. Enum Conversions
        2. Enumerating Enum Values
        3. How Enums Work
@@ -366,7 +366,7 @@ Joseph Albahari & Eric Johannsen
        1. ICollection\<T> and ICollection
        2. IList\<T> and IList
        3. IReadOnlyCollection\<T> and IReadOnlyList\<T>
-   3. The Array Class 
+   3. The Array Class
        1. Construction and Indexing
        2. Enumeration
        3. Length and Rank
@@ -452,7 +452,7 @@ Joseph Albahari & Eric Johannsen
        3. Void → Sequence
     2. Filtering
        1. Where
-       2. Take and Skip 
+       2. Take and Skip
        3. TakeWhile and SkipWhile
        4. Distinct
     3. Projecting
@@ -476,17 +476,17 @@ Joseph Albahari & Eric Johannsen
        1. First, Last, and Single
        2. ElementAt
        3. DefaultIfEmpty
-   10. Aggregation Methods
-       1. Count and LongCount
-       2. Min and Max
-       3. Sum and Average
-       4. Aggregate
-   11. Quantifiers
-       1. Contains and Any
-       2. All and SequenceEqual
-   12. Generation Methods
-       1. Empty
-       2. Range and Repeat
+    10. Aggregation Methods
+        1. Count and LongCount
+        2. Min and Max
+        3. Sum and Average
+        4. Aggregate
+    11. Quantifiers
+        1. Contains and Any
+        2. All and SequenceEqual
+    12. Generation Methods
+        1. Empty
+        2. Range and Repeat
 11. LINQ to XML
     1. Architectural Overview
        1. What is a DOM?
@@ -498,10 +498,10 @@ Joseph Albahari & Eric Johannsen
        1. Functional Construction
        2. Specifying Content
        3. Automatic Deep Cloning
-    4. Navigating and Querying 
+    4. Navigating and Querying
        1. Child Node Navigation
        2. Parent Navigation
-       3. Peer Node Navigation 
+       3. Peer Node Navigation
        4. Attribute Navigation
     5. Updating an X-DOM
        1. Simple Value Updates
@@ -573,12 +573,86 @@ Joseph Albahari & Eric Johannsen
         1. Fail and Assert
         2. TraceListener
         3. Flushing and Closing Listeners
-    3. Debugger Integration 
+    3. Debugger Integration
         1. Attaching and Breaking
         2. Debugger Attributes
     4. Processes and Process Threads
-
-        
-        
-
-    
+        1. Examining Running Processes
+        2. Examining Threads in a Process
+    5. StackTrace and StackFrame
+    6. Windows Event Logs
+        1. Writing to the Event Log
+        2. Reading the Event Log
+        3. Monitoring the Event Log
+    7. Performance Counters
+        1. Enumerating the Available Counters
+        2. Reading Performance Counter Data
+        3. Creating Counters and Writing Performance Data
+    8. The Stopwatch Class
+    9. Cross-Platform Diagnostics Tools
+        1. dotnet-counters
+        2. dotnet-trace
+        3. dotnet-dump
+15. Concurrency and Asynchrony
+    1. Introdcution
+    2. Threading
+        1. Creating a Thread
+        2. Join and Sleep
+        3. Blocking
+        4. Local versus Shared State
+        5. Locking and Thread Safety
+        6. Passing Data to a Thread
+        7. Exception Handling
+        8. Foreground versus Background Threads
+        9. Thread Priority
+        10. Signaling
+        11. Threading in Rich Client Applications
+        12. Synchronization Contexts
+        13. The Thread Pool
+    3. Tasks
+        1. Starting a Task
+        2. Returning values
+        3. Exceptions
+        4. Continuations
+        5. TaskCompletionSource
+        6. Task.Delay
+    4. Principles of Asynchrony
+        1. Synchronous versus Asynchronous Operations
+        2. What Is Asynchronous Programming?
+        3. Asynchronous Programming and Continuations
+        4. Why Language Support Is Important
+    5. Asynchronous Functions in C#
+        1. Awaiting
+        2. Writing Asynchronous Functions
+        3. Asynchronous Lambda Expressions
+        4. Asynchronous Streams(C# 8)
+        5. Asynchronous Methods in WinRT
+        6. Asynchronous and Synchronization Contexts
+        7. Optimizations
+    6. Asynchronous Patterns
+        1. Cancellation
+        2. Progress Reporting
+        3. The Task-Based Asynchronous Pattern
+        4. Task Combinators
+        5. Asynchronous Locking
+    7. Obsolete Patterns
+        1. Asynchronous Programming Model
+        2. Event-Based Asynchronous Pattern
+        3. BackgroundWorker
+16. Streams and I/O
+    1. Stream Architecture
+    2. Using Streams
+        1. Reading and Writing
+        2. Seeking
+        3. Closing and Flushing
+        4. Timeouts
+        5. Thread Safety
+        6. Backing Store Streams
+        7. FileStream
+        8. MemoryStream
+        9. PipeStream
+        10. BufferedStream
+    3. Stream Adapters
+        1. Text Adapters
+        2. Binary Adapters
+        3. Closing and Disposing Stream Adapters
