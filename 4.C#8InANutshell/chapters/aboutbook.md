@@ -403,7 +403,7 @@ Joseph Albahari & Eric Johannsen
        2. IComparer and Comparer
        3. StringComparer
        4. IStructuralEquatable and IStructualComparable
-9. LINQ Querues
+9. LINQ Queries
    1. Getting Started
    2. Fluent Syntax
        1. Chaining Query Operators
@@ -656,3 +656,61 @@ Joseph Albahari & Eric Johannsen
         1. Text Adapters
         2. Binary Adapters
         3. Closing and Disposing Stream Adapters
+    4. Compression Streams
+        1. Compressing in Memory
+        2. Unix gzip File Compression
+    5. Working with ZIP Files
+    6. File and Directory Operations
+        1. The File Class
+        2. The Directory Class
+        3. FileInfo and DirectoryInfo
+        4. Path
+        5. Special Folders
+        6. Querying Volume Information
+        7. Catching Filesystem Events
+    7. File I/O in UWP
+        1. Working with Directories
+        2. Working with Files
+        3. Obtaining Directories and Files
+    8. OS Security
+        1. Running in a Standard User Account
+        2. Administrative Elevation and Virtualization
+    9. Memory-Mapped Files
+        1. Memory-Mapped Files and Random File I/O
+        2. Memory-Mapped Files and Shared Memory(Windows)
+        3. Cross-Platform Interprocess Shared Memory
+        4. Working with View Accessors
+17. Networking
+    1. Network Architecture
+    2. Addresses and Ports
+    3. URIs
+    4. Client-Side Classes
+        1. WebClient
+        2. WebRequest and WebResponse
+        3. HttpClient
+        4. Proxies
+        5. Authentication
+        6. Exception Handling
+    5. Working with HTTP
+        1. Headers
+        2. Query Strings
+        3. Uploading Form Data
+        4. Cookies
+    6. Writing an HTTP Server
+    7. Using FTP
+    8. Using DNS
+    9. Sending Mail with SmtpClient
+    10. Using TCP
+        1. Concurrency with TCP
+    11. Receiving POP3 Mail with TCP
+    12. TCP in UWP
+18. Serialization
+    1. Serialization Concepts
+        1. Serialization Engines
+        2. Formatters
+        3. Explicit Versus Implicit Serialization
+    2. The XML Serializer
+        1. Getting Started with Attribute-Based Serialization
+        2. Subclasses and Child Objects
+        3. Serializing Collections
+        4. IXmlSerializable
