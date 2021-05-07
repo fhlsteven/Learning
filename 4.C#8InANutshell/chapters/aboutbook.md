@@ -714,3 +714,257 @@ Joseph Albahari & Eric Johannsen
         2. Subclasses and Child Objects
         3. Serializing Collections
         4. IXmlSerializable
+    3. The JSON Serializer
+        1. Getting Started
+        2. Serializing Child Objects
+        3. Serializing Collections
+        4. Controlling Serialization with Attributes
+        5. Customing Data Conversion
+        6. JSON Serialization Options
+    4. The Binary Serialization
+        1. Getting Started
+    5. Binary Serialization Attributes
+        1. [NonSerialized]
+        2. [OnDeserializing]
+        3. [OnDeserialized]
+        4. [OnSerializing] and [OnSerialized]
+        5. [OptionalField] and Versioning
+    6. Binary Serialization with ISerializable
+        1. Subclassing Serializable Classes
+19. Assemblies
+    1. What's in an Assembly
+        1. The Assembly Manifest
+        2. The Application Manifest(Windows)
+        3. Modules
+        4. The Assembly Class
+    2. Strong Names and Assembly Signing
+        1. How to Strongly Name an Assembly
+    3. Assembly Names
+        1. Fully Qualified Names
+        2. The AssemblyName Class
+        3. Assembly Informational and File Versions
+    4. Authenticode Signing
+        1. How to Sign with Authenticode
+    5. Resources and Satellite Assemblies
+        1. Directly Embedding Resources
+        2. .resources Files
+        3. .resx Files
+        4. Satellite Assemblies
+        5. Cultures and Subcultures
+    6. Loading,Resolving,and Isolating Assemblies
+        1. Assembly Load Contexts
+        2. The Default ALC
+        3. The Current ALC
+        4. Assembly.Load and Contextual ALCs
+        5. Loading and Resolving Unmanaged Libraries
+        6. AssemblyDependencyResolver
+        7. Unloading ALCs
+        8. The Legacy Loading Methods
+        9. Writing a Plug-In System
+20. Reflection and Metadata
+    1. Reflecting and Activating Types
+        1. Obtaining a Type
+        2. Type Names
+        3. Base Types and Interfaces
+        4. Instantiating Types
+        5. Generic Types
+    2. Reflecting and Invoking Members
+        1. Member Types
+        2. C# Members versus CLR Members
+        3. Generic Type Members
+        4. Dynamically Invoking a Memeber
+        5. Method Parameters
+        6. Using Delegates for Performance
+        7. Accessing Nonpublic Members
+        8. Generic Methods
+        9. Anonymously Calling Members of a Generic Interface
+    3. Reflecting Assemblies
+        1. Modules
+    4. Working with Attributes
+        1. Attribute Basics
+        2. The AttributeUsage Attribute
+        3. Defining Your Own Attribute
+        4. Retrieving Attributes at Runtime
+    5. Dynamic Code Generation
+        1. Generating IL with DynamicMethod
+        2. The Evaluation Stack
+        3. Passing Arguments to a Dynamic Method
+        4. Generating Local Variables
+        5. Branching
+        6. Instantiating Objects and Calling Instance Methods
+        7. Exception Handling
+    6. Emitting Assemblies and Types
+        1. The Reflection.Emit Object Model
+    7. Emitting Type Members
+        1. Emitting Methods
+        2. Emitting Fields and Properties
+        3. Emitting Constructors
+        4. Attaching Attributes
+    8. Emitting Generic Methods and Types
+        1. Defining Generic Methods
+        2. Defining Generic Types
+    9. Awkward Emission Targets
+        1. Uncreated Closed Generics
+        2. Circular Dependencies
+    10. Parsing IL
+        1. Writing a Disassembler
+21. Dynamic Programming
+    1. The Dynamic Language Runtime
+    2. Numeric Type Unification
+    3. Dynamic Member Overload Resolution
+        1. Simplifying the Visitor Pattern
+        2. Anonymously Calling Members of a Generic Type
+    4. Implementing Dynamic Objects
+        1. DynamicObject
+        2. ExpandoObject
+    5. Interoperating with Dynamic Languages
+        1. Passing State Between C# and a Script
+22. Cryptography
+    1. Overview
+    2. Windows Data Protection
+    3. Hashing
+        1. Hash Algorithms in .NET Core
+        2. Hashing Passwords
+    4. Symmetric Encryption
+        1. Encrypting in Memory
+        2. Chaining Encryption Streams
+        3. Disposing Encryption Objects
+        4. Key Management
+    5. Public-Key Encryption and Signing
+        1. The RSA Class
+        2. Digital Signing
+23. Advanced Threading
+    1. Synchronization Overview
+    2. Exclusive Locking
+        1. The lock Statement
+        2. Monitor.Enter and Monitor.Exit
+        3. Choosing the Synchronization Object
+        4. When to Lock
+        5. Locking and Atomicity
+        6. Nested Locking
+        7. Deadlocks
+        8. Performance
+        9. Mutex
+    3. Locking and Thread Safety
+        1. Thread Safety and .NET Core Types
+        2. Thread Safety in Application Servers
+        3. Immutable Objects
+    4. Nonexclusive Locking
+        1. Semaphore
+        2. Reader/Writer Locks
+    5. Signaling with Event Wait Handles
+        1. AutoResetEvent
+        2. ManualResetEvent
+        3. CountdownEvent
+        4. Creating a Cross-Process EventWaitHandle
+        5. Wait Handles and Continuations
+        6. WaitAny,WaitAll,and SignalAndWait
+    6. The Barrier Class
+    7. Lazy Initializer
+        1. Lazy<T>
+        2. LazyInitializer
+    8. Thread-Local Storage
+        1. [ThreadStatic]
+        2. ThreadLocal\<T\>
+        3. GetData and SetData
+        4. AsyncLocal\<T\>
+    9. Timers
+        1. Multithreaded Timers
+        2. Single-Threaded Timers
+24. Parallel Programming
+    1. Why PFX?
+        1. PFX Concepts
+        2. PFX Components
+        3. When to Use PFX
+    2. PLINQ
+        1. Parallel Execution Ballistics
+        2. PLINQ and Ordering
+        3. PLINQ Limitations
+        4. Example:Parallel Spellchecker
+        5. Functional Purity
+        6. Setting the Degree of Parallelism
+        7. Cancellation
+        8. Optimizing PLINQ
+    3. The Parallel Class
+        1. Parallel.Invoke
+        2. Parallel.For and Parallel.ForEach
+    4. Task Parallelism
+        1. Creating and Starting Tasks
+        2. Waiting on Multiple Tasks
+        3. Canceling Tasks
+        4. Continuations
+        5. Task Schedulers
+        6. TaskFactory
+    5. Working with AggregateException
+        1. Flatten and Handle
+    6. Concurrent Collections
+        1. IProducerConsumerCollection\<T\>
+        2. ConcurrentBag\<T\>
+    7. BlockingCollection\<T\>
+        1. Writing a Producer/Consumer Queue
+25. Span\<T\> and Memory\<T\>
+    1. Spans and Slicing
+        1. CopyTo and TryCopyTo
+        2. Working with Text
+    2. Memory\<T\>
+    3. Forward-Only Enumerators
+    4. Working with Stack-Allocated and Unmanaged Memory
+26. Native and COM Interoperability
+    1. Calling into Native DLLs
+    2. Type Marshaling
+        1. Marshaling Common Types
+        2. Marshaling Classes and Structs
+        3. In and Out Marshaling
+    3. Callbacks from Unmanaged Code
+    4. Simulating a C Union
+    5. Shared Memory
+    6. Mapping a Struct to Unmanaged Memory
+        1. fixed and fixed {...}
+    7. COM Interoperability
+        1. The Purpose of COM
+        2. The Basics of the COM Type System
+    8. Calling a COM Component from C#
+        1. Optional Parameters and Named Arguments
+        2. Implicit ref Parameters
+        3. Indexers
+        4. Dynamic Binding
+    9. Embedding Interop Types
+        1. Type Equivalence
+    10. Exposing C# Objects to COM
+        1. Enabling Registry-Free COM
+27. Regular Expressions
+    1. Regular Expression Basics
+        1. Compiled Regular Expressions
+        2. RegexOptions
+        3. Character Escapes
+        4. Character Sets
+    2. Quantifiers
+        1. Greedy Versus Lazy Quantifiers
+    3. Zero-Width Assertions
+        1. Lookahead and Lookbehind
+        2. Anchors
+        3. Word Boundaries
+    4. Groups
+        1. Named Groups
+    5. Replacing and Splitting Text
+        1. MatchEvaluator Delegate
+        2. Splitting Text
+    6. Cookbook Regular Expressions
+        1. Recipes
+    7. Regular Expressions Language Reference
+28. The Roslyn Compiler
+    1. Roslyn Architecture
+        1. Workspaces
+        2. Scripting
+    2. Syntax Trees
+        1. SyntaxTree Structure
+        2. Obtaining a Syntax Tree
+        3. Traversing and Searching a Tree
+        4. Trivia
+        5. Transforming a Syntax Tree
+    3. Compilations and Semantic Models
+        1. Creating a Compilation
+        2. Emitting an Assembly
+        3. Querying the Semantic Model
+        4. Example:Renaming a Symbol
+29. Index
