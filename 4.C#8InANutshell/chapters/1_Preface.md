@@ -9,3 +9,24 @@ Like the past five editions, *C# 8.0 in a Nutshell* is organized around concepts
 This book covers C#, the Common Language Runtime(CLR), and the essential .NET Core assemblies. We've chosen this focus to allow space for difficult topics such as concurrency, security, and access to operating system functionality-without compromising depth or readability. Features new to C# 8 are flagged so that you can also use this book as a reference for C# 7.
 
 ## Intended Audience
+
+This book targets intermediate to advanced audiences. No prior knowledge of C# is required, but some general programming experience is necessary. For the beginner,this book complements, rather than repalces, a tutorial-style introduction to programming.
+
+This book is an ideal companion to any of the vast array of books that focus on an applied technology such as ASP.NET Core,Windows Presentation Foundation(WPF),and Universal Windows Platform(UWP). The areas of the language and .NET Core that such books omit,*C# 8.0 in a Nutshell* covers in detail,and vice versa.
+
+If you're looking for a book that skims every .NET technology,this is not for you. This book is also unsuitable if you want to learn about APIs specific to moblie device development.
+
+## How This Book is Organized
+
+Chapters 2 through 4 concentrate purely on C#, starting with the basics of syntax, types, and variables, and finishing with advanced topics such as unsafe code and preprocessor directives. If you're new to the languague, you should read these chapters sequentially.
+
+The remaining chapters cover essential elements of .NET Core, including
+
+3. What You Need to Use This Book
+4. Conventions Used in This Book
+5. Using Code Examples
+6. O'Reilly Online Learning
+7. We'd Like To Hear from You
+8. Acknowledgments
+    1. Joseph Albahari
+    2. Eric Johannsen
