@@ -20,10 +20,38 @@ If you're looking for a book that skims every .NET technology,this is not for yo
 
 Chapters 2 through 4 concentrate purely on C#, starting with the basics of syntax, types, and variables, and finishing with advanced topics such as unsafe code and preprocessor directives. If you're new to the languague, you should read these chapters sequentially.
 
-The remaining chapters cover essential elements of .NET Core, including
+The remaining chapters cover essential elements of .NET Core, including such topics as Language-Integrated Query(LINQ), XML,collections, concurrency, I/O and networking, memory management, reflection, dynamic programming, attributes, security, and native interoperability. You can read most of these chapters randomly, except for Chapters 5 and 6, which lay a foundation for subsequent topics. You're also best off reading the three chapters on LINQ in sequence, and some chapters assume some knowledge of concurrency,which we cover in Chapter 14. 
 
-3. What You Need to Use This Book
-4. Conventions Used in This Book
+## What You Need to Use This Book
+
+The examples in this book require .NET Core 3. You will also find Microsoft's .NET documentation useful to look up individual types and members(which is available online).
+
+Although it's possible to write source code in Notepad and build your program from the command line, you'll be much more productive with a *code scratchpad* for instantly testing code snippets, plus an *Integrated Development Environment*(IDE) for producing executables and libraries.
+
+For a Windows code scratchpad, download LINQPad 6 from [www.linqpad.net](www.linqpad.net)(free). LINQPad fully supports C# 8.0 and is maintained by one of the authors.
+
+For a Windows IDE, download Visual Studio 2019: any edition is suitable for what's taught in this book. For a cross-platform IDE, download Visual Sutdio Code.
+
+> Note   
+> All code listings for all chapters are available as interactive (editable) LINQPad samples. You can download the entire lot in a single click: at the bottom left, click the LINQPad's Samples tab,click "Download more samples", and then choose "C# 8.0 in a Nutshell".  
+> .NET Core is avaiable for Windows, Linux, and macOS. Certain cross-platform features were tested on Ubuntu Linux 18.04. That code is available on GitHub.
+
+## Conventions Used in This Book
+
+The book users basic UML notation to illustrate relationships between types, as shown in Figure P-1. A slanted rectangle means an abstract class; a circle means an interface. A line with a hollow triangle denotes inheritance, with the triangle pointing to the base type. A line with an arrow denotes a one-way association; a line without an arrow denotes a two-way association.
+
+![p_1](../resources/images/p_1.png)
+
+The following typographical conventions are used in this book:
+
+*Italic*  
+    Indicates new terms, URIs, filenames, and directories
+
+Constant width  
+    Indicates C# code, keywords and identifiers, and 
+
+
+
 5. Using Code Examples
 6. O'Reilly Online Learning
 7. We'd Like To Hear from You
