@@ -48,11 +48,20 @@ The following typographical conventions are used in this book:
     Indicates new terms, URIs, filenames, and directories
 
 Constant width  
-    Indicates C# code, keywords and identifiers, and 
+    Indicates C# code, keywords and identifiers, and program output 
 
+**Constant width bold**  
+    Shows a highlighted section of code
 
+*Constant with italic*  
+    Shows text that should be repalaced with user-supplied values
 
-5. Using Code Examples
+> Note  
+> This element signifies a general note.
+
+## Using Code Examples
+
+This book is here to help you get your job done. In general, you may use the code in this book in your programs and documenttation. You do not need to contact us for permission unless you're reproducung a significant portion of the code. For example, writing a program that uses several chunks of code from this book does not require permission. Selling or distributing examples from O'Reilly books *does* require permission.
 6. O'Reilly Online Learning
 7. We'd Like To Hear from You
 8. Acknowledgments
