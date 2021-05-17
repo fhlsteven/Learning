@@ -62,7 +62,15 @@ Constant width
 ## Using Code Examples
 
 This book is here to help you get your job done. In general, you may use the code in this book in your programs and documenttation. You do not need to contact us for permission unless you're reproducung a significant portion of the code. For example, writing a program that uses several chunks of code from this book does not require permission. Selling or distributing examples from O'Reilly books *does* require permission.
-6. O'Reilly Online Learning
+
+If you feel your use of code examples falls outside fair use or the permission given here,feel free to contact us at permissions@oreilly.com.
+
+## O'Reilly Online Learning
+
+> Note  
+> For more than 40 years,*[O'Reilly Media](https://www.oreilly.com/)* has provided technology and business training, knowledge, and insight to help companies succeed.
+
+Our unique 
 7. We'd Like To Hear from You
 8. Acknowledgments
     1. Joseph Albahari
