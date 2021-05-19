@@ -15,7 +15,7 @@ Joseph Albahari & Eric Johannsen
    8. Acknowledgments
         1. Joseph Albahari
         2. Eric Johannsen
-2. Introducing C# and .NET Core
+2. [Introducing C# and .NET Core](./1_Introducing_C#andCore.md)
    1. Object Orientation
    2. Type Safety
    3. Memory Management

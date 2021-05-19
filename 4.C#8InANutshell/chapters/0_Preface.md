@@ -70,8 +70,66 @@ If you feel your use of code examples falls outside fair use or the permission g
 > Note  
 > For more than 40 years,*[O'Reilly Media](https://www.oreilly.com/)* has provided technology and business training, knowledge, and insight to help companies succeed.
 
-Our unique 
-7. We'd Like To Hear from You
-8. Acknowledgments
-    1. Joseph Albahari
-    2. Eric Johannsen
+Our unique network of experts and innovators share their knowledge and expertise through books, articles, and our online learning platform. O'Reilly's online learning platform gives you on-demand access to live training courses,in-depth learning paths, interactive coding environments, and a vast collection of text and video from O'Reilly and 200+ other publishers. For more information, please visit *[http://oreilly.com](http://oreilly.com)*.
+
+## We'd Like To Hear from You
+
+Please address comments and questions concerning this book to the publisher:
+
+* O'Reilly Media,Inc.  
+  1005 Gravenstein Highway North  
+  Sebastopol, CA 95472
+
+* 800-998-9938 (in the United States or Canada)
+
+* 707-829-0515 (international or local)
+
+* 707-829-0104 (fax)
+
+We have a web page for this book, where we list errata, examples, and any additional information. You can access this page at:
+
+* *[https://oreil.ly/c-sharp-8](https://oreil.ly/c-sharp-8)*
+
+Code listings and additional resources are provided at:
+
+* *[http://www.albahari.com/nutshell](http://www.albahari.com/nutshell)*
+
+To comment or ask technical questions about this book, send an email
+to:
+
+* bookquestions@oreilly.com
+
+For more information about our books, conferences, Resource
+Centers, and the O’Reilly Network, see our website at:
+
+* [http://www.oreilly.com](http://www.oreilly.com)
+
+## Acknowledgments
+
+### Joseph Albahari
+
+First, I want to thank Eric Johannsen for his help on this edition-particularly for his work in making the book Unix friendly. I also want to thank my brother, Ben Albahari, for his contributions on earlier editons.
+
+It's been an honor to have superb technical reviewers on the team. I'd like to extend particular thanks to Vitek Karas and Stephen Toub from Microsoft for providing invaluable feedback at a busy time. Also, my thanks to Paulo Morgado, Aaron Robinson, Jan Vorlicek, and Sam Gentile for their contributions.
+
+The book was built on previous editions, whose technical reviewers I owe a similar honor: in the past two editions, Rod Stephens, Jared Parsons, Stephen Toub, Matthew Groves, Dixin Yan, Lee Coward, Bonnie DeWitt, Wonseok Chae, Lori Lalonde, and James
+Montemagno. And in previous editions, Eric Lippert, Jon Skeet,
+Stephen Toub, Nicholas Paldino, Chris Burrows, Shawn Farkas,
+Brian Grunkemeyer, Maoni Stephens, David DeWinter, Mike Barnett,
+Melitta Andersen, Mitch Wheat, Brian Peek, Krzysztof Cwalina,
+Matt Warren, Joel Pobar, Glyn Griffiths, Ion Vasilian, Brad Abrams,
+and Adam Nathan.
+
+I appreciate that many of the technical reviewers are accomplished individuals at Microsoft, and I particularly thank you for taking the time to raise this book to the next quality bar.
+
+I want to thank the O'Reilly team-particularly my efficient and responsive editor Corbin Collins. Finally, my deepest thanks to my wonderful wife, Li Albahari, whose presence kept me happy throughout the project.
+
+### Eric Johannsen
+
+It's remarkable how the internet allows collaboration with some of the world's smartest people from the confines of my home office.
+
+I thank Joseph Albahari for inviting me to collaborate on this amazing project.
+
+The Microsoft employees and community members who collaborate on [.NET Core on GitHub](https://github.com/dotnet/corefx) are tremendously responsive and helpful. If I couldn't find a solution to a tricky question already documented there, my own questions were answered in short order.Thank you for your support.
+
+I wouldn't have been able to accept Joseph's offer without the loving support of my family. I thank my wife, Rose, for picking up the slack during this busy time, and my triplet children, Sydney, Alexis, and Ryan, for their understanding.
