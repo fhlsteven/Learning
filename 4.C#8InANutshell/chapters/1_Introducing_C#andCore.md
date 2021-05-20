@@ -99,6 +99,33 @@ A CLR does not ship on its own, but as part of a *framework* that includes a sta
 A framework comproses three layers, as illustrated in Figure 1-1. The
 Base Class Libraries (BCL) sit atop the CLR, providing features useful to any kind of application (such as collections, XML/JSON, input/output [I/O]), networking, serialization, and parallel programming). Sitting atop the BCL are *application framework* layers, which provide the APIs for a user interface paradigm (such as  ASP.NET Core for a web application, or Windows Presentation Foundation [WPF] for a rich-client application). A command-line program does not require an application layer.
 
+![framework_architecture](../resources/images/1_1.png)
+*Figure 1-1. Framework architecture*
+
+When C# was first released in 2000, there was just the Microsoft
+.NET Framework. Now there are four major framework choices:
+
+* .NET Core  
+    Modern open source framework for writing web and console applications that run on  Windows, Linux, and macOS-and rich-client applications that run on Windows 7 through 10 (with .NET Core 3+). You can install multiple versions of .NET Core side by side, and applications can be *self-contained*, so as not to require a .NET Core installation.
+
+* UWP  
+    For writing immersive touch-first applications that run on Windows 10 desktop and devices (Xbox, Surface Hub, and Hololens). UWP apps are sandboxed and ship via the Windows Store. UWP is preinstalled with Windows 10.
+
+* Mono + Xamarin
+    Open source framework for writing mobile apps that run on IOS and Android.
+
+* .NET Framework (superseded by .NET Core 3)
+    For writing web and rich-client applications that target Windows desktop/server. No major new releases are planned, although Microsoft will continue to support and maintain the current 4.8 release due to the wealth of existing applications. .NET Framework is preinstalled in Windows and supports C# 7.3 and earlier.
+
+Although each of these frameworks differ in their platform support and intended uses, they all expose a similar CLR and BCL.
+
+> NOTE
+> You can take advantage of this commonality and write class libraries that work across multiple frameworks-see ".NET Standard" in Chapter 5.
+
+This book focuses on C# and the core functionality of the CLR and BCL, as shown in Figure 1-2. Even though the main emphasis is on .NET Core 3, we also cover some of the Windows Runtime types for UWP apoplications that provide functionality in parallel to the BCL.
+
+
+
 ## Legacy and Niche Frameworks
 
 ## Windows Runtime
