@@ -99,7 +99,7 @@ A CLR does not ship on its own, but as part of a *framework* that includes a sta
 A framework comproses three layers, as illustrated in Figure 1-1. The
 Base Class Libraries (BCL) sit atop the CLR, providing features useful to any kind of application (such as collections, XML/JSON, input/output [I/O]), networking, serialization, and parallel programming). Sitting atop the BCL are *application framework* layers, which provide the APIs for a user interface paradigm (such as  ASP.NET Core for a web application, or Windows Presentation Foundation [WPF] for a rich-client application). A command-line program does not require an application layer.
 
-![framework_architecture](../resources/images/1_1.png)
+![framework_architecture](../resources/images/1_1.png)  
 *Figure 1-1. Framework architecture*
 
 When C# was first released in 2000, there was just the Microsoft
