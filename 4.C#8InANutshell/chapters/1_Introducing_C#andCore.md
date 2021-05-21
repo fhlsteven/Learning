@@ -124,9 +124,16 @@ Although each of these frameworks differ in their platform support and intended 
 
 This book focuses on C# and the core functionality of the CLR and BCL, as shown in Figure 1-2. Even though the main emphasis is on .NET Core 3, we also cover some of the Windows Runtime types for UWP apoplications that provide functionality in parallel to the BCL.
 
-
+![figure_1_2](../resources/images/1_2.png)  
+*Figure 1-2. Topics covered in this book-the application frameworks (swhow in gray(green)) are not covered*
 
 ## Legacy and Niche Frameworks
+
+The following frameworks are still available to support older platforms:
+
+* Windows Runtime for Windows 8/8.1 (now UWP)
+
+* Microsoft XNA for game development (now UWP)
 
 ## Windows Runtime
 
