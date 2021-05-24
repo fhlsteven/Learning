@@ -135,7 +135,23 @@ The following frameworks are still available to support older platforms:
 
 * Microsoft XNA for game development (now UWP)
 
+* .NET Core 1.x and 2.x (for web and command-line applications only)
+
+There are also the following niche frameworks:
+
+* The .NET Micro Frameworks is for running .NET code on highly resource-constrained embedded devices (under one megabyte).
+
+* Mono (upon which Xamarin sits) also has an application layer to develop cross-platform desktop "Windows Forms" applications on Linux, macOS, and Windows. Not all features are supported or work fully. (Another option for cross-platform user interface [UI] development is *Avalonia*, which is a WPF-inspired library that runs atop .NET Core and .NET Framework.)
+
+* Unity is a game development platform that allows game logic to be scripted with C#.
+
+It's also possible to run managed code within SQL Server. With SQL Server CLR integration, you can write custom functions, stored procedures, and aggregations in C# and then call them from SQL. This works in conjunction with .NET Framework and a special "hosted" CLR that enforces a sandbox to protect the integrity of the SQL Server process.
+
 ## Windows Runtime
+
+C# also interoperates with *Windows Runtime* (WinRT) technology. WinRT means two things:
+
+* A language-neutral object-oriented execution
 
 ## A Brief History of C\#
 
