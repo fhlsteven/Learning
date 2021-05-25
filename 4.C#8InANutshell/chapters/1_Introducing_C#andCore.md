@@ -151,7 +151,18 @@ It's also possible to run managed code within SQL Server. With SQL Server CLR in
 
 C# also interoperates with *Windows Runtime* (WinRT) technology. WinRT means two things:
 
-* A language-neutral object-oriented execution
+* A language-neutral object-oriented execution interface supported in Windows 8 and above
+
+* A set of libraries baked into Windows 8 and above that support this execution interface
+
+> NOTE  
+> Somewhat confusingly, the term *WinRT* has historically been used to mean two more things:
+> * The predecessor to UWP; that is, the development platform for writing Store apps for Windows 8/8.1, sometimes called "Metro" or "Modern"
+> * The defunct mobile operating system for RISC-based tablets (“Windows RT”) that Microsoft released in 2011
+
+By *execution interface*, we mean a protocol for calling code that's (potentially) written in another language. Microsoft Windows has historically provided a primitive execution interface in the form of low-level C-style function calls comprising the Win32 API.
+
+WinRT is much richer, In part, it is an enhanced version of 
 
 ## A Brief History of C\#
 
