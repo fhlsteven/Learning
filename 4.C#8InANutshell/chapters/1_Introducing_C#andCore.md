@@ -174,9 +174,54 @@ In C#, you not only can consume WinRT libraries, you can also write your own (an
 
 ## A Brief History of C\#
 
+The following is a reverse chronology of the new features in each C# version, for the benefit of readers who are already familiar with an older version of the language.
+
 ### What's New in C# 8.0
 
+C# 8.0 ships with *Visual Studio 2019*.
+
 ### What's New in C# 7.x
+
+#### INDICES AND RANGES
+
+*Indices and ranges* simplify working with elements or portions of an array (or the low-level types `Span<T>` and `ReadOnlySpan<T>`).
+
+Indices let you refer to elements relative to the *end* of an array by using the `^` operator. `^1` refers to the last element, `^2` refers to the second-to-last element, and so on:
+
+```C#
+char[] vowels = new char[] {'a','e','i','o','u'}; 
+char lastElement  = vowels[^1]; // 'u' 
+char secondToLast = vowels[^2];   //'o'
+```
+
+Ranges let you “slice” an array by using the `..` operator:
+
+```C#
+char[] firstTwo  = vowels[..2];     // 'a', 'e'
+char[] lastThree = vowels[2..];     // 'i', 'o', 'u'
+char[] middleOne = vowels[2..3];    // 'i'
+char[] lastTwo   = vowels[^2..];    //'o','u'
+```
+
+C# implements indexes and ranges with the help of the `Index` and `Range` types:
+
+```C#
+Index last = ^1;
+Range firstTwoRange = 0..2; 
+char[]firstTwo = vowels[firstTwoRange]; //'a','e'
+```
+
+You can support indices and ranges in your own classes by defining an indexer with a parameter type of `Index` or `Range`:
+
+```C#
+class Sentence
+{
+    string[] words = "The quick brown fox".Split();
+
+    public string this   [Index index] => words[index];
+    public string[] this [Range range] => words[range];
+}
+```
 
 ### What's New in C# 6.0
 
