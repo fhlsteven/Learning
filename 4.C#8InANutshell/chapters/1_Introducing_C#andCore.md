@@ -223,6 +223,51 @@ class Sentence
 }
 ```
 
+For more information, see "Indices and Ranges (C# 8)" in Chapter 2.
+
+#### NULL-COALESCING ASSIGNMENT
+
+The `??=` operator assigns a variable only if it's null. Instead of this:
+
+```C#
+if (s == null) s = "Hello, world";
+```
+
+you can now write this:
+
+```C#
+s ??= "Hello, world";
+```
+
+#### USING DECLARATIONS
+
+If you omit the brackets and statement block following a `using` statement, it becomes a *using declaration*. The resource is then disposed when execution falls outside the *enclosing* statement block:
+
+```C#
+if (File.Exists ("file.txt"))
+{
+    using var reader = File.OpenText ("file.txt");
+    Console.WriteLine (reader.ReadLine());
+    ...
+}
+```
+
+In this case, `reader` will be disposed when execution falls outside the `if` statement block.
+
+#### READONLY MEMBERS
+
+C# 8 lets you apply the `readonly` modifier to a struct's *functions*, ensuring that if the function attempts to modify any field, a compile-time error is generated:
+
+```C#
+struct Point
+{
+    public int X, Y;
+    public readonly void ResetX() => X = 0;  // Errpr!
+}
+```
+
+If a `readonly` function calls a non-readonly function, the compiler generates a warning (and defensively copies the struct to avoid the possibility of a mutation).
+
 ### What's New in C# 6.0
 
 ### What's New in C# 5.0
