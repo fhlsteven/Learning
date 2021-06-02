@@ -180,8 +180,6 @@ The following is a reverse chronology of the new features in each C# version, fo
 
 C# 8.0 ships with *Visual Studio 2019*.
 
-### What's New in C# 7.x
-
 #### INDICES AND RANGES
 
 *Indices and ranges* simplify working with elements or portions of an array (or the low-level types `Span<T>` and `ReadOnlySpan<T>`).
@@ -267,6 +265,148 @@ struct Point
 ```
 
 If a `readonly` function calls a non-readonly function, the compiler generates a warning (and defensively copies the struct to avoid the possibility of a mutation).
+
+#### STATIC LOCAL METHODS
+
+Adding the `static` modifier to a local method prevents it from seeing the local variables and parameters of the enclosing method. This helps to reduce coupling as well as enabling the local method to declare variables as it pleases, without risk of colliding with those in the containing method.
+
+#### DEFAULT INTERFACE MEMBERS
+
+C# 8 lets you add a default implementation to an interface member, making t optional to implement:
+
+```C#
+interface ILogger
+{
+    void Log(string text) => Console.WriteLine(text);
+}
+```
+
+This means that you can add a member to an interface without breaking implementations. Default implementations must be called explicitly through the interface:
+
+```C#
+((ILogger)new Logger()).Log ("message");
+```
+
+Interfaces can also define static members (including fields), which can be accessed from code inside default implementations:
+
+```C#
+interface ILogger
+{
+    void Log(string text) => Console.WriteLine(Prefix + text);
+    static string Prefox = "";
+}
+```
+
+or from outside the interface:
+
+```C#
+Ilogger.Prefix = "File log:";
+```
+
+unless restricted via an accessibility modifier on the static interface member (such as `private`, `protected`, or `internal`). Instance fields are prohibited.
+
+For more details, see “Default Interface Members (C# 8)” in Chapter 3.
+
+### SWITCH EXPRESSIONS
+
+From C# 8, you can use `switch` in the context of an *expression*:
+
+```C#
+string cardName = cardNumber switch // assuming cardNumber is an 
+int 
+{
+    13 => "King",
+    12 => "Queen",
+    11 => "Jack",
+    _ => "Pip card"     // equivalent to 'default'
+};
+```
+
+For more examples, see “switch expressions (C# 8)” in Chapter 2.
+
+#### TUPLE, POSITIONAL, AND PROPERTY PATTERNS
+
+C# 8 supports three new patterns, mostly for the benefit of `switch` statements/expressions (see “Patterns” in Chapter 4). *Tuple patterns* let you switch on multiple values:
+
+```C#
+int cardNumber = 12; string value = "spades";
+string cardNumber = (cardNumber, suite) switch
+{
+    (13, "spades") => "king of spades", 
+    (13, "clubs") => "King of clubs",
+    ...
+}
+```
+
+Positional patterns allow a similar syntax for objects that expose a deconstructor, and *property patterns* let you match on an object’s properties. You can use all of the patterns both in switches and by the `is` operator. The following example uses a property pattern to test whether `obj` is a string with a length of 4:
+
+```C#
+if(obj is string { Length:4 }) ...
+```
+
+#### NULLABLE REFERENCE TYPES
+
+Whereas *nullable value types* bring nullability to value types, *nullable reference types* do the opposite and bring (a degree of) *non-nullability* to reference types, with the purpose of helping to avoid `NullReferenceExceptions`. Nullable reference types introduce a level of safety that’s enforced purely by the compiler in the form of warnings or errors when it detects code that’s at risk of generating a `NullReferenceException`.
+
+Nullable reference types can be enabled either at the project level (via the *Nullable* element in the *.csproj* project file) or in code (via the `#nullable` directive). After it’s enabled, the compiler makes non-nullability the default: if you want a reference type to accept nulls, you must apply the `?` suffix to indicate a *nullable reference type*:
+
+```C#
+#nullable enable  // Enable nullable reference types from this point on 
+
+string s1 = null; // Generates a compiler warning! (s1 is non-nullable)
+string? s2 = null; // OK: s2 is nullable reference type
+```
+
+Uninitialized fields also generate a warning (if the type is not marked as nullable), as does dereferencing a nullable reference type, if the compiler thinks a `NullReferenceException` might occur:
+
+```C#
+void Foo(string? s) => Console.Write(s.Length);     // Warning (.Length)
+```
+
+To remove the warning, you can use the *null-forgiving* operator (`!`):
+
+```C#
+void Foo (string? s) => Console.Write(s!.Length);
+```
+
+For a full discussion, see "Nullable Reference Types(C# 8)" in Chapter 4.
+
+#### ASYNCHRONOUS STREAMS
+
+Prior to C# 8, you could use yield return to write an iterator, or await to write an asynchronous function. But you couldn’t do both and write an iterator that awaits, yielding elements asynchronously. C# 8 fixes this through the introduction of *asynchronous streams*:
+
+```C#
+async IAsyncEnumerable<int> RangeAsync(int start, int count, int delay)
+{
+    for(int i = start; i < start + count; i++)
+    {
+        await Task.Delay(delay);
+        yield return i;
+    }
+}
+```
+
+The `await` `foreach` statement consumes an asynchronous stream:
+
+```C#
+await foreach(var number in RangeAsync(0, 10, 100))
+    Console.WriteLine(number);
+```
+
+For more information, see “Asynchronous Streams (C# 8)” in Chapter 14.
+
+### What's New in C# 7.x
+
+C# 7 shipped with Visual Studio 2017.
+
+#### C# 7.3
+
+C# 7.3 made minor improvements to existing features, such as enabling use of the equality operators with tuples, improved overload resolution, and the ability to apply attributes to the backing fields of automatic properties:
+
+```C#
+[field:NonSerialized]
+public int MyProperty { get; set; }
+```
 
 ### What's New in C# 6.0
 
