@@ -408,6 +408,61 @@ C# 7.3 made minor improvements to existing features, such as enabling use of the
 public int MyProperty { get; set; }
 ```
 
+C# 7.3 also built on C# 7.2’s advanced low-allocation programming features, with the ability to reassign *ref locals*, no requirement to pin when indexing fixed fields, and field initializer support with `stackalloc`:
+
+```C#
+int* pointer  = stackalloc int[] {1, 2, 3};
+Span<int> arr = staclalloc [] {1, 2, 3}; 
+```
+
+Notice that stack-allocated memory can be assigned directly to a `Span<T>`. We describe spans—and why you would use them—in Chapter 24.
+
+#### C# 7.2
+
+C# 7.2 added a new `private` `protected` modifier (the *intersection* of `internal` and `protected`), the ability to follow named arguments with positional ones when calling methods, and `readonly` structs. A `readonly` struct enforces that all fields are `readonly`, to aid in declaring intent and to allow the compiler more optimization freedom:
+
+```C#
+readonly struct Point
+{
+    public readonly int X, Y;       // X and Y must be readonly
+}
+```
+
+C# 7.2 also added specialized features to help with micro-optimization and low-allocation programming: see “The in modifier”, “Ref Locals”, and “Ref Returns” in Chapter 2, and “Ref Structs” in Chapter 3.
+
+#### C# 7.1
+
+From C# 7.1, you can omit the type when using the `default` keyword, if the type can be inferred:
+
+```C#
+decimal number = default;   // number is decimal
+```
+
+C# 7.1 also relaxed the rules for `switch` statements (so that you can pattern-match on generic type parameters), allowed a program’s Main method to be asynchronous, and allowed tuple element names to be inferred:
+
+```C#
+var now = DateTime.Now;
+var tuple = (now.Hour, now.Minute, now.Second);
+```
+
+##### NUMERIC LITERAL IMPROVEMENTS
+
+Numeric literals in C# 7 can include underscores to improve readability. These are called *digit separators* and are ignored by the compiler:
+
+```C#
+int million = 1_000_000;
+```
+
+*Binary literals* can be specified with the `0b` prefix:
+
+```C#
+var b = 0b1010_1011_1100_1101_1110_1111;
+```
+
+##### OUT VARIABLES AND DISCARDS
+
+
+
 ### What's New in C# 6.0
 
 ### What's New in C# 5.0
