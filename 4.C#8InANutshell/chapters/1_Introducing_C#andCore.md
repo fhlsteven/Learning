@@ -627,6 +627,54 @@ string Capitalize(string value) =>
 
 ### What's New in C# 6.0
 
+C# 6.0, which shipped with Visual Studio 2015, features a new-generation compiler, completely written in C#. Known as project "Roslyn," the new compiler exposes the entire compilation pipeline via libraries, allowing you to perform code analysis on arbitrary source code (see Chapter 27). The compiler itself is open source, and the source code is available on GitHub.
+
+In addition, C# 6.0 featurea several minor but signigicant enhancements, aimed primarily at reducing code clutter.
+
+The *null-conditional*("Elvis") operator (see "Null Operators" in Chapter 2) avoids having to explicitly check for null before calling a method or accessing a type member. In the following example, result evaluates to null instead of throwing a `NullReferenceException` :
+
+```C#
+System.Text.StringBuilder sb = null;
+string result = sb?.ToString();     // result is null
+```
+
+*Expression-bodied functions* (see "Methods" in Chapter 3) allow methods, properties, operators, and indexers that comprise a single expression to be written more tersely, in the style of a lambda expression :
+
+```C#
+public int TimesTwo(int x) => x * 2;
+public string SomeProperty => "Property value";
+```
+
+*Property initializers* (Chapter 3) let you assign an initial value to an automatic property:
+
+```C#
+public DateTime TimeCreated { get; set; } = DateTime.Now;
+```
+
+Initialized properties can also be read-only:
+
+```C#
+public DateTime TimeCreated { get; } = DateTime.Now;
+```
+
+Read-only properties can also be set in the constructor, making it easier to create immutable (read-only) types.
+
+*Index initializers* (Chapter 4) allow single-step initialization of any type that exposes an indexer:
+
+```C#
+var dict = new Dictionary<int, string>()
+{
+    [3]  = "three",
+    [10] = "ten"
+};
+```
+
+*String interpolation* (see "String Type" in Chapter 2) offers a succinct alternative to `string.Format` :
+
+```C#
+string s = $"It is {DateTime.Now.DayOfWeek} today";
+```
+
 ### What's New in C# 5.0
 
 ### What's New in C# 4.0
