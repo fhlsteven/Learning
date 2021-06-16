@@ -675,6 +675,20 @@ var dict = new Dictionary<int, string>()
 string s = $"It is {DateTime.Now.DayOfWeek} today";
 ```
 
+*Exception filters* (see "try Statements and Exceptions" in Chapter 4) let you apply a condition to a `catch` block:
+
+```C#
+string html;
+try
+{
+    html = new WebClient().DownloadString("http://asef");
+}
+catch (WebException ex) when (ex.Status == WebExceptionStatus.Timeout)
+{
+    ...
+}
+```
+
 ### What's New in C# 5.0
 
 ### What's New in C# 4.0
