@@ -689,9 +689,37 @@ catch (WebException ex) when (ex.Status == WebExceptionStatus.Timeout)
 }
 ```
 
+The `using static` (see "Namespaces" in Chapter 2) directive lets you import all the static members of a type so that can use those members unqualified:
+
+```C#
+using static System.Console;
+...
+WriteLine("Hello, world");      // WriteLine instead of Console.WriteLine
+```
+
+The `nameof` (Chapter 3) operator returns the name of a variable, type, or other symbol as a string. This avoids breaking code when you rename a symbol in Visual Studio:
+
+```C#
+int capacity = 123;
+string x = nameof(capacity);        // x is "capacity"
+string y = nameof(Uri.Host);        // y is "Host"
+```
+
+And finally, you're now allowed to `await` inside `catch` and `finally` blocks.
+
 ### What's New in C# 5.0
 
+C# 5.0's big new feature was support for `asynchronous functions` via two new keywords, `async` and `await`. Asynchronous functions enable *asynchronours continuations*, which make it easier to write responsive and thread-safe rich-client applications. They also make it easy to write highly concurrent and efficient I/O-bound applications that don't tie up a thread resource per operation.
+
+We cover asynchrounous functions in detail in Chapter 14.
+
 ### What's New in C# 4.0
+
+C# 4.0 introduced four major enhancements:
+
+* *Dynamic binding* (Chapters 4 and 20) defers *binding* - the process of resolving types and members - from compile time to runtime and is useful in scenarios that would otherwise require complicated reflection code. Dynamic binding is also useful when interoprating with dynamic languages and COM components.
+
+* *Optional parameters* (Chapter 2) allow functions to specify default paramter values so that callers can omit arguments, and `named`
 
 ### What's New in C# 3.0
 
