@@ -719,8 +719,23 @@ C# 4.0 introduced four major enhancements:
 
 * *Dynamic binding* (Chapters 4 and 20) defers *binding* - the process of resolving types and members - from compile time to runtime and is useful in scenarios that would otherwise require complicated reflection code. Dynamic binding is also useful when interoprating with dynamic languages and COM components.
 
-* *Optional parameters* (Chapter 2) allow functions to specify default paramter values so that callers can omit arguments, and `named`
+* *Optional parameters* (Chapter 2) allow functions to specify default paramter values so that callers can omit arguments, and `named` arguments allow a function caller to identify an argument by name rather than position.
+
+* *Type variance rules* were relaxed in C# 4.0 (Chapters 3 and 4) , such that type parameters in generic interfaces and generic delegates can be marked as *covariant* or *contravariant*, allowing more natural type conversions.
+
+* *COM interoperability* (Chapter 25) was enhanced in C# 4.0 in three ways.First, arguments can be passed by reference without the `ref` keyword (particularly useful in conjunction with optional parameters). Second, assemblies that contain COM interop types can be *linked*
+rather than `referenced`. Linked interop types support type equivalence, avoiding the need for *Primary Interop Assemblies* and putting an en to versioning  and deployment headaches. Third, functios that return COM-Variant types from linked interop types are mapped to `dynamic` rather than `object`, eliminating the need for casting.
 
 ### What's New in C# 3.0
+
+The features added to C# 3.0 were mostly centered on *Laguage-Intergrated Query (LINQ)* capabilities. LINQ enables queries to be written directly within a C# program and checked statically for correctness, and query both local collections (such as lists or XML documents) or remote data sources(such as a database). The C# 3.0 features added to support LINQ comprised implicitly typed local variables, anonymous types, object initializers, lambda expressions, extension methods, query expressions, and exression trees.
+
+*Implicitly typed local variables* (`var` keyword, Chapter 2) let you omit the variable type in a declaration statement, allowing the compiler to infer it. This reduces clutter as well as allowing anonymous types (Chapter 4), which are simple classes created on the fly that are commonly used in the final output of LINQ queries. You can also implicitly type arrays (Chapter 2).
+
+*Object initializers* (Chapter 3) simplify object construction by allowing you to set properties inline after the constructor call. Object initializers work with both named and anonymous types.
+
+*Lambda expressions* (Chapter 4) are miniature functions created by the compiler on the fly; they are particularly useful in “fluent” LINQ queries (Chapter 8).
+
+
 
 ### What's New in C# 2.0
