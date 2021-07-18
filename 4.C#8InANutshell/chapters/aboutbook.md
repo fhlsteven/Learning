@@ -32,7 +32,7 @@ Joseph Albahari & Eric Johannsen
       5. What's New in C# 4.0
       6. What's New in C# 3.0
       7. What's New in C# 2.0
-3. C# Language Basics
+3. [C# Language Basics](./2_C#LanguageBasics.md)
    1. A First C# Program
        1. Compilation
    2. Syntax
