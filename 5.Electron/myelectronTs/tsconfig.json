@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module":"commonjs",
+        "target": "es2019",
+        "noImplicitAny": false,  // 在表达式和声明上有隐含的'any'类型时报错, 最好之后改成true
+        "sourceMap": true,
+        "outDir": "./dist",
+        "baseUrl": ".",
+        "paths": {
+            "*":["node_modules/*"]  // 输出目录
+        }
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
+/*
+可以看到这里指定了dist目录为输出目录, 而来源是src目录,
+它指明了: 将src目录下所有.ts文件, 编译为.js文件, 并且将.js文件, 放置在dist目录中, 其二级目录和多级目录, 和src目录保持一致.
+*/

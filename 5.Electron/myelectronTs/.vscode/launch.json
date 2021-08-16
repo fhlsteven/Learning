@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [{
+        "type": "node",
+        "request": "launch",
+        "name": "Electron JS", // 配置方案名字, 左下角可以选
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+        "program": "${workspaceFolder}/src/mainJS.js", // electron入口
+        "protocol": "inspector" // 默认的协议是legacy，该协议导致不进入断点
+    },{
+        "type": "pwa-node",
+        "request": "launch",
+        "name": "Electron TS",// 配置方案名字, 左下角可以选
+        "program": "${workspaceFolder}/dist/main.js",// 这里要写编译后的js文件, 即electron入口
+        "preLaunchTask": "tsc: build - tsconfig.json",
+        "sourceMaps": true,// 必须为true
+        "outFiles": ["${workspaceFolder}/**/*.js"],
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+        "protocol": "inspector" // 默认的协议是legacy，该协议导致不进入断点
+    }]
+}
