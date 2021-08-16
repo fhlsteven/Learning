@@ -78,3 +78,9 @@ C# recognizes a method called `Main` as signaling the default entry point if exe
 > NOTE
 >> An array(such as `string[]`) represents a fixed number of elements of a particular type. Arrays are specified by placing square brackets after the elemnt type. We describe them in "Arrays".
 
+(The `Main` method can also be declared `async` and return a `Task` or `Task<int>` in support of asynchronous programming, which we conver in Chapter 14.)
+
+Methods are one of several kinds of functions in C#. Another kind of function we used in our example program was the `*` operator, which performs multiplication. There are also *constructors*,*properties*,*events*,*indexers*, and *finalizers*.
+
+In our example, the two methods are grouped into a *class*. A class groups function memebers and data memebers to form an object-oriented building block. The `Console` class
+
