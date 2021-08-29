@@ -1,5 +1,5 @@
 // study https://www.cnblogs.com/silenzio/p/11580267.html
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 
 let mainWindow: Electron.BrowserWindow;
@@ -12,7 +12,13 @@ function createWindow(): void {
         height: 600,
         width: 800,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
+
+            // https://blog.csdn.net/adley_app/article/details/118143784?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-0&spm=1001.2101.3001.4242
+            // render.js Uncaught ReferenceError: require is not defined
+            nodeIntegration:true,
+            enableRemoteModule:true,
+            contextIsolation:false            
         }
     });
 
@@ -20,7 +26,7 @@ function createWindow(): void {
     mainWindow.loadFile(path.join(__dirname, '../html/index.html'));
 
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools({mode:'undocked'});
 
     // Emitted when the window is closed.
     mainWindow.on("close", () => {
@@ -76,4 +82,9 @@ const mySpawn = myChildProcess.spawn('D:\\Program Files (x86)\\Notepad++\\notepa
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.on("kill-child-now",(e,appUrl)=>{
+    console.log(appUrl);
+    mySpawn.kill();
+});
 

@@ -13,13 +13,17 @@ function createWindow() {
         height: 600,
         width: 800,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
+            // render.js Uncaught ReferenceError: require is not defined
+            nodeIntegration: true,
+            enableRemoteModule: true,
+            contextIsolation: false
         }
     });
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, '../html/index.html'));
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools({ mode: 'undocked' });
     // Emitted when the window is closed.
     mainWindow.on("close", () => {
         // Dereference the window object, usually you would store windows
@@ -66,4 +70,8 @@ const myChildProcess = require("child_process");
 const mySpawn = myChildProcess.spawn('D:\\Program Files (x86)\\Notepad++\\notepad++.exe');
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+electron_1.ipcMain.on("kill-child-now", (e, appUrl) => {
+    console.log(appUrl);
+    mySpawn.kill();
+});
 //# sourceMappingURL=main.js.map
