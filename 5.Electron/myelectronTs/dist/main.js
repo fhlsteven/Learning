@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// study https://www.cnblogs.com/silenzio/p/11580267.html
 const electron_1 = require("electron");
 const path = require("path");
 let mainWindow;
