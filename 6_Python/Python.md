@@ -404,7 +404,7 @@ abs('a')     # TypeError: bad operand type for abs(): 'str'
 
 ```py
 def my_abs(x):
-    if not isinstance(x, (int, float)):  # x,tuple
+    if not  (x, (int, float)):  # x,tuple
         raise TypeError('bad operand type')
     if x >= 0:
         return x
@@ -562,4 +562,120 @@ person('Jack', 24, 'Beijing', 'Engineer') # TypeError: person() missing 2 requir
 def person(name, age, *, city='Beijing', job):
     print(name, age, city, job)
 
+```
+
+#### 参数组合
+
+参数定义的顺序必须是：必选参数、默认参数、可变参数、命名关键字参数和关键字参数。
+
+任意函数通过类似`func(*args, **kw)`的形式调用
+
+```py
+def f1(a, b, c=0, *args, **kw):
+    print('a =', a, 'b =', b, 'c =', c, 'args =', args, 'kw =', kw)
+
+def f2(a, b, c=0, *, d, **kw):
+    print('a =', a, 'b =', b, 'c =', c, 'd =', d, 'kw =', kw)
+
+f1(1, 2)                # a = 1 b = 2 c = 0 args = () kw = {}
+f1(1, 2, c=3)           # a = 1 b = 2 c = 3 args = () kw = {}
+f1(1, 2, 3, 'a', 'b')   # a = 1 b = 2 c = 3 args = ('a', 'b') kw = {}
+f1(1, 2, 3, 'a', 'b', x=99) # a = 1 b = 2 c = 3 args = ('a', 'b') kw = {'x': 99}
+f2(1, 2, d=99, ext=None) # a = 1 b = 2 c = 0 d = 99 kw = {'ext': None}
+
+args = (1, 2, 3, 4)
+kw = {'d': 99, 'x': '#'}
+f1(*args, **kw) # a = 1 b = 2 c = 3 args = (4,) kw = {'d': 99, 'x': '#'}
+
+args = (1, 2, 3) 
+kw = {'d': 88, 'x': '#'}
+f2(*args, **kw) # a = 1 b = 2 c = 3 d = 88 kw = {'x': '#'}
+```
+
+小结
+
+Python的函数具有非常灵活的参数形态，既可以实现简单的调用，又可以传入非常复杂的参数。
+
+默认参数一定要用不可变对象，如果是可变对象，程序运行时会有逻辑错误！
+
+要注意定义可变参数和关键字参数的语法：
+
+`*args`是可变参数，`args`接收的是一个`tuple`；
+
+`**kw`是关键字参数，kw接收的是一个`dict`。
+
+以及调用函数时如何传入可变参数和关键字参数的语法：
+
+可变参数既可以直接传入：`func(1, 2, 3)`，又可以先组装`list`或`tuple`，再通过`*args`传入：`func(*(1, 2, 3))`；
+
+关键字参数既可以直接传入：`func(a=1, b=2)`，又可以先组装`dict`，再通过`**kw`传入：`func(**{'a': 1, 'b': 2})`。
+
+使用`*args`和`**kw`是Python的习惯写法，当然也可以用其他参数名，但最好使用习惯用法。
+
+命名的关键字参数是为了限制调用者可以传入的参数名，同时可以提供默认值。
+
+定义命名的关键字参数在没有可变参数的情况下不要忘了写分隔符`*`，否则定义的将是位置参数。
+
+### 递归函数
+
+函数在内部调用自身本身;
+
+函数调用通过栈（`stack`）实现，每当进入一个函数调用，栈就会加一层栈帧，每当函数返回，栈就会减一层栈帧。栈的大小不是无限的，递归调用的次数过多，会导致栈溢出；解决递归调用栈溢出通过**尾递归**，函数返回时，调用自身本身；
+
+阶乘：$fact(n)=n!=1×2×3×⋅⋅⋅×(n−1)×n=(n−1)!×n=fact(n−1)×n$
+
+```py
+def fact(n):
+    if n==1:
+        return 1
+    return n * fact(n - 1)
+
+# ===> fact(5)
+# ===> 5 * fact(4)
+# ===> 5 * (4 * fact(3))
+# ===> 5 * (4 * (3 * fact(2)))
+# ===> 5 * (4 * (3 * (2 * fact(1))))
+# ===> 5 * (4 * (3 * (2 * 1)))
+# ===> 5 * (4 * (3 * 2))
+# ===> 5 * (4 * 6)
+# ===> 5 * 24
+# ===> 120
+
+def fact(n):
+    return fact_iter(n, 1)
+
+def fact_iter(num, product):
+    if num == 1:
+        return product
+    return fact_iter(num - 1, num * product)
+# return fact_iter(num - 1, num * product)仅返回递归函数本身，num - 1和num * product在函数调用前就会被计算
+
+# ===> fact_iter(5, 1)
+# ===> fact_iter(4, 5)
+# ===> fact_iter(3, 20)
+# ===> fact_iter(2, 60)
+# ===> fact_iter(1, 120)
+# ===> 120
+```
+
+---
+
+## 高级特性
+
+### 切片
+
+```py
+L = ['Michael', 'Sarah', 'Tracy', 'Bob', 'Jack']
+L[0:3] # ['Michael', 'Sarah', 'Tracy']
+L[:3]  # ['Michael', 'Sarah', 'Tracy']
+L[-2:] # ['Bob', 'Jack']
+L[-2:-1] # ['Bob']
+
+L = list(range(100)) # [0, 1, 2, 3, ..., 99]
+L[:10] # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+L[-10:] # [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]
+L[10:20] # [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+L[:10:2] # [0, 2, 4, 6, 8] 前10个数，每两个取一个
+L[::5] # [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95] 所有数，每5个取一个
+L[:] # [0, 1, 2, 3, ..., 99] 原样复制list
 ```
