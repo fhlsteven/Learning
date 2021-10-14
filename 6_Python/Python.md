@@ -658,6 +658,23 @@ def fact_iter(num, product):
 # ===> 120
 ```
 
+```py
+# 汉诺塔游戏
+def move(n, a, b, c):
+    #如果n=1,直接a到c
+    if n == 1:
+        print(a, '-->', c)
+    #n＞1,视为1个最大的圆盘和剩余n-1个圆盘当一个整体移动,
+    #那n-1个移到b,最大那个移到c,即可实现递归
+    else:
+        move(n-1,a,c,b)  # n-1个以整体移到b
+        print(a,'-->',c) # 剩下那个最大的移到c
+        move(n-1,b,a,c)  # n-1个变成新的问题:如何将n-1个从b移到c.(递归即可)
+
+move(3, 'A', 'B', 'C')
+
+```
+
 ---
 
 ## 高级特性
@@ -678,4 +695,110 @@ L[10:20] # [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 L[:10:2] # [0, 2, 4, 6, 8] 前10个数，每两个取一个
 L[::5] # [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95] 所有数，每5个取一个
 L[:] # [0, 1, 2, 3, ..., 99] 原样复制list
+
+list(rang(6,0,-1))  # [6, 5, 4, 3, 2, 1]
 ```
+
+### 迭代
+
+使用`for`循环，只要作用于一个**可迭代对象**即可正常运行
+
+通过`collections.abc`模块的`Iterable`类型判断可迭代
+
+`enumerate`函数可以把一个`list`变成**索引-元素**
+
+```py
+from collections.abc import Iterable
+L = [2,4,7]
+for i in L:   # list 迭代
+    print(i)
+
+T = (3,6,9)
+for t in T:  # tuple 迭代
+    print(t)
+
+D = {'a': 1, 'b': 2, 'c': 3} 
+
+for key in D: # dict 迭代, 默认迭代的是 key
+    print(key)
+
+for value in D.values(): # dict 迭代 value
+    print(value)
+
+for k, v in D.items(): # 同时迭代 key 和 value
+   print(f'key:{k},value:{v}')
+
+for ch in 'ABC': # 迭代字符串
+    print(ch)
+
+isinstance('abc', Iterable)   # str是否可迭代 True
+isinstance([1,2,3], Iterable) # list是否可迭代 True
+isinstance(123, Iterable) # 整数是否可迭代 False
+
+for i, value in enumerate(['A', 'B', 'C']):  # 0 A   1 B   2 C
+    print(i,value)
+
+# 同时引用了两个变量
+for x, y in [(1, 1), (2, 4), (3, 9)]:  # 1 1   2 4    3 9
+    print(x,y)
+```
+
+### 列表生成式
+
+列表生成式即 *List Comprehensions*
+
+```py
+list(range(1, 11)) # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+L = []
+for x in range(1, 11):
+    L.append(x * x)
+L   # [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# 这行代替上面的
+[x * x for x in range(1, 11)] # [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# for 后面还能跟 if
+[x * x for x in range(1, 11) if x % 2 == 0] # [4, 16, 36, 64, 100]
+
+# 两层循环，全排列
+[m + n for m in 'ABC' for n in 'XYZ'] # ['AX', 'AY', 'AZ', 'BX', 'BY', 'BZ', 'CX', 'CY', 'CZ']
+
+import os # 导入os模块
+[d for d in os.listdir('.')] # os.listdir可以列出文件和目录
+#  ['.emacs.d', '.ssh', '.Trash', 'Adlm', 'Applications', 'Desktop', 'Documents', 'Downloads', 'Library', 'Movies', 'Music', 'Pictures', 'Public', 'VirtualBox VMs', 'Workspace', 'XCode']
+```
+
+`for`循环其实可以同时使用两个甚至多个变量，比如`dict`的`items()`可以同时迭代`key`和`value`
+
+```py
+d = {'x': 'A', 'y': 'B', 'z': 'C' }
+for k, v in d.items():
+    print(k, '=', v)
+
+# x = A
+# y = B
+# z = C
+
+# 列表生成式使用两个变量生成list
+[k + '=' + v for k, v in d.items()] # ['x=A', 'y=B', 'z=C']
+
+# 把一个list中所有的字符串变成小写
+L = ['Hello', 'World', 'IBM', 'Apple']
+[s.lower() for s in L]  # ['hello', 'world', 'ibm', 'apple']
+```
+
+列表生成式中的 `if ... else`:
+
+* `for` 后面的 `if` 是一个筛选条件，不能带 `else`
+* `for` 前面的 `if` 是一个表达式，必须带`else`
+
+```py
+[x for x in range(1, 11) if x % 2 == 0] # [2, 4, 6, 8, 10]
+[x if x % 2==0 else -x for x in range(1,11)] # [-1, 2, -3, 4, -5, 6, -7, 8, -9, 10]
+
+```
+
+`isinstance`函数可以判断一个变量是不是字符串
+
+
