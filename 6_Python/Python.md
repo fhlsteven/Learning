@@ -801,4 +801,32 @@ L = ['Hello', 'World', 'IBM', 'Apple']
 
 `isinstance`函数可以判断一个变量是不是字符串
 
+### 生成器
+
+循环过程中不断推算出后面的元素
+
+```py
+L = [x * x for x in range(10)] # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+g = (x * x for x in range(10)) # <generator object <genexpr> at 0x7f831c7c7050>
+next(g) # 0
+next(g) # 1
+next(g) # 4
+
+for n in g:
+    print(n)   # 9 16, 25, 36, 49, 64, 81
+
+# 
+def fib(max):   # <function fib at 0x7f831da6fd40>
+    n,a,b = 0,0,1
+    while n < max:
+        print(b)
+        a,b = b,a+b # 相当于 t = (b, a + b);a = t[0];b = t[1]  # t 是一个tuple
+        n = n+1
+    return 'done'
+
+fib(6) # 1 1 2 3 5 8 'done'
+```
+
+
+
 
