@@ -815,7 +815,6 @@ next(g) # 4
 for n in g:
     print(n)   # 9 16, 25, 36, 49, 64, 81
 
-# 
 def fib(max):   # <function fib at 0x7f831da6fd40>
     n,a,b = 0,0,1
     while n < max:
@@ -826,6 +825,103 @@ def fib(max):   # <function fib at 0x7f831da6fd40>
 
 fib(6) # 1 1 2 3 5 8 'done'
 ```
+
+generator 函数 遇到 `yield`语句返回，再次执行时从上次返回的`yield`语句处继续执行。
+
+**调用generator函数会创建一个generator对象，多次调用generator函数会创建多个相互独立的generator。**
+
+```py
+# generator 函数
+def fib(max):
+    n,a,b = 0,0,1
+    while n < max:
+        yield b
+        a,b = b,a+b
+        n=n+1
+    return 'done'
+
+f = fib(6) # f => <generator object fib at 0x7f831dacf150>
+
+for n in fib(6):
+    print(n)     # 1 1 2 3 5 8
+
+g = fib(6)
+while True:
+    try:
+        x= next(g)
+        print('g:',x)
+    except StopIteration as e:
+        print('Generator return value:',e.value)
+        break
+
+# g:1 g:1 g:2 g:3 g:5 g:8 Generator return value: done
+
+# 杨辉三角
+def triangles():
+    L=[1]
+    while True:
+        yield L
+        L = L + [0]
+        L = [L[i]+L[i-1] for i in range(len(L))]
+
+n=0
+results = []
+for t in triangles():
+    results.append(t)
+    n = n+1
+    if n ==10:
+        break
+
+for t in results:
+    print(t)
+
+# [1]
+# [1, 1]
+# [1, 2, 1]
+# [1, 3, 3, 1]
+# [1, 4, 6, 4, 1]
+# [1, 5, 10, 10, 5, 1]
+# [1, 6, 15, 20, 15, 6, 1]
+# [1, 7, 21, 35, 35, 21, 7, 1]
+# [1, 8, 28, 56, 70, 56, 28, 8, 1]
+# [1, 9, 36, 84, 126, 126, 84, 36, 9, 1]
+
+```
+
+### 迭代器
+
+作用于 `for` 的数据类型
+
+* 集合，`list`,`tuple`,`dict`,`set`,`str`等
+* `generator`,带 `yield` 的 generator function
+
+可直接作用于 `for` 循环的对象统称为可迭代独享：`Iterable`
+可以被`next()`函数调用不断返回下一个值的对象 `Iterator`
+
+`iter()` 把 `list`,`dict`,`str` 等 `Iterable` 变成 `Iterator`  
+
+使用 `isinstance()` 判断
+
+```py
+from collections.abc import Iterable
+
+isinstance([],Iterable) # True
+isinstance({},Iterable) # True
+isinstance('abc',Iterable) # True
+isinstance((x for x in range(10)), Iterable) # True
+isinstance(123,Iterable) # False
+
+isinstance((x for x in range(10)), Iterator) # True
+isinstance([],Iterator) # False
+isinstance({},Iterator) # False
+isinstance('abc',Iterator) # False
+
+isinstance(iter([]),Iterator)     # True
+isinstance(iter('abc'), Iterator) # True
+```
+
+
+
 
 
 
