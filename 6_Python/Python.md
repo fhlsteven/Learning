@@ -897,8 +897,8 @@ for t in results:
 
 可直接作用于 `for` 循环的对象统称为可迭代独享：`Iterable`
 可以被`next()`函数调用不断返回下一个值的对象 `Iterator`
-
-`iter()` 把 `list`,`dict`,`str` 等 `Iterable` 变成 `Iterator`  
+`iter()` 把 `list`,`dict`,`str` 等 `Iterable` 变成 `Iterator`
+Python的`for`循环本质上就是通过不断调用`next()`函数实现的
 
 使用 `isinstance()` 判断
 
@@ -911,6 +911,8 @@ isinstance('abc',Iterable) # True
 isinstance((x for x in range(10)), Iterable) # True
 isinstance(123,Iterable) # False
 
+from collections.abc import Iterator
+
 isinstance((x for x in range(10)), Iterator) # True
 isinstance([],Iterator) # False
 isinstance({},Iterator) # False
@@ -920,9 +922,75 @@ isinstance(iter([]),Iterator)     # True
 isinstance(iter('abc'), Iterator) # True
 ```
 
+为什么`list`、`dict`、`str`等数据类型不是`Iterator`？
+>因为Python的`Iterator`对象表示的是一个**数据流**，`Iterator`对象可以被`next()`函数调用并不断返回下一个数据，直到没有数据时抛出`StopIteration`错误。可以把这个数据流看做是一个**有序序列**，但我们却不能提前知道序列的长度，只能不断通过`next()`函数实现按需计算下一个数据，所以`Iterator`的计算是惰性的，只有在需要返回下一个数据时它才会计算。
+>`Iterator`甚至可以表示一个无限大的数据流，例如全体自然数。而使用`list`是永远不可能存储全体自然数的。
+
+[Collections Abstract Base Classes, Iterator Types](https://docs.python.org/3/library/collections.abc.html#collections-abstract-base-classes)
+
+* `Iterable` 对象需要实现 `__iter__` 方法
+* `Iterator` 继承自 Iterable, 因而也必须实现 `__iter__` 方法， 并且原则上此方法应直接返回 `self`, 即对象本身，但非强制。
+* `Iterator` 还需要实现 `__next__` 方法
+
+一个 `Iterator` 对象需且仅需同时具有 `__iter__` 和 `__next__` 方法
+生成器是一个用于创建迭代器的简单而强大的工具，也就是说生成器也是迭代器
+
+## 函数式编程(Functional Programming)
+
+函数式编程的一个特点就是，允许把函数本身作为参数传入另一个函数，还允许返回一个函数！
+Python不是纯函数式编程语言(可以使用变量)
+
+### 高阶函数
+
+* 变量可以指向函数(函数可以复制给变量)
+* 函数名也是变量
+* 传入参数（高阶函数：一个函数接收另一个函数作为参数）
+
+```py
+abs(-10) # 10
+abs      # <built-in function abs>
+x = abs(-10)
+x        # 10
+f = abs
+f        # <built-in function abs>
+f(-10)   # 10
+
+abs = 10
+abs(-10) # Traceback (most recent call last):  File "<stdin>", line 1, in <module>  TypeError: 'int' object is not callable
+
+def add(x, y, f):    # 高阶函数
+    return f(x)+f(y)
+
+add(-5,6,abs)  # 11
+```
+
+#### `map`、`reduce`
+
+* `map()`函数接收两个参数，一个是函数，一个是`Iterable`，`map`将传入的函数依次作用到序列的每个元素，并把结果作为新的`Iterator`返回
+
+```py
+def f(x):
+    return x * x
+
+r = map(f, [1,2,3,4,5,6,7,8,9])  # r 是Iterator 惰性序列
+list(r)     #  [1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+list(map(str, [1, 2, 3, 4, 5, 6, 7, 8, 9])) # ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+```
+
+* `reduce()`把一个函数作用在一个序列`[x1, x2, x3, ...]`上，这个函数必须接收两个参数，`reduce`把结果继续和序列的下一个元素做累积计算，其效果就是
+
+`reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)`
+
+```py
+from functools import reduce
+def add(x,y):
+    return x + y
+reduce(add, [1,3,5,7,9]) # 25
+
+def fn(x,y):
+    return x*10 +y
+reduce(fn,[1,3,5,7,9])   # 13579
 
 
-
-
-
-
+```
