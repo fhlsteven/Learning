@@ -992,5 +992,28 @@ def fn(x,y):
     return x*10 +y
 reduce(fn,[1,3,5,7,9])   # 13579
 
+def char2num(s):
+    digits = {'0':0, '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8,'9':9}
+    return digits[s]
 
+reduce(fn, map(char2num,'13579')) # 13579
+```
+
+```py
+from functools import reduce
+
+DIGITS = {'0':0, '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8,'9':9}
+
+def str2int(s):
+    def fn(x,y):
+        return x*10 +y
+    def char2num(s):
+        return DIGITS[s]
+    return reduce(fn, map(char2num,s))
+
+def char2num2(s):
+    return DIGITS[s]
+
+def str2int2(s):
+    return reduce(lambda x, y:x*10+y, map(char2num, s))
 ```
