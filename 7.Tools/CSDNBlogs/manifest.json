@@ -1,0 +1,22 @@
+{
+    "name":"Blogs",
+    "description":"CSDN Blogs Analysis",
+    "version":"1.0.0.0",
+    "manifest_version":3,
+    "permissions":["activeTab","scripting","printing"],
+    "action":{
+        "default_popup":"main.html",
+        "default_icon":{
+            "16":"/images/b-16.png",
+            "32":"/images/b-32.png",
+            "48":"/images/b-48.png",
+            "128":"/images/b-128.png"
+        }
+    },
+    "icons":{
+        "16":"/images/b-16.png",
+        "32":"/images/b-32.png",
+        "48":"/images/b-48.png",
+        "128":"/images/b-128.png"
+    }
+}
