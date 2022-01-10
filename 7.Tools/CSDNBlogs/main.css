@@ -1,3 +1,16 @@
 body{
     background-color: wheat;
 }
+
+.button{
+    outline: none;
+    margin: 10px;
+    border: 1px sienna solid;
+    border-radius: 2px;
+    height: 30px;
+    width: 100px;
+    cursor: pointer;
+}
+.button:hover{
+    border: 2px salmon solid;
+}

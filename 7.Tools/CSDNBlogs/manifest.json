@@ -3,7 +3,7 @@
     "description":"CSDN Blogs Analysis",
     "version":"1.0.0.0",
     "manifest_version":3,
-    "permissions":["activeTab","scripting","printing"],
+    "permissions":["activeTab","scripting","pageCapture"],
     "action":{
         "default_popup":"main.html",
         "default_icon":{

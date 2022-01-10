@@ -1,15 +1,27 @@
 /* jshint esversion:9 */
-
 // window.addEventListener 属于 Firefox 和 Chrome 
 // window.addEventListener('DOMContentLoaded', handler, false);   //firefox
 // window.addEventListener('load', handler, false); // Chrome
 // window.attachEvent('onload',f); IE 需要用这个
-window.addEventListener("load",async()=>{   
-    let[tab] = await chrome.tabs.query({active:true, currentWindow:true});
-    chrome.scripting.executeScript({
-        target:{tabId:tab.id},
-        function:findBlogsInfo,
-        args:[ARTICLE_LIST_CLASS_NAME]
+window.addEventListener("load", async()=>{   
+    console.log("lodaded");
+    let getAll = document.getElementById("getAll");
+    let saveAsMhtml = document.getElementById("saveMhtml");
+
+    getAll.addEventListener("click", async()=>{
+        let[tab] = await chrome.tabs.query({active:true, currentWindow:true});
+        chrome.scripting.executeScript({
+            target:{tabId:tab.id},
+            function:findBlogsInfo,
+            args:[ARTICLE_LIST_CLASS_NAME]
+        });
+    });
+
+    saveAsMhtml.addEventListener("click",async()=>{
+        let [tab] = await chrome.tabs.query({active:true, currentWindow:true});
+        chrome.pageCapture.saveAsMHTML({tabId:tab.id},(mhtmlData)=>{
+            saveAs(mhtmlData, tab.title+'.mhtml');
+        });
     });
 });
 
@@ -27,7 +39,7 @@ function findBlogsInfo(articleListClassName){
     }
     document.getElementsByTagName("body")[0].innerHTML='';
 
-    for(let i =articles.length-1;i>=0;i--){
+    for(let i =articles.length-1;i>=37;i--){
         articles[i].index = i;
         getHtmlInfo(articles[i]);
         sleep(1500);
@@ -44,10 +56,7 @@ function findBlogsInfo(articleListClassName){
                 div.innerHTML = xhr.responseText;
                 div.dataset.index= articleDetail.index;
                 document.getElementsByTagName("body")[0].appendChild(div);
-                sleep(1000);     
-                chrome.printing.submitJob({ job:{}},function(res){
-                        console.log(res);                
-                });
+                sleep(1000);
             }
         };
         xhr.open("get",articleDetail.href,false);
