@@ -975,7 +975,7 @@ def f(x):
 r = map(f, [1,2,3,4,5,6,7,8,9])  # r 是Iterator 惰性序列
 list(r)     #  [1, 4, 9, 16, 25, 36, 49, 64, 81]
 
-list(map(str, [1, 2, 3, 4, 5, 6, 7, 8, 9])) # ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+list(map(str, [1, 2, 3, 4, 5, 6, 7, 8, 9])) # ['1', '2', '3', '4', '5', '6', '7', '8', '9'] 把这个list所有数字转为字符串
 ```
 
 * `reduce()`把一个函数作用在一个序列`[x1, x2, x3, ...]`上，这个函数必须接收两个参数，`reduce`把结果继续和序列的下一个元素做累积计算，其效果就是
@@ -999,6 +999,8 @@ def char2num(s):
 reduce(fn, map(char2num,'13579')) # 13579
 ```
 
+把`str`转换为`int`
+
 ```py
 from functools import reduce
 
@@ -1014,6 +1016,413 @@ def str2int(s):
 def char2num2(s):
     return DIGITS[s]
 
-def str2int2(s):
+def str2int2(s):  # 最简化
     return reduce(lambda x, y:x*10+y, map(char2num, s))
+```
+
+把字符串`'123.456'`转换成浮点数`123.456`
+
+```py
+from functools import reduce
+def str2float(s):
+    s1 ,s2 = s.split('.')
+    num_dict = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}
+    def char2num(x):
+        return num_dict[x]
+    return reduce(lambda x,y : x*10+y ,map(char2num , s1)) + reduce(lambda x,y: x/10+y, map(char2num , s2[::-1]))/10 # s2[::-1] 字符串反转
+```
+
+#### `filter`
+
+`filter()`函数用于过滤序列。`filter()`把传入的函数依次作用于每个元素，根据返回值`True`,`False`决定是否保留该元素
+`filter()`函数返回的是一个`Iterator`惰性序列，要强迫`filter()`完成计算结果，需要用`list()`函数获得所有结果并返回`list`。
+
+```py
+# 在list中删掉偶数保留奇数
+def is_odd(n):
+    return n % 2 == 1
+
+list(filter(is_odd, [1, 2, 4, 5, 6, 9, 10, 15]))
+# 结果: [1, 5, 9, 15]
+
+# 删掉序列中的空字符串
+def not_empty(s):
+    return s and s.strip()
+list(filter(not_empty, ['A', '', 'B', None, 'C', '  ']))
+# 结果: ['A', 'B', 'C']
+```
+
+计算素数的一个方法是[埃氏筛法](https://baike.baidu.com/item/%E5%9F%83%E6%8B%89%E6%89%98%E6%96%AF%E7%89%B9%E5%B0%BC%E7%AD%9B%E6%B3%95/374984?fromtitle=%E5%9F%83%E6%8B%89%E6%89%98%E8%89%B2%E5%B0%BC%E7%AD%9B%E9%80%89%E6%B3%95&fromid=4524938)
+
+首先，列出从`2`开始的所有自然数，构造一个序列：
+`2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...`
+取序列的第一个数`2`，它一定是素数，然后用`2`把序列的`2`的倍数筛掉：
+`3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...`
+取新序列的第一个数`3`，它一定是素数，然后用3把序列的`3`的倍数筛掉：
+`5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...`
+取新序列的第一个数`5`，然后用`5`把序列的`5`的倍数筛掉：
+`7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...`
+不断筛下去，就可以得到所有的素数
+
+```py
+# (从3开始的奇数序列) 生成器-无限序列
+def _odd_iter():
+    n = 1
+    while True:
+        n = n + 2
+        yield n
+
+# 筛选函数
+def _not_divisible(n):
+    return lambda x: x % n > 0
+
+# 生成器 不断返回下一个素数
+def primes():
+    yield 2
+    it = _odd_iter() # 初始序列
+    while True:
+        n = next(it) # 返回序列的第一个数
+        yield n
+        it = filter(_not_divisible(n), it) # 构造新序列  it = filter(lambda x: x % n > 0, it)
+
+# 打印1000以内的素数:
+for n in primes():
+    if n < 1000:
+        print(n)
+    else:
+        break
+```
+
+```py
+# 回数是指从左向右读和从右向左读都是一样的数，例如12321，909
+def is_palindrome(n):
+    return str(n)==str(n)[::-1]
+# 测试:
+output = filter(is_palindrome, range(1, 1000))
+print('1~1000:', list(output))
+```
+
+#### `sorted`
+
+排序算法
+
+```py
+sorted([36, 5, -12, 9, -21])
+# 对list排序 [-21, -12, 5, 9, 36]
+
+# key指定的函数将作用于list的每一个元素上
+sorted([36, 5, -12, 9, -21], key=abs)
+# [5, 9, -12, -21, 36]
+
+sorted(['bob', 'about', 'Zoo', 'Credit'])
+# ['Credit', 'Zoo', 'about', 'bob']
+sorted(['bob', 'about', 'Zoo', 'Credit'], key=str.lower)
+# ['about', 'bob', 'Credit', 'Zoo']
+
+# 反向排序
+sorted(['bob', 'about', 'Zoo', 'Credit'], key=str.lower, reverse=True)
+# ['Zoo', 'Credit', 'bob', 'about']
+
+L = [('Bob', 75), ('Adam', 92), ('Bart', 66), ('Lisa', 88)]
+L2 = sorted(L, key=lambda t : t[0])  # 按姓名排序
+print(L2)
+L3 = sorted(L, key=lambda t : -t[1])  # 按分高到低排序
+print(L3)
+L4 = sorted(L, key=lambda t : t[1], reverse=True)  # 按分高到低排序
+print(L4)
+```
+
+### 返回函数
+
+#### 函数作为返回值
+
+```py
+# 求和函数
+def calc_sum(*args):
+    ax = 0
+    for n in args:
+        ax = ax + n
+    return ax
+
+# 返回求和函数，在需要的时候调用
+def lazy_sum(*args):
+    def sum():
+        ax = 0
+        for n in args:
+            ax = ax + n
+        return ax
+    return sum
+
+f = lazy_sum(1, 3, 5, 7, 9) # <function lazy_sum.<locals>.sum at 0x0000018999D6D160>
+f()  # 25
+# 调用lazy_sum()时，每次都会返回一个新的函数，即使传入相同的参数
+
+f1 = lazy_sum(1, 3, 5, 7, 9)
+f == f1 # False  f()和f1()调用结果互不影响
+```
+
+#### 闭包
+
+当一个函数返回了一个函数后，其内部的局部变量还被新函数引用
+**返回闭包时牢记一点：返回函数不要引用任何循环变量，或者后续会发生变化的变量。**
+
+```py
+def count():
+    fs = []
+    for i in range(1, 4):
+        def f():
+             return i*i
+        fs.append(f)
+    return fs
+
+f1, f2, f3 = count()
+
+f1() # 9
+f2() # 9
+f3() # 9
+
+def count2():
+    def f(j):
+        def g():
+            return j*j
+        return g    # lambda : j*j
+    fs = []
+    for i in range(1, 4):
+        fs.append(f(i)) # f(i)立刻被执行，因此i的当前值被传入f()
+    return fs
+
+f12, f22, f32 = count2()
+
+f12() # 1
+f22() # 4
+f32() # 9
+```
+
+nonlocal
+
+使用闭包，内层函数引用了外层函数的局部变量。只读外层变量，返回的闭包函数调用一切正常
+
+**使用闭包时，对外层变量赋值前，需要先使用`nonlocal`声明该变量不是当前函数的局部变量。**
+
+```py
+def inc():
+    x = 0
+    def fn():
+        # 仅读取x的值:
+        return x + 1
+    return fn
+
+f = inc()
+print(f()) # 1
+print(f()) # 1
+
+# 对外层变量赋值，由于Python解释器会把x当作函数fn()的局部变量
+def inc():
+    x = 0
+    def fn():
+        # nonlocal x   # 解释器把fn()的x看作外层函数的局部变量，它已经被初始化了，可以正确计算x+1
+        x = x + 1 # UnboundLocalError: local variable 'x' referenced before assignment(x作为局部变量并没有初始化，直接计算x+1是不行的)
+        return x
+    return fn
+
+f = inc()
+print(f()) # 1
+print(f()) # 2
+
+
+def createCounter():
+    num = 0
+    def counter():
+        nonlocal num 
+        num = num + 1
+        return num
+    return counter
+
+counterA = createCounter()
+print(counterA(), counterA(), counterA(), counterA(), counterA()) # 1 2 3 4 5
+```
+
+### 匿名函数
+
+关键字`lambda`表示匿名函数，
+缺点：只能有一个表达式，不用写`return`，返回值就是该表达式的结果
+有点：不必担心函数名冲突，函数对象可赋值给变量
+
+```py
+f = lambda x: x * x
+f(5) # 25
+
+L = list(filter(lambda x: x%2 ==1, range(1, 20))) # 奇数
+```
+
+跟普通函数一样，lambda 也支持 无参数、默认参数 和可变参数
+无参数：`lambda :100 #传入一个固定值或者其他值`
+默认参数：`lambda a,b=20,c=30 :a+b+c`
+可变参数：`fn=lambda *a:list(a) ; print(fn(1,2,3)) #输出[1,2,3]`
+可变参数：`fn=lambda **kws: kws ; print(fn(l1=1,l2=2,l3=3)) #输出{'l1': 1, 'l2': 2, 'l3': 3}`
+
+### 装饰器
+
+Python的decorator可以用函数实现，也可以用类实现。
+
+```py
+def now():
+    print('2015-3-25')
+
+f = now
+f()  # 2015-3-25
+now.__name__ #'now'
+f.__name__ #'now'
+```
+
+假设增强`now()`函数的功能，比如，在函数调用前后自动打印日志，但又不修改`now()`函数的定义，在代码运行期间动态增加功能的方式，称之为“装饰器”（Decorator）。decorator就是一个返回函数的高阶函数
+
+```py
+# 接受一个函数作为参数，并返回一个函数
+def log(func):
+    def wrapper(*args, **kw):
+        print('call %s():' % func.__name__)
+        return func(*args, **kw)
+    return wrapper
+
+# 借助Python的@语法，把decorator置于函数的定义处
+@log   # now = log(now)
+def now():
+    print('2015-3-25')
+
+now() # call now():
+      # 2015-3-25
+```
+
+由于`log()`是一个decorator，返回一个函数，所以，原来的`now()`函数仍然存在，只是现在同名的`now`变量指向了新的函数，于是调用`now()`将执行新函数，即在`log()`函数中返回的`wrapper()`函数。
+`wrapper()`函数的参数定义是`(*args, **kw)`，因此，`wrapper()`函数可以接受任意参数的调用。在`wrapper()`函数内，首先打印日志，再紧接着调用原始函数。
+
+```py
+# decorator本身需要传入参数
+def log(text):
+    def decorator(func):
+        def wrapper(*args, **kw):
+            print('%s %s():' % (text, func.__name__))
+            return func(*args, **kw)
+        return wrapper
+    return decorator
+
+@log('execute')   # now = log('execute')(now)
+def now():
+    print('2015-3-25')
+
+now()  # execute now():
+       # 2015-3-25
+now.__name__ # 'wrapper'
+```
+
+首先执行`log('execute')`，返回的是`decorator`函数，再调用返回的函数，参数是`now`函数，返回值最终是`wrapper`函数
+因为返回的那个`wrapper()`函数名字就是`'wrapper'`，所以需要把原始函数的`__name__`等属性复制到`wrapper()`函数中，否则，有些依赖函数签名的代码执行就会出错
+
+不需要编写`wrapper.__name__ = func.__name__`这样的代码，使用Python内置的`functools.wraps`
+
+```py
+import functools
+
+def log(func):
+    @functools.wraps(func)  # 处理函数名等属性
+    def wrapper(*args, **kw):
+        print('call %s():' % func.__name__)
+        return func(*args, **kw)
+    return wrapper
+
+import functools
+
+def log(text):
+    def decorator(func):
+        @functools.wraps(func) # 处理函数名等属性
+        def wrapper(*args, **kw):
+            print('%s %s():' % (text, func.__name__))
+            return func(*args, **kw)
+        return wrapper
+    return decorator
+```
+
+```py
+# 打印函数执行时间
+import time, functools
+def metric(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kw):
+        t = time.time()
+        ret = fn(*args, **kw)
+        t2 = time.time()
+        print('%s executed in %s ms' % (fn.__name__, t2-t))
+        return ret
+    return wrapper
+
+@metric
+def fast(x, y):
+    time.sleep(0.0012)
+    return x + y
+
+@metric
+def slow(x, y, z):
+    time.sleep(0.1234)
+    return x * y * z
+
+f = fast(11, 22)
+s = slow(11, 22, 33)
+```
+
+```py
+# 既支持  @log 又支持 @log('execute')
+def log(func):
+    # print(func)
+    if callable(func):  # 检查一个对象是否是可调用的. 对于函数、方法、lambda 函式、 类以及实现了 __call__ 方法的类实例, 它都返回 True。
+        @functools.wraps(func)
+        def wrap(*args, **kw):
+            print('no args %s():' % (func.__name__))
+            print("begin call")
+            r = func(*args, **kw)
+            print("end call")
+            return r
+        return wrap
+    
+    def decorator(fn):
+        @functools.wraps(fn)
+        def wrap(*args, **kw):
+            print('args  %s %s():' % (func, fn.__name__))
+            print("begin call")
+            r = fn(*args, **kw)
+            print("end call")
+            return r
+        return wrap  
+    return decorator        
+```
+
+### 偏函数
+
+`functools`模块提供了很多有用的功能，其中一个就是偏函数（Partial function）
+
+```py
+int('12345')            # 12345
+# 传入base参数，就可以做N进制的转换
+int('12345', base=8)    # 5349
+int('12345', 16)        # 74565
+
+# 假设要转换大量的二进制字符串，每次都传入int(x, base=2)非常麻烦，于是可以定义一个int2()的函数，默认把base=2传进去
+def int2(x, base=2):
+    return int(x, base)
+
+int2('1000000')  # 64
+int2('1010101')  # 85
+```
+
+利用`functools.partial`创建一个偏函数,把一个函数的某些参数给固定住(设置默认值),返回一个新的函数，调用这个新函数会更简单
+
+```py
+import functools
+int2 = functools.partial(int, base=2)
+int2('1000000')  # 64
+int2('1010101')  # 85
+# 也可以传入 base 值
+int2('1000000', base=10) # 1000000
+
+int2('10010') # 相当于 kw = { 'base': 2 }  int('10010', **kw)
 ```
