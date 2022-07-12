@@ -1425,4 +1425,232 @@ int2('1010101')  # 85
 int2('1000000', base=10) # 1000000
 
 int2('10010') # 相当于 kw = { 'base': 2 }  int('10010', **kw)
+
+max2 = functools.partial(max, 10) # 实际上会把10作为*args的一部分自动加到左边
+max2(5, 6, 7) # args = (10, 5, 6, 7)   max(*args)
 ```
+
+## 模块
+
+模块是一组Python代码的集合，可以使用其他模块，也可以被其他模块使用。
+
+为了编写可维护的代码，把很多函数分组，分别放到不同的文件里，每个文件包含的代码就相对较少，很多编程语言都采用这种组织代码的方式。
+在Python中，一个.py文件就称之为一个模块（Module）。
+
+可维护性高，可以被其他地方引用，避免函数名和变量名冲突
+
+[python所有内置函数](https://docs.python.org/3/library/functions.html)
+
+避免模块名冲突，Python引入了按目录来组织模块的方法，称为包（Package）
+
+举例：一个`abc.py`是一个叫`abc`的模块，一个`xyz.py`是一个叫`xyz`的模块
+避免冲突与其他模块冲突，使用顶层包名，比如`mycompany`，按照如下目录存放
+
+```txt
+mycompany
+├─ __init__.py   # 必须存在,否则是普通目录，而不是一个包；可以是空文件，也可有代码，本身就是一个模块 mycompany
+├─ abc.py        # mycompany.abc
+└─ xyz.py        # mycompany.xyz
+
+# 多级目录
+mycompany
+ ├─ web
+ │  ├─ __init__.py
+ │  ├─ utils.py     # mycompany.web.utils
+ │  └─ www.py       # mycompany.web.www
+ ├─ __init__.py
+ ├─ abc.py
+ └─ utils.py        # mycompany.utils
+```
+
+**自己创建模块时要注意命名，不能和Python自带的模块名称冲突。例如，系统自带了`sys`模块，自己的模块就不可命名为`sys.py`，否则将无法导入系统自带的`sys`模块。**
+
+注意：
+
+* 模块名要遵循Python变量命名规范，不要使用中文、特殊字符;
+* 模块名不要和系统模块名冲突，最好先查看系统是否已存在该模块，检查方法是在Python交互环境执行`import abc`，若成功则说明系统存在此模块。
+
+### 使用模块
+
+```py
+#!/usr/bin/env python3                     # 让代码直接在Unix/Linux/Mac上运行
+# -*- coding: utf-8 -*-                    # 使用标准UTF-8编码
+
+' a test module '                          # 表示模块的文档注释，任何模块代码的第一个字符串都被视为模块的文档注释
+
+__author__ = 'Steven'                      # 
+
+import sys                                 # 导入sys模块
+
+def test():
+    args = sys.argv                        # list存储了命令行的所有参数
+    if len(args)==1:
+        print('Hello, world!')
+    elif len(args)==2:
+        print('Hello, %s!' % args[1])
+    else:
+        print('Too many arguments!')
+
+if __name__=='__main__':                   # 命令行运行 hello 模块文件时，Python解释器把一个特殊变量__name__置为__main__，而如果在其他地方导入该hello模块时，if判断将失败，因此，这种if测试可以让一个模块通过命令行运行时执行一些额外的代码，最常见的就是运行测试。
+    test()
+```
+
+命令行运行` hello `模块文件时，Python解释器把一个特殊变量`__name__`置为`__main__`，而如果在其他地方导入该`hello`模块时，`if`判断将失败，因此，这种`if`测试可以让一个模块通过命令行运行时执行一些额外的代码，最常见的就是运行测试。
+
+#### 作用域
+
+通过`_`前缀控制作用域
+
+正常的函数和变量名是公开的（`public`），可以被直接引用，比如：`abc`，`x123`，`PI`等；
+类似`__xxx__`这样的变量是**特殊变量**，可以被直接引用，但是有特殊用途，比如上面的`__author__`，`__name__`就是特殊变量，hello模块定义的文档注释也可以用特殊变量`__doc__`访问，我们自己的变量一般不要用这种变量名；
+类似`_xxx`和`__xxx`这样的函数或变量就是非公开的（`private`），*不应该*被直接引用，比如`_abc`，`__abc`等；
+
+### 安装第三方模块
+
+`pip install Pillow`   Anaconda
+
+添加自己的搜索目录：1.运行时添加要搜索的目录，运行结束后失效 2：设置环境变量`PYTHONPATH`，该环境变量的内容会被自动添加到模块搜索路径中。
+
+```cmd
+>>> import sys
+>>> sys.path.append('/Users/michael/my_py_scripts')
+```
+
+## 面向对象编程
+
+Object Oriented Programming - OOP
+在Python中，所有数据类型都可以视为对象，当然也可以自定义对象。自定义的对象数据类型就是面向对象中的类（Class）的概念。
+
+```py
+class Student(object):
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
+    def print_score(self):
+        print('%s: %s' % (self.name, self.score))
+
+# 给对象发消息实际上就是调用对象对应的关联函数，称之为对象的方法（Method）
+bart = Student('Bart Simpson', 59)
+lisa = Student('Lisa Simpson', 87)
+bart.print_score()
+lisa.print_score()
+```
+
+### 类(Class)和实例(Instance)
+
+定义类是通过`class`关键字
+
+```py
+class Student(object):
+    pass
+
+>>> bart = Student()
+>>> bart
+<__main__.Student object at 0x000002518C453DC0>   
+>>> Student
+<class '__main__.Student'>
+```
+
+`class`后面紧接着是类名，即`Student`，类名通常是大写开头的单词，紧接着是`(object)`，表示该类是从哪个类继承的，如果没有合适的继承类，就使用`object`类，所有类最终都会继承`object`类。
+
+使用特殊方法`__init__`，在创建实例的时候初始化属性  **注意：特殊方法“__init__”前后分别有两个下划线！！！**
+
+注意到`__init__`方法的第一个参数永远是`self`，表示创建的实例本身，因此，在`__init__`方法内部，就可以把各种属性绑定到`self`，因为`self`就指向创建的实例本身。
+
+有了`__init__`方法，在创建实例的时候，就不能传入空的参数了，必须传入与`__init__`方法匹配的参数，但`self`不需要传，Python解释器自己会把实例变量传进去：
+
+**`object` 和 `self`**
+
+小结
+
+* 类是创建实例的模板，而实例则是一个一个具体的对象，各个实例拥有的数据都互相独立，互不影响；
+* 方法就是与实例绑定的函数，和普通函数不同，方法可以直接访问实例的数据；
+* 通过在实例上调用方法，我们就直接操作了对象内部的数据，但无需知道方法内部的实现细节。
+* 和静态语言不同，Python允许对实例变量绑定任何数据，也就是说，对于两个实例变量，虽然它们都是同一个类的不同实例，但拥有的变量名称都可能不同：
+
+### 访问限制
+
+实例的变量名如果以`__`开头，就变成了一个私有变量(（)private)，只有内部可以访问，外部不能访问
+
+在Python中，变量名类似`__xxx__`的，也就是以双下划线开头，并且以双下划线结尾的，是特殊变量，特殊变量是可以直接访问的，不是private变量，所以，不能用`__name__`、`__score__`这样的变量名。
+
+不能直接访问`__name`是因为Python解释器对外把`__name`变量改成了`_Student__name`，所以，仍然可以通过`_Student__name`来访问`__name`变量,不同版本的Python解释器可能会把`__name`改成不同的变量名
+
+```py
+class Student(object):
+    def __init__(self, name, score):
+        self.__name = name
+        self.__score = score
+    def print_score(self):
+        print('%s: %s' % (self.__name, self.__score))
+    def get_name(self):
+        return self.__name
+    def get_score(self):
+        return self.__score
+    def set_score(self, score):
+        if 0 <= score <= 100:
+            self.__score = score
+        else:
+            raise ValueError('bad score')
+```
+
+```cmd
+>>> bart = Student('Bart Simpson', 59)
+>>> bart.__name
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'Student' object has no attribute '__name'
+>>> bart._Student__name  # 不同版本的Python解释器可能会把__name改成不同的变量名
+'Bart Simpson'
+
+# 特别注意的错误写法
+>>> bart = Student('Bart Simpson', 59)
+>>> bart.get_name()
+'Bart Simpson'
+>>> bart.__name = 'New Name' # 设置__name变量！ 这个相当于新加了一个玩意儿
+>>> bart.__name
+'New Name'
+
+>>> bart.get_name() # get_name()内部返回self.__name
+'Bart Simpson'
+```
+
+### 继承和多态
+
+```py
+class Animal(object):
+    def run(self):
+        print('Animal is running...')
+class Dog(Animal):
+    pass
+class Cat(Animal):
+    pass
+
+dog = Dog()
+dog.run()
+
+cat = Cat()
+cat.run()
+```
+
+```py
+class Animal(object):
+    def run(self):
+        print('Animal is running...')
+    def eat(self):
+        print('Eating meat...')
+class Dog(Animal):
+    def run(self):
+        print('Dog is running...')
+class Cat(Animal):
+     def run(self):
+        print('Cat is running...')
+
+dog = Dog()
+dog.run()
+
+cat = Cat()
+cat.run()
+```
+
+https://www.liaoxuefeng.com/wiki/1016959663602400/1017497232674368
