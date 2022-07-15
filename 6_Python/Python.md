@@ -1634,6 +1634,7 @@ cat.run()
 ```
 
 ```py
+# 定义class 就是定义一种数据类型
 class Animal(object):
     def run(self):
         print('Animal is running...')
@@ -1647,10 +1648,959 @@ class Cat(Animal):
         print('Cat is running...')
 
 dog = Dog()
-dog.run()
+dog.run()   # 子类的run()覆盖了父类的run()
 
 cat = Cat()
 cat.run()
+
+a = list()      # a是list类型
+b = Animal()    # b是Animal类型
+c = Dog()       # c是Dog类型
+
+isinstance(a, list)   # True
+isinstance(b, Animal) # True
+isinstance(c, Dog)    # True
+isinstance(c, Animal) # True
+isinstance(b, Dog)    # False
+
+def run_twice(animal):
+    animal.run()
+    animal.run()
+
+run_twice(Animal())
+# Animal is running...
+# Animal is running...
+run_twice(Dog())
+# Dog is running...
+# Dog is running...
+run_twice(Cat())
+# Cat is running...
+# Cat is running...
+class Tortoise(Animal):
+    def run(self):
+        print('Tortoise is running slowly...')
+
+run_twice(Tortoise())
+# Tortoise is running slowly...
+# Tortoise is running slowly...
 ```
 
-https://www.liaoxuefeng.com/wiki/1016959663602400/1017497232674368
+对扩展开放：允许新增`Animal`子类；
+对修改封闭：不需要修改依赖`Animal`类型的`run_twice()`等函数。
+
+#### 静态语言 vs 动态语言
+
+对于**静态语言**（例如Java）来说，如果需要传入`Animal`类型，则传入的对象必须是`Animal`类型或者它的子类，否则，将无法调用`run()`方法。
+对于Python这样的**动态语言**来说，则不一定需要传入`Animal`类型。只需要保证传入的对象有一个`run()`方法就可以了
+
+### 获取对象信息
+
+#### 使用`type()`
+
+基本类型都可用`type()`判断
+变量指向函数或者类可用`type()`判断
+
+```py
+type(123)   # <class 'int'>
+type('str') # <class 'str'>
+type(None)  # <type(None) 'NoneType'>
+
+type(abs)  # <class 'builtin_function_or_method'>
+# 比较两个变量的type类型是否相同
+type(123)==type(456)        # True
+type(123)==int              # True
+type('abc')==type('123')    # True
+type('abc')==str            # True
+type('abc')==type(123)      # False
+
+# 可以使用types模块中定义的常量,判断一个对象是否是函数
+import types
+def fn():
+    pass
+
+type(fn)==types.FunctionType                        # True
+type(abs)==types.BuiltinFunctionType                # True
+type(lambda x: x)==types.LambdaType                 # True
+type((x for x in range(10)))==types.GeneratorType   # True
+```
+
+#### 使用`isinstance()`
+
+判断`class`的类型，可以使用`isinstance()`函数
+能用`type()`判断的基本类型可用`isinstance()`判断
+
+**总是优先使用`isinstance()`判断类型，可以将指定类型及其子类“一网打尽”。**
+
+```py
+# object -> Animal -> Dog -> Husky
+class Animal(object):
+    pass
+
+class Dog(Animal):
+    pass
+
+class Husky(Dog):
+    pass
+
+a = Animal()
+d = Dog()
+h = Husky()
+
+# 判断的是一个对象是否是该类型本身，或者位于该类型的父继承链上
+isinstance(h, Husky)    # True
+isinstance(h, Dog)      # True
+isinstance(h, Animal)   # True
+isinstance(d, Dog) and isinstance(d, Animal) # True
+isinstance(d, Husky)    # False
+
+isinstance('a', str)    # True
+isinstance(123, int)    # True
+isinstance(b'a', bytes) # True
+
+# 可以判断一个变量是否是某些类型中的一种
+isinstance([1, 2, 3], (list, tuple))  # True list
+isinstance((1, 2, 3), (list, tuple))  # True tuple
+```
+
+#### 使用`dir()`
+
+获得一个对象的所有属性和方法,返回一个包含字符串的`list`
+配合`getattr()`、`setattr()`以及`hasattr()`，可直接操作一个对象的状态
+
+```py
+dir('ABC')
+# ['__add__', '__class__', '__contains__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__getnewargs__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__len__', '__lt__', '__mod__', '__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__rmod__', '__rmul__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'capitalize', 'casefold', 'center', 'count', 'encode', 'endswith', 'expandtabs', 'find', 'format', 'format_map', 'index', 'isalnum', 'isalpha', 'isascii', 'isdecimal', 'isdigit', 'isidentifier', 'islower', 'isnumeric', 'isprintable', 'isspace', 'istitle', 'isupper', 'join', 'ljust', 'lower', 'lstrip', 'maketrans', 'partition', 'replace', 'rfind', 'rindex', 'rjust', 'rpartition', 'rsplit', 'rstrip', 'split', 'splitlines', 'startswith', 'strip', 'swapcase', 'title', 'translate', 'upper', 'zfill']
+
+len('ABC')          # 3
+'ABC'.__len__()     # 3  在len()函数内部，它自动去调用该对象的__len__()方法
+
+class MyCat(object):
+    def __len__(self):
+        return 100
+
+cat = MyCat()
+len(cat)            # 100
+
+'ABC'.lower()       # 'abc'
+
+class TObject(object):
+    def __init__(self):
+        self.x = 9
+    def power(self):
+        return self.x * self.x
+
+obj = TObject()
+hasattr(obj, 'x')       # 有属性'x'吗？ True
+obj.x                   # 9
+hasattr(obj, 'y')       # 有属性'y'吗？ False
+setattr(obj, 'y', 19)   # 设置一个属性'y'
+hasattr(obj, 'y')       # 有属性'y'吗？ True
+getattr(obj, 'y')       # 获取属性'y'  19
+obj.y                   # 获取属性'y'  19
+
+# 试图获取不存在的属性，会抛出AttributeError的错误
+getattr(obj, 'z')       # 获取属性'z' 
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# AttributeError: 'TObject' object has no attribute 'z'
+
+getattr(obj, 'z', 404)  # 获取属性'z'，如果不存在，返回默认值404
+# 404
+
+hasattr(obj, 'power')   # 有属性'power'吗？True
+getattr(obj, 'power')   # 获取属性'power'
+# <bound method TObject.power of <__main__.TObject object at 0x0000027AA5633550>>
+
+fn = getattr(obj, 'power') # 获取属性'power'并赋值到变量fn
+fn                         # fn指向obj.power
+# <bound method TObject.power of <__main__.TObject object at 0x0000027AA5633550>>
+
+# 从文件流fp中读取图像,首先要判断该fp对象是否存在read方法，存在，则是一个流；不存在，则无法读取
+def readImage(fp):
+    if hasattr(fp, 'read'):
+        return readData(fp)
+    return None
+```
+
+### 实例属性和类属性
+
+由于Python是动态语言，根据类创建的实例可以任意绑定属性。
+给实例绑定属性的方法是通过实例变量，或者通过`self`变量：
+**千万不要对实例属性和类属性使用相同的名字**
+
+* 实例属性属于各个实例所有，互不干扰；
+* 类属性属于类所有，所有实例共享一个属性
+
+```py
+class Student(object):
+    name = 'Student' # 类属性
+
+s = Student()        # 创建实例s
+print(s.name)        # 打印name属性，因为实例并没有name属性，所以会继续查找class的name属性
+# Student
+print(Student.name)  # 打印类的name属性
+# Student
+s.name = 'Michael'   # 给实例绑定name属性
+print(s.name)        # 由于实例属性优先级比类属性高，因此，它会屏蔽掉类的name属性
+# Michael
+print(Student.name)  # 但是类属性并未消失，用Student.name仍然可以访问
+# Student
+del s.name           # 如果删除实例的name属性
+print(s.name)        # 再次调用s.name，由于实例的name属性没有找到，类的name属性就显示出来了
+# Student
+
+# 统计学生人数
+class Student(object):
+    count = 0
+    def __init__(self, name):
+        self.name = name
+        Student.count = Student.count + 1
+
+```
+
+## 面向对象高级编程
+
+基础：数据封装、继承和多态
+多重继承、定制类、元类等高级概念
+
+### 使用`__slots__`
+
+限制实例的属性
+`__slots__`定义的属性仅对当前类实例起作用，对继承的子类是不起作用的：
+
+```py
+class Student(object):
+    pass
+
+s = Student()
+s.name = 'Michael'  # 动态给实例绑定一个属性
+print(s.name)       # Michael
+
+def set_age(self, age): # 定义一个函数作为实例方法
+    self.age = age
+
+from types import MethodType
+s.set_age = MethodType(set_age, s) # 给实例绑定一个方法
+s.set_age(25)           # 调用实例方法
+s.age                   # 测试结果  25
+
+# 给一个实例绑定的方法，对另一个实例是不起作用的：
+s2 = Student() # 创建新的实例
+s2.set_age(25) # 尝试调用方法
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# AttributeError: 'Student' object has no attribute 'set_age'
+
+# 给所有实例都绑定方法，可以给class绑定方法
+def set_score(self, score):
+    self.score = score
+
+Student.set_score = set_score
+s.set_score(100)
+s.score           # 100
+s2.set_score(99)
+s2.score          # 99
+```
+
+```py
+class Student(object):
+    __slots__ = ('name', 'age') # 用tuple定义允许绑定的属性名称
+
+s = Student()       # 创建新的实例
+s.name = 'Michael'  # 绑定属性'name'
+s.age = 25          # 绑定属性'age'
+s.score = 99        # 绑定属性'score'； 'score'没有被放到__slots__中 报错
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# AttributeError: 'Student' object has no attribute 'score'
+
+class GraduateStudent(Student):
+    pass
+
+g = GraduateStudent()
+g.score = 9999          # 不报错，继承子类可以不受限制
+```
+
+### 使用`@property`
+
+Python内置的`@property`装饰器负责把一个方法变成属性调用
+**属性的方法名不要和实例变量重名**
+
+```py
+class Student(object):
+    def get_score(self):
+         return self._score
+    def set_score(self, value):
+        if not isinstance(value, int):
+            raise ValueError('score must be an integer!')
+        if value < 0 or value > 100:
+            raise ValueError('score must between 0 ~ 100!')
+        self._score = value
+
+s = Student()
+s.set_score(60)  # ok!
+s.get_score()    # 60
+
+s.set_score(9999)
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+#   File "<stdin>", line 8, in set_score
+# ValueError: score must between 0 ~ 100!
+```
+
+加上`@property`就可把一个`getter`方法变成属性,`@property`本身又创建了另一个装饰器`@score.setter`，负责把一个`setter`方法变成属性赋值
+
+```py
+class Student(object):
+    @property
+    def score(self):
+        return self._score
+    @score.setter
+    def score(self, value):
+        if not isinstance(value, int):
+            raise ValueError('score must be an integer!')
+        if value < 0 or value > 100:
+            raise ValueError('score must between 0 ~ 100!')
+        self._score = value
+
+s = Student()
+s.score = 60    # OK，实际转化为s.set_score(60)
+s.score         # OK，实际转化为s.get_score()
+
+s.score = 9999
+# Traceback (most recent call last):
+# ValueError: score must between 0 ~ 100!
+```
+
+```py
+# birth可读写属性 age是只读属性
+class Student(object):
+    @property
+    def birth(self):
+        return self._birth
+    @birth.setter
+    def birth(self, value):
+        self._birth = value
+    @property
+    def age(self):
+        return 2022 - self._birth
+
+# 属性的方法名不要和实例变量重名 error 错误示例
+class Student(object):
+    # 方法名称和实例变量均为birth:
+    @property
+    def birth(self):
+        return self.birth
+
+class Screen(object):
+    @property
+    def width(self):
+        return self._width
+    @width.setter
+    def width(self, val):
+        self._width = val    
+    @property
+    def height(self):
+        return self._height
+    @height.setter
+    def height(self, value):
+        self._height = value    
+    @property
+    def resolution(self):
+        return self._width * self._height
+
+```
+
+### 多重继承
+
+Dog - 狗；Bat - 蝙蝠；Parrot - 鹦鹉；Ostrich - 鸵鸟。
+
+```asi
+# 哺乳动物和鸟类归类
+            ┌────────┐
+       ┌────┤ Animal ├────┐       
+       │    └────────┘    │
+       │                  │
+  ┌────▼────┐        ┌────▼─────┐
+  │  Mammal │        │   Bird   │
+  └─┬─────┬─┘        └─┬──────┬─┘
+    │     │            │      │
+    │     │            │      │
+┌───▼─┐ ┌─▼───┐  ┌─────▼──┐ ┌─▼───────┐
+│ Dog │ │ Bat │  │ Parrot │ │ Ostrich │
+└─────┘ └─────┘  └────────┘ └─────────┘
+
+# 能跑”和“能飞”来归类
+                ┌──────────┐
+          ┌─────┤  Animal  ├───┐
+          │     └──────────┘   │
+          │                    │
+          │                    │
+    ┌─────▼─────┐        ┌─────▼──────┐
+    │  Runnable │        │  Flyable   │
+    └─┬──────┬──┘        └──┬───────┬─┘
+      │      │              │       │
+      │      │              │       │
+ ┌────▼─┐ ┌──▼──────┐  ┌────▼───┐ ┌─▼───┐
+ │ Dog  │ │ Ostrich │  │ Parrot │ │ Bat │
+ └──────┘ └─────────┘  └────────┘ └─────┘
+
+# 两种分类都包含进来
+                          ┌───────────┐
+                     ┌────┤   Animal  ├────┐
+                     │    └───────────┘    │
+                     │                     │
+                ┌────▼─────┐         ┌─────▼────┐
+                │  Mammal  │         │  Bird    │
+                └┬───────┬─┘         └┬───────┬─┘
+                 │       │            │       │
+             ┌───▼──┐ ┌──▼───┐   ┌────▼─┐   ┌─▼─────┐
+             │ MRun │ │ MFly │   │ BRun │   │ BFly  │
+             └──┬───┘ └──┬───┘   └───┬──┘   └───┬───┘
+                │        │           │          │
+             ┌──▼───┐ ┌──▼───┐  ┌────▼────┐ ┌───▼────┐
+             │ Dog  │ │ Bat  │  │ Ostrich │ │ Parrot │
+             └──────┘ └──────┘  └─────────┘ └────────┘
+
+```
+
+避免类的数量呈指数增长采用多重继承
+
+```py
+class Animal(object):
+    pass
+
+# 大类:
+class Mammal(Animal):
+    pass
+
+class Bird(Animal):
+    pass
+
+# 各种动物:
+class Dog(Mammal):
+    pass
+
+class Bat(Mammal):
+    pass
+
+class Parrot(Bird):
+    pass
+
+class Ostrich(Bird):
+    pass
+
+# 
+class Runnable(object):
+    def run(self):
+        print('Running...')
+
+class Flyable(object):
+    def fly(self):
+        print('Flying...')
+
+class Dog(Mammal, Runnable):
+    pass
+class Bat(Mammal, Flyable):
+    pass
+```
+
+#### MixIn
+
+在设计类的继承关系时，通常，主线都是单一继承下来的，例如，`Ostrich`继承自`Bird`。但是，如果需要“混入”额外的功能，通过多重继承就可以实现，比如，让`Ostrich`除了继承自`Bird`外，再同时继承`Runnable`。这种设计通常称之为**MixIn**。
+肉食动物`CarnivorousMixIn`和植食动物`HerbivoresMixIn`
+
+```py
+class Animal(object):
+    pass
+
+# 大类:
+class Mammal(Animal):
+    pass
+
+class RunnableMixIn(object):
+    def run(self):
+        print('Running...')
+class FlyableMixIn(object):
+    def fly(self):
+        print('Flying...')
+class CarnivorousMixIn(object):
+    def eat(self):
+        print("eat mean .....")
+
+class Dog(Mammal, RunnableMixIn, CarnivorousMixIn):
+    pass
+```
+
+Python自带的很多库也使用了MixIn。举个例子，Python自带了`TCPServer`和`UDPServer`这两类网络服务，而要同时服务多个用户就必须使用多进程或多线程模型，这两种模型由`ForkingMixIn`和`ThreadingMixIn`提供。通过组合，我们就可以创造出合适的服务来。
+
+```py
+# 编写一个多进程模式的TCP服务
+class MyTCPServer(TCPServer, ForkingMixIn):
+    pass
+
+# 编写一个多线程模式的UDP服务
+class MyUDPServer(UDPServer, ThreadingMixIn):
+    pass
+# 如果打算搞一个更先进的协程模型，可以编写一个CoroutineMixIn：
+class MyTCPServer(TCPServer, CoroutineMixIn):
+    pass
+```
+
+### 定制类
+
+`__len__()`方法是为了能让`class`作用于`len()`函数
+
+#### `__str__`
+
+`__str__()`返回用户看到的字符串; `__repr__()`返回程序开发者看到的字符串,为调试服务
+
+```py
+# ex 1
+class Student(object):
+    def __init__(self, name):
+        self.name = name
+
+print(Student('Michael'))
+# <__main__.Student object at 0x0000029082FC7880>
+
+# ex 2
+class Student(object):
+    def __init__(self, name):
+        self.name = name
+    def __str__(self):
+        return 'Student object (name: %s)' % self.name
+
+print(Student('Michael'))
+# Student object (name: Michael)
+
+s = Student('Michael')
+s
+# <__main__.Student object at 0x0000029082FC7880>
+
+# ex 3
+class Student(object):
+    def __init__(self, name):
+        self.name = name
+    def __str__(self):
+        return 'Student object (name: %s)' % self.name
+    __repr__ = __str__
+
+print(Student('Michael'))
+# Student object (name: Michael)
+
+s = Student('Michael')
+s
+# Student object (name: Michael)   
+```
+
+#### `__iter__`
+
+用于`for ... in`循环,实现一个`__iter__()`方法,返回一个迭代对象,`for`循环会不断调用该迭代对象的`__next__()`方法拿到循环的下一个值，直到遇到`StopIteration`错误时退出循环
+
+```py
+class Fib(object):
+    def __init__(self):
+        self.a, self.b = 0, 1 # 初始化两个计数器a，b
+    def __iter__(self):
+        return self # 实例本身就是迭代对象，故返回自己
+    def __next__(self):
+        self.a, self.b = self.b, self.a + self.b # 计算下一个值
+        if self.a > 100000: # 退出循环的条件
+            raise StopIteration()
+        return self.a # 返回下一个值
+
+for n in Fib():
+    print(n)
+# 1
+# 1
+# 2
+# 3
+# 5
+# ...
+# 46368
+# 75025
+```
+
+#### `__getitem__`
+
+`Fib`实例虽然能作用于`for`循环，和`list`有点像，但是，把它当成`list`来使用还是不行
+按照下标取出元素，需要实现`__getitem__()`
+
+```py
+Fib()[5]
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# TypeError: 'Fib' object does not support indexing
+
+class Fib(object):
+    def __getitem__(self, n):
+        a, b = 1, 1
+        for x in range(n):
+            a, b = b, a + b
+        return a
+
+f = Fib()
+f[0]    # 1
+f[1]    # 1
+f[2]    # 2
+f[3]    # 3
+f[10]   # 89
+f[100]  # 573147844013817084101
+
+list(range(100))[5:10] # list 切片方法
+# [5, 6, 7, 8, 9]
+
+class Fib(object):
+    def __getitem__(self, n):
+        if isinstance(n, int): # n是索引
+            a, b = 1, 1
+            for x in range(n):
+                a, b = b, a + b
+            return a
+        if isinstance(n, slice): # n是切片
+            start = n.start
+            stop = n.stop
+            if start is None:
+                start = 0
+            a, b = 1, 1
+            L = []
+            for x in range(stop):
+                if x >= start:
+                    L.append(a)
+                a, b = b, a + b
+            return L
+
+f = Fib()
+f[0:5]  # [1, 1, 2, 3, 5]
+f[:10]  # [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+f[:10:2] # 没有对step参数 [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+# 也没有对负数作处理
+```
+
+如果把对象看成`dict`，`__getitem__()`的参数也可能是一个可以作`key`的`object`，例如`str`。
+与之对应的是`__setitem__()`方法，把对象视作`list`或`dict`来对集合赋值。最后，还有一个`__delitem__()`方法，用于删除某个元素。
+
+总之，通过上面的方法，定义的类表现得和Python自带的`list`、`tuple`、`dict`没什么区别，这完全归功于动态语言的“鸭子类型”，不需要强制继承某个接口。
+
+#### `__getattr__`
+
+`__getattr__`默认返回就是`None`
+
+```py
+class Student(object):
+    def __init__(self):
+        self.name = 'Michael'
+
+s = Student()
+print(s.name)       # Michael
+print(s.score)
+# Traceback (most recent call last):
+#   ...
+# AttributeError: 'Student' object has no attribute 'score'
+
+# 避免错误 除了加上一个score属性外，可写一个__getattr__()方法，动态返回一个属性
+class Student(object):
+    def __init__(self):
+        self.name = 'Michael'
+    def __getattr__(self, attr):
+        if attr=='score':
+            return 99
+
+s = Student()
+s.name     # Michael
+s.score    # 99
+
+# 返回函数也可以
+class Student(object):
+    def __getattr__(self, attr):
+        if attr=='age':
+            return lambda: 25
+
+s.age()  # 25
+
+class Chain(object):
+    def __init__(self, path=''):
+        self._path = path
+    def __getattr__(self, path):
+        return Chain('%s/%s' % (self._path, path))
+    def __str__(self):
+        return self._path
+    __repr__ = __str__
+
+Chain().status.user.timeline.list  # /status/user/timeline/list
+
+class Chain(object):
+    def __init__(self, path='') -> None:
+        self._path = path
+    def __getattr__(self, path):
+        return Chain("{}/{}".format(self._path, path))
+    def __str__(self):
+        return self._path
+    def __call__(self, name):
+        return Chain("{}/{}".format(self._path, name))
+    __repr__ = __str__
+# Chain().users('michael').repos     # /users/:user/repos
+
+# 1. Chain()                            # 
+# 2. Chain().users                      # /users                --> __getattr__
+# 3. Chain().users('michael')           # /users/michael                          -->  __call__
+# 4. Chain().users('michael').repos     # /users/michael/repos                                    --> __getattr__ --> __reper__ --> __str__
+```
+
+#### `__call__`
+
+直接在实例本身上调用属性和方法
+`__call__()`还可以定义参数。对实例进行直接调用就好比对一个函数进行调用一样，完全可以把对象看成函数，把函数看成对象，这两者之间没啥根本的区别。
+判断一个对象是否能被调用，能被调用的对象就是一个`Callable`对象
+
+```py
+class Student(object):
+    def __init__(self, name):
+        self.name = name
+
+    def __call__(self):
+        print('My name is %s.' % self.name)
+
+s = Student('Michael')
+s()             # self参数不要传入
+# My name is Michael.
+
+callable(Student())  # True
+callable(max)        # True
+callable([1, 2, 3])  # False
+callable(None)       # False
+callable('str')      # False
+```
+
+### 使用枚举类
+
+`value`是自动赋给成员的`int`常量，默认从`1`开始。
+
+```py
+from enum import Enum
+
+Month = Enum('Month', ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'))
+
+Month.Jan       # <Month.Jan: 1>
+
+for name, member in Month.__members__.items():
+    print(name, '=>', member, ',', member.value)
+
+# Jan => Month.Jan , 1
+# Feb => Month.Feb , 2
+# Mar => Month.Mar , 3
+# Apr => Month.Apr , 4
+# May => Month.May , 5
+# Jun => Month.Jun , 6
+# Jul => Month.Jul , 7
+# Aug => Month.Aug , 8
+# Sep => Month.Sep , 9
+# Oct => Month.Oct , 10
+# Nov => Month.Nov , 11
+# Dec => Month.Dec , 12
+
+from enum import unique
+# 精确控制枚举类型
+@unique             # 检查保证没有重复值
+class Weekday(Enum):
+    Sun = 0  # Sun的value设为0
+    Mon = 1
+    Tue = 2
+    Wed = 3
+    Thu = 4
+    Fri = 5
+    Sat = 6
+
+day1 = Weekday.Mon
+print(day1)             # Weekday.Mon
+print(Weekday.Tue)      # Weekday.Tue
+print(Weekday['Tue'])   # Weekday.Tue
+print(Weekday.Tue.value)# 2
+print(day1 == Weekday.Mon) # True
+print(day1 == Weekday.Tue) # False
+print(Weekday(1))       # Weekday.Mon
+print(day1 == Weekday(1)) # True
+Weekday(7)        
+# Traceback (most recent call last):
+#   ...
+# ValueError: 7 is not a valid Weekday
+
+for name,member in Weekday.__members__.items():
+    print(name, '=>', member)
+
+# Sun => Weekday.Sun
+# Mon => Weekday.Mon
+# Tue => Weekday.Tue
+# Wed => Weekday.Wed
+# Thu => Weekday.Thu
+# Fri => Weekday.Fri
+# Sat => Weekday.Sat
+```
+
+### 使用元类
+
+#### `type()`
+
+```py
+# hello.py
+class Hello(object):
+    def hello(self, name='world'):
+        print('Hello, %s.' % name)
+
+# 当Python解释器载入hello模块时，就会依次执行该模块的所有语句，执行结果就是动态创建出一个Hello的class对象
+from hello import Hello
+h = Hello()
+h.hello()  #Hello, world.
+
+# Hello是一个class，它的类型就是type，而h是一个实例，它的类型就是class Hello
+print(type(Hello))  # <class 'type'>
+print(type(h))      # <class 'hello.Hello'>
+```
+
+`type()`函数既可以返回一个对象的类型，又可以创建出新的类型
+
+创建`class`对象，`type()`函数依次传入3个参数：
+
+1. `class`的名称；
+2. 继承的父类集合，注意Python支持多重继承，如果只有一个父类，别忘了`tuple`的单元素写法；
+3. `class`的方法名称与函数绑定，把函数`fn`绑定到方法名`hello`。
+
+```py
+def fn(self, name='world'): # 先定义函数
+    print('Hello, %s.' % name)
+
+Hello = type('Hello', (object,), dict(hello=fn)) # 创建Hello class
+h = Hello()
+h.hello()           # Hello, world.
+print(type(Hello))  # <class 'type'>
+print(type(h))      # <class '__main__.Hello'>
+```
+
+#### `metaclass`
+
+元类：`metaclass`允许创建类或者修改类。换句话说，可以把类看成是`metaclass`创建出来的“实例”
+
+`__new__()`方法接收到的参数依次是：
+
+1. 当前准备创建的类的对象；
+2. 类的名字；
+3. 类继承的父类集合；
+4. 类的方法集合。
+
+```py
+# metaclass是类模板，必须从`type`类型派生：
+class ListMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        attrs['add'] = lambda self, value: self.append(value)
+        return type.__new__(cls, name, bases, attrs)
+
+class MyList(list, metaclass=ListMetaclass):
+    pass
+#当传入关键字参数metaclass时，它指示Python解释器在创建MyList时，要通过ListMetaclass.__new__()来创建
+#在此，可以修改类的定义，比如，加上新的方法，然后，返回修改后的定义。
+
+L = MyList()
+L.add(1)
+L    # [1]
+
+# 普通的list没有add()方法
+L2 = list()
+L2.add(1)
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# AttributeError: 'list' object has no attribute 'add'
+```
+
+ORM全称“Object Relational Mapping”( 对象-关系映射)
+
+```py
+class Field(object):
+    def __init__(self, name, column_type):
+        self.name = name
+        self.column_type = column_type
+    def __str__(self):
+        return '<%s:%s>' % (self.__class__.__name__, self.name)
+
+class StringField(Field):
+    def __init__(self, name):
+        super(StringField, self).__init__(name, 'varchar(100)')
+
+class IntegerField(Field):
+    def __init__(self, name):
+        super(IntegerField, self).__init__(name, 'bigint')
+
+class ModelMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        if name=='Model':
+            return type.__new__(cls, name, bases, attrs)
+        print('Found model: %s' % name)
+        mappings = dict()
+        for k, v in attrs.items():
+            if isinstance(v, Field):
+                print('Found mapping: %s ==> %s' % (k, v))
+                mappings[k] = v
+        for k in mappings.keys():
+            attrs.pop(k)
+        attrs['__mappings__'] = mappings # 保存属性和列的映射关系
+        attrs['__table__'] = name # 假设表名和类名一致
+        return type.__new__(cls, name, bases, attrs)
+
+class Model(dict, metaclass=ModelMetaclass):
+    def __init__(self, **kw):
+        super(Model, self).__init__(**kw)
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r"'Model' object has no attribute '%s'" % key)
+    def __setattr__(self, key, value):
+        self[key] = value
+    def save(self):
+        fields = []
+        params = []
+        args = []
+        for k, v in self.__mappings__.items():
+            fields.append(v.name)
+            params.append('?')
+            args.append(getattr(self, k, None))
+        sql = 'insert into %s (%s) values (%s)' % (self.__table__, ','.join(fields), ','.join(params))
+        print('SQL: %s' % sql)
+        print('ARGS: %s' % str(args))
+
+class User(Model):
+    # 定义类的属性到列的映射：
+    id = IntegerField('id')
+    name = StringField('username')
+    email = StringField('email')
+    password = StringField('password')
+
+# Found model: User
+# Found mapping: id ==> <IntegerField:id>
+# Found mapping: name ==> <StringField:username>
+# Found mapping: email ==> <StringField:email>
+# Found mapping: password ==> <StringField:password>
+
+# 创建一个实例：
+u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd')
+# 保存到数据库：
+u.save()
+
+# SQL: insert into User (id,username,email,password) values (?,?,?,?)
+# ARGS: [12345, 'Michael', 'test@orm.org', 'my-pwd']
+```
+
+当用户定义一个`class User(Model)`时，Python解释器首先在当前类`User`的定义中查找`metaclass`，如果没有找到，就继续在父类`Model`中查找`metaclass`，找到了，就使用`Model`中定义的`metaclass`的`ModelMetaclass`来创建`User`类，也就是说，`metaclass`可以隐式地继承到子类，但子类自己却感觉不到。
+
+在`ModelMetaclass`中，一共做了几件事情：
+
+1. 排除掉对`Model`类的修改；
+2. 在当前类（比如`User`）中查找定义的类的所有属性，如果找到一个`Field`属性，就把它保存到一个`__mappings__`的`dict`中，同时从类属性中删除该`Field`属性，否则，容易造成运行时错误（实例的属性会遮盖类的同名属性）；
+3. 把表名保存到`__table__`中，这里简化为表名默认为类名。
+4. 在`Model`类中，就可以定义各种操作数据库的方法，比如`save()`，`delete()`，`find()`，`update`等等。
+
+我们实现了`save()`方法，把一个实例保存到数据库中。因为有表名，属性到字段的映射和属性值的集合，就可以构造出INSERT语句。
+
+## 错误、调试和测试
+
+https://www.liaoxuefeng.com/wiki/1016959663602400/1017598814713792
