@@ -2603,4 +2603,794 @@ u.save()
 
 ## 错误、调试和测试
 
-https://www.liaoxuefeng.com/wiki/1016959663602400/1017598814713792
+bug，程序问题，用户问题，环境问题等
+
+### 错误处理
+
+约定返回错误代码
+
+```py
+def foo():
+    r = some_function()
+    if r==(-1):
+        return (-1)
+    # do something
+    return r
+
+def bar():
+    r = foo()
+    if r==(-1):
+        print('Error')
+    else:
+        pass
+```
+
+#### `try`
+
+内置`try...except...finally...`机制，所有的错误类型都继承自`BaseException`
+
+常见错误类型和继承关系：https://docs.python.org/3/library/exceptions.html#exception-hierarchy
+
+```py
+try:
+    print('try...')
+    r = 10 / 0
+    print('result:', r)
+except ZeroDivisionError as e:
+    print('except:', e)
+finally:
+    print('finally...')
+# try...
+# except: division by zero
+# finally...
+```
+
+```py
+try:
+    print('try...')
+    r = 10 / int('2')
+    print('result:', r)
+except ValueError as e:
+    print('ValueError:', e)
+except ZeroDivisionError as e:
+    print('ZeroDivisionError:', e)
+else:
+    print('no error!')      # 当没有错误发生时
+finally:
+    print('finally...')
+
+# try...
+# result: 5.0
+# no error!
+# finally...
+```
+
+可以跨越多层调用
+
+```py
+def foo(s):
+    return 10 / int(s)
+def bar(s):
+    return foo(s) * 2
+def main():
+    try:
+        bar('0')
+    except Exception as e:
+        print('Error:', e)
+    finally:
+        print('finally...')
+
+main()
+# Error: division by zero
+# finally...
+```
+
+#### 调用栈
+
+如果错误没有被捕获，就会一直往上抛，最后被Python解释器捕获，打印错误信息，然后程序退出
+**出错的时候，一定要分析错误的调用栈信息，才能定位错误的位置**
+
+```py
+# err.py:
+def foo(s):
+    return 10 / int(s)
+def bar(s):
+    return foo(s) * 2
+def main():
+    bar('0')
+main()
+
+# Traceback (most recent call last):
+#   File "err.py", line 7, in <module>
+#     main()
+#   File "err.py", line 6, in main
+#     bar('0')
+#   File "err.py", line 4, in bar
+#     return foo(s) * 2
+#   File "err.py", line 2, in foo
+#     return 10 / int(s)
+# ZeroDivisionError: division by zero
+```
+
+#### 记录错误
+
+Python内置的`logging`模块可以非常容易地记录错误信息,程序打印完错误信息后会继续执行，并正常退出
+通过配置，`logging`可以把错误记录到日志文件。
+
+```py
+# err_logging.py
+import logging
+def foo(s):
+    return 10 / int(s)
+def bar(s):
+    return foo(s) * 2
+def main():
+    try:
+        bar('0')
+    except Exception as e:
+        logging.exception(e)
+main()
+print('END')
+
+# ERROR:root:division by zero
+# Traceback (most recent call last):
+#   File "err_logging.py", line 8, in main
+#     bar('0')
+#   File "err_logging.py", line 5, in bar
+#     return foo(s) * 2
+#   File "err_logging.py", line 3, in foo
+#     return 10 / int(s)
+# ZeroDivisionError: division by zero
+# END
+```
+
+#### 抛出错误
+
+定义一个错误的`class`，选择好继承关系，用`raise`语句抛出一个错误的实例
+`raise`语句如果不带参数，就会把当前错误原样抛出
+由于当前函数不知道应该怎么处理该错误，所以，最恰当的方式是继续往上抛
+
+```py
+# err_raise.py
+class FooError(ValueError):
+    pass
+def foo(s):
+    n = int(s)
+    if n==0:
+        raise FooError('invalid value: %s' % s)
+    return 10 / n
+
+foo('0')
+
+# Traceback (most recent call last):
+#   File "err_raise.py", line 9, in <module>
+#     foo('0')
+#   File "err_raise.py", line 6, in foo
+#     raise FooError('invalid value: %s' % s)
+# __main__.FooError: invalid value: 0
+```
+
+### 调试
+
+1. `print`
+2. `assert`
+3. `logging`
+4. ``
+
+#### 断言
+
+`print` 打印找错后续麻烦，断言(assert) 来代替
+断言失败，`assert`语句本身就会抛出`AssertionError`
+启动Python解释器时可以用`-O`参数来关闭`assert`(大写字母`O`)  `> python -O err.py`
+
+```py
+def foo(s):
+    n = int(s)
+    assert n != 0, 'n is zero!'
+    return 10 / n
+def main():
+    foo('0')
+main()
+
+# Traceback (most recent call last):
+#   File "err.py", line 7, in <module>
+#     main()
+#   File "err.py", line 6, in main
+#     foo('0')
+#   File "err.py", line 3, in foo
+#     assert n != 0, 'n is zero!'
+# AssertionError: n is zero!
+```
+
+#### `logging`
+
+有`debug`，`info`，`warning`，`error`等几个级别
+通过简单配置，一条语句可以同时输出到不同的地方，比如`console`和文件。
+
+```py
+import logging
+logging.basicConfig(level=logging.INFO)  # 加这个,不指定级别 log不生效，生效的只是指定级别的log
+s = '0'
+n = int(s)
+logging.info('n = %d' % n)
+print(10 / n)
+
+# INFO:root:n = 0
+# Traceback (most recent call last):
+#   File "err.py", line 6, in <module>
+#     print(10 / n)
+# ZeroDivisionError: division by zero
+```
+
+#### pdb
+
+启动Python的调试器pdb,单步方式运行,随时查看运行状态
+
+```txt
+$ python -m pdb err.py
+> c:\users\steven\downloads\err.py(2)<module>()
+-> s = '0'
+
+(Pdb) l  # 以参数-m pdb启动后，pdb定位到下一步要执行的代码-> s = '0'。输入命令l来查看代码
+  1     # err.py
+  2  -> s = '0'
+  3     n = int(s)
+  4     print(10 / n)
+[EOF]
+
+#  输入命令n可以单步执行代码：
+
+(Pdb) n
+> c:\users\steven\downloads\err.py(3)<module>()
+-> n = int(s)
+(Pdb) n
+> c:\users\steven\downloads\err.py(4)<module>()
+-> print(10 / n)
+
+# 任何时候都可以输入命令p 变量名来查看变量
+(Pdb) p s
+'0'
+(Pdb) p n
+0
+
+# 输入命令q结束调试，退出程序
+(Pdb) q
+```
+
+`pdb.set_trace()` 不需要单步执行,可能出错的地方用它设置断点
+
+```py
+# err.py
+import pdb
+
+s = '0'
+n = int(s)
+pdb.set_trace() # 运行到这里会自动暂停
+print(10 / n)
+```
+
+```txt
+> c:\users\steven\downloads\err.py(7)<module>()
+-> print(10 / n)
+
+# 用命令p查看变量，或者用命令c继续运行
+(Pdb) p n
+0
+(Pdb) c
+Traceback (most recent call last):
+  File "err.py", line 7, in <module>
+    print(10 / n)
+ZeroDivisionError: division by zero
+```
+
+IDE
+如果要比较爽地设置断点、单步执行，就需要一个支持调试功能的IDE。目前比较好的Python IDE有：
+Visual Studio Code：https://code.visualstudio.com/，需要安装Python插件。
+PyCharm：http://www.jetbrains.com/pycharm/
+另外，Eclipse加上pydev插件也可以调试Python程序。
+**用IDE调试起来比较方便，但是logging才是终极武器**
+
+### 单元测试
+
+测试驱动开发（TDD：Test-Driven Development）
+
+```py
+# mydict.py
+class Dict(dict):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r"'Dict' object has no attribute '%s'" % key)
+    def __setattr__(self, key, value):
+        self[key] = value
+```
+
+```py
+# mydict_test.py
+import unittest
+from mydict import Dict
+
+class TestDict(unittest.TestCase):  # 继承自 unittest.TestCase
+
+    def test_init(self):            #  test开头是测试方法，不以 test 开头认为不是测试方法，不会执行
+        d = Dict(a=1, b='test')
+        self.assertEqual(d.a, 1)
+        self.assertEqual(d.b, 'test')
+        self.assertTrue(isinstance(d, dict))
+
+    def test_key(self):
+        d = Dict()
+        d['key'] = 'value'
+        self.assertEqual(d.key, 'value')   # assertEqual
+
+    def test_attr(self):
+        d = Dict()
+        d.key = 'value'
+        self.assertTrue('key' in d)
+        self.assertEqual(d['key'], 'value')
+
+    def test_keyerror(self):
+        d = Dict()
+        with self.assertRaises(KeyError): # assertRaises
+            value = d['empty']
+
+    def test_attrerror(self):
+        d = Dict()
+        with self.assertRaises(AttributeError):
+            value = d.empty
+```
+
+#### 运行单元测试
+
+1. 最简单，在 `mydict_test.py` 最后加上两行代码
+
+```py
+if __name__ == '__main__':
+    unittest.main()
+```
+
+把`mydict_test.py`当做正常的python脚本运行 `$ python mydict_test.py`
+2. 命令行加参数 `-m unittest` 直接运行(**推荐**)
+
+```txt
+$ python -m unittest mydict_test
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK
+```
+
+#### `setUp`与`tearDown`
+
+`setUp()`和`tearDown()`这两个方法会分别在每调用一个测试方法的前后分别被执行。
+测试需要启动数据库时，可以在`setUp()`中连接数据库，在`tearDown()`中关闭数据库
+
+```py
+class TestDict(unittest.TestCase):
+    def setUp(self):
+        print('setUp...')
+    def tearDown(self):
+        print('tearDown...')
+```
+
+小结
+单元测试可以有效地测试某个程序模块的行为，是未来重构代码的信心保证。
+单元测试的测试用例要覆盖常用的输入组合、边界条件和异常。
+单元测试代码要非常简单，如果测试代码太复杂，那么测试代码本身就可能有bug。
+单元测试通过了并不意味着程序就没有bug了，但是不通过程序肯定有bug。
+
+### 文档测试
+
+Python内置的“文档测试”（doctest）模块可以直接提取**注释中的代码**并执行测试。
+
+```py
+import re
+m = re.search('(?<=abc)def', 'abcdef')
+m.group(0)
+# 'def'
+
+def abs(n):
+    '''
+    Function to get absolute value of number.
+    
+    Example:
+    
+    >>> abs(1)
+    1
+    >>> abs(-1)
+    1
+    >>> abs(0)
+    0
+    '''
+    return n if n >= 0 else (-n)
+```
+
+```py
+# mydict2.py
+class Dict(dict):
+    '''
+    Simple dict but also support access as x.y style.
+
+    >>> d1 = Dict()
+    >>> d1['x'] = 100
+    >>> d1.x
+    100
+    >>> d1.y = 200
+    >>> d1['y']
+    200
+    >>> d2 = Dict(a=1, b=2, c='3')
+    >>> d2.c
+    '3'
+    >>> d2['empty']
+    Traceback (most recent call last):
+        ...
+    KeyError: 'empty'
+    >>> d2.empty
+    Traceback (most recent call last):
+        ...
+    AttributeError: 'Dict' object has no attribute 'empty'
+    '''
+    def __init__(self, **kw):
+        super(Dict, self).__init__(**kw)
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r"'Dict' object has no attribute '%s'" % key)
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+#  当模块正常导入时，doctest不会被执行。只有在命令行直接运行时，才执行doctest
+if __name__=='__main__':
+    import doctest
+    doctest.testmod()
+```
+
+```bash
+$ python mydict2.py
+# 什么输出也没有 说明doctest运行都是正确的
+
+# 把__getattr__()方法注释掉，再运行就会报错
+$ python mydict2.py
+**********************************************************************
+File "mydict2.py", line 8, in __main__.Dict
+Failed example:
+    d1.x
+Exception raised:
+    Traceback (most recent call last):
+      File "D:\Programs\Python\Python38\lib\doctest.py", line 1336, in __run
+        exec(compile(example.source, filename, "single",
+      File "<doctest __main__.Dict[2]>", line 1, in <module>
+        d1.x
+    AttributeError: 'Dict' object has no attribute 'x'
+**********************************************************************
+File "mydict2.py", line 14, in __main__.Dict
+Failed example:
+    d2.c
+Exception raised:
+    Traceback (most recent call last):
+      File "D:\Programs\Python\Python38\lib\doctest.py", line 1336, in __run
+        exec(compile(example.source, filename, "single",
+      File "<doctest __main__.Dict[6]>", line 1, in <module>
+        d2.c
+    AttributeError: 'Dict' object has no attribute 'c'
+**********************************************************************
+1 items had failures:
+   2 of   9 in __main__.Dict
+***Test Failed*** 2 failures.
+```
+
+## IO编程
+
+Input/Output，输入和输出
+Stream（流）,只能单向流动
+同步IO;异步IO
+
+### 文件读写
+
+在磁盘上读写文件的功能都是由操作系统提供的，现代操作系统不允许普通的程序直接操作磁盘，所以，读写文件就是请求操作系统打开一个文件对象（通常称为文件描述符），然后，通过操作系统提供的接口从这个文件对象中读取数据（读文件），或者把数据写入这个文件对象（写文件）
+
+#### 读文件
+
+`open`传入文件名和标示符，打开文件对象
+文件不存在，`open()`函数会抛出`IOError`错误
+
+调用`read()`会一次性读取文件的全部内容，如果文件有10G，内存就爆了，保险起见，可以反复调用`read(size)`方法，每次最多读取`size`个字节的内容。另外，调用`readline()`可以每次读取一行内容，调用`readlines()`一次读取所有内容并按行返回`list`。因此，要根据需要决定怎么调用。
+
+如果文件很小，`read()`一次性读取最方便；如果不能确定文件大小，反复调用`read(size)`比较保险；如果是配置文件，调用`readlines()`最方便：
+
+```py
+f = open('/Users/michael/test.txt', 'r')  #  r 代表只读
+f2 = open('/Users/michael/notfound.txt', 'r')
+# Traceback (most recent call last):
+#   File "<stdin>", line 1, in <module>
+# FileNotFoundError: [Errno 2] No such file or directory: '/Users/michael/notfound.txt'
+
+f.read()    # 一次读取文件的全部内容，把内容读到内存，用一个str对象表示
+# 'Hello, world!'
+f.close()   # 文件使用完毕后必须关闭，文件对象会占用操作系统的资源，操作系统同一时间能打开的文件数量有限
+```
+
+```py
+# 保证无论是否出错都能正确地关闭文件
+try:
+    f = open('/path/to/file', 'r')
+    print(f.read())
+finally:
+    if f:
+        f.close()
+# 和上面的try catch 效果一样
+with open('/path/to/file', 'r') as f:
+    print(f.read())
+
+for line in f.readlines():
+    print(line.strip()) # 把末尾的'\n'删掉
+```
+
+##### file-like Object
+
+像`open()`函数返回的这种有个`read()`方法的对象，在Python中统称为**file-like Object**。除`file`外，还可以是内存的字节流，网络流，自定义流等等。file-like Object不要求从特定类继承，只要写个`read()`方法就行。
+`StringIO`就是在内存中创建的file-like Object，常用作临时缓冲。
+
+##### 二进制文件
+
+前面讲的默认都是读取文本文件，并且是UTF-8编码的文本文件。要读取二进制文件，比如图片、视频等等，用`'rb'`模式打开文件即可：
+
+```py
+f = open('/Users/michael/test.jpg', 'rb')
+f.read()
+# b'\xff\xd8\xff\xe1\x00\x18Exif\x00\x00...' # 十六进制表示的字节
+```
+
+##### 字符编码
+
+要读取非UTF-8编码的文本文件，需要给`open()`函数传入`encoding`参数，例如，读取GBK编码的文件：
+
+```py
+f = open('/Users/michael/gbk.txt', 'r', encoding='gbk')
+f.read()
+# '测试'
+```
+
+遇到有些编码不规范的文件，可能会遇到`UnicodeDecodeError`，因为在文本文件中可能夹杂了一些非法编码的字符。这种情况，`open()`函数还接收一个`errors`参数，表示如果遇到编码错误后如何处理。最简单的方式是直接忽略：`f = open('/Users/michael/gbk.txt', 'r', encoding='gbk', errors='ignore')`
+
+#### 写文件
+
+写文件和读文件是一样的，唯一区别是调用`open()`函数时，传入标识符`'w'`或者`'wb'`表示写文本文件或写二进制文件：
+
+你可以反复调用`write()`来写入文件，但是务必要调用`f.close()`来关闭文件。写文件时，操作系统往往不会立刻把数据写入磁盘，而是放到内存缓存起来，空闲的时候再慢慢写入。只有调用`close()`方法时，操作系统才保证把没有写入的数据全部写入磁盘。忘记调用`close()`的后果是数据可能只写了一部分到磁盘，剩下的丢失了。所以，用`with`语句保险：
+
+```py
+f = open('/Users/michael/test.txt', 'w')
+f.write('Hello, world!')
+f.close()
+
+with open('/Users/michael/test.txt', 'w') as f:
+    f.write('Hello, world!')
+```
+
+要写入特定编码的文本文件，请给`open()`函数传入`encoding`参数，将字符串自动转换成指定编码。
+以`'w'`模式写入文件时，如果文件已存在，会直接覆盖（相当于删掉后新写入一个文件）。传入`'a'`以追加（append）模式写入。
+
+### `StringIO`和`BytesIO`
+
+从内存中读写`string`或者`bytes`与直接读写文件类似，有相同的接口
+
+#### `StringIO`
+
+`StringIO`在内存中读写`str`
+
+```py
+from io import StringIO
+f = StringIO()
+f.write('hello')
+# 5
+f.write(' ')
+# 1
+f.write('world!')
+# 6
+print(f.getvalue())     # hello world! # getvalue()方法获得写入后的str。
+
+
+f = StringIO('Hello!\nHi!\nGoodbye!')  # 用str初始化
+while True:
+    s = f.readline()
+    if s == '':
+        break
+    print(s.strip())
+
+# Hello!
+# Hi!
+# Goodbye!
+```
+
+#### `BytesIO`
+
+操作二进制数据,内存中读写`bytes`
+
+```py
+from io import BytesIO
+f = BytesIO()
+f.write('中文'.encode('utf-8'))  # 6
+print(f.getvalue())             # b'\xe4\xb8\xad\xe6\x96\x87'
+
+f = BytesIO(b'\xe4\xb8\xad\xe6\x96\x87') # 用bytes初始化BytesIO
+f.read()    #b'\xe4\xb8\xad\xe6\x96\x87'
+```
+
+### 操作文件和目录
+
+`os`模块可直接调用操作系统提供的接口函数。
+
+```py
+import os
+os.name # 操作系统类型 posix:Linux、Unix或Mac OS X  ; nt:Windows
+# nt 
+
+os.uname() # 获取详细的系统信息 ; windows 上没有
+# posix.uname_result(sysname='Darwin', nodename='MichaelMacPro.local', release='14.3.0', version='Darwin Kernel Version 14.3.0: Mon Mar 23 11:59:05 PDT 2015; root:xnu-2782.20.48~5/RELEASE_X86_64', machine='x86_64')
+
+os.environ # 操作系统中定义的环境变量
+#environ({'ALLUSERSPROFILE': 'C:\\ProgramData', 'APPDATA': 'C:\\Users\\Steven\\AppData\\Roaming', 'CLASSPATH': '.;D:\\Program Files\\Java\\jdk1.8.0_301\\lib;D:\\Program Files\\Java\\jdk1.8.0_301\\lib\\tools.jar', 'COMMONPROGRAMFILES': 'C:\\Program Files\\Common Files', ...})
+
+os.environ.get('PATH') # 获取某个环境变量的值, os.environ.get('key')
+#  'C:\\Program Files\\Microsoft\\jdk-11.0.12.7-hotspot\\bin;D:\\Program Files (x86)\\VMware\\VMware Player\\bin\\;...'
+```
+
+#### 操作文件和目录
+
+`os`模块，一部分在`os.path`模块
+
+```py
+os.path.abspath('.')        # 查看当前目录的绝对路径
+# '/Users/michael'
+os.path.join('/Users/michael', 'testdir') # 在某个目录下创建一个新目录，首先把新目录的完整路径表示出来
+# '/Users/michael/testdir'
+
+os.mkdir('/Users/michael/testdir')  # 创建一个目录
+os.rmdir('/Users/michael/testdir')  # 删掉一个目录
+
+os.path.split('/Users/michael/testdir/file.txt')  # 拆分路径
+# ('/Users/michael/testdir', 'file.txt')
+
+os.path.splitext('/path/to/file.txt')     # 得到文件扩展名
+# ('/path/to/file', '.txt')
+```
+
+合并(`os.path.join()`)、拆分路径(`os.path.split`)函数不要求目录和文件要真实存在，它们只对字符串进行操作。处理不同操作系统的路径分隔符
+
+```py
+os.rename('test.txt', 'test.py')    # 对文件重命名
+os.remove('test.py')                # 删掉文件
+
+# shutil模块提供了copyfile()的函数
+# 利用Python的特性来过滤文件
+
+[x for x in os.listdir('.') if os.path.isdir(x)] # 列出当前目录下的所有目录
+# ['.lein', '.local', '.m2', '.npm', '.ssh', '.Trash', '.vim', 'Applications', 'Desktop', ...]
+
+[x for x in os.listdir('.') if os.path.isfile(x) and os.path.splitext(x)[1]=='.py'] # 列出所有的.py文件
+# ['apis.py', 'config.py', 'models.py', 'pymonitor.py', 'test_db.py', 'urls.py', 'wsgiapp.py']
+```
+
+```py
+# 前目录以及当前目录的所有子目录下查找文件名包含指定字符串的文件，并打印出相对路径
+def find(s: str, cur='.'):
+    L = []
+    if s.__len__() == 0:
+        return L
+    s = s.strip()
+
+    def dfs(cur):
+        for n in os.listdir(cur):
+            # 如果不拼接下一目录则无法判断
+            next_dir = os.path.join(cur, n)
+            # 目录则递归
+            if os.path.isdir(next_dir):
+                dfs(next_dir)
+            # 文件则返回绝对路径
+            elif os.path.isfile(next_dir) and s in os.path.splitext(n)[0]:
+                L.append(os.path.join(os.path.abspath('.'), n))
+    return dfs(cur) or L
+
+def find(s, name):
+    d = [x for x in os.listdir(s) if os.path.isdir(os.path.join(s, x))]
+    f = [x for x in os.listdir(s) if os.path.isfile(os.path.join(s, x)) and name in os.path.splitext(x)[0]]
+
+    for x in f:
+        print(os.path.join(s, x))
+    for x in d:
+        g = os.path.join(s, x)        
+        find(g, name)
+```
+
+### 序列化
+
+把变量从内存中变成可存储或传输的过程称之为序列化，在Python中叫`pickling`，在其他语言中也被称之为`serialization`，`marshalling`，`flattening`等等
+把变量内容从序列化的对象重新读到内存里称之为反序列化，即`unpickling`
+
+```py
+import pickle
+d = dict(name='Bob', age=20, score=88)
+pickle.dumps(d)     # 把任意对象序列化成一个bytes，然后，就可以把这个bytes写入文件; pickle.loads()
+# b'\x80\x04\x95$\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x04name\x94\x8c\x03Bob\x94\x8c\x03age\x94K\x14\x8c\x05score\x94KXu.'
+
+f = open('dump.txt', 'wb')
+pickle.dump(d, f)       # 直接把对象序列化后写入一个file-like Object ； pickle.load()
+f.close()
+
+f = open('dump.txt', 'rb')
+d = pickle.load(f)
+f.close()
+d           # {'age': 20, 'score': 88, 'name': 'Bob'}
+```
+
+JSON
+
+JSON类型|Python类型
+--|--
+{}|dict
+[]|list
+"string"|str
+1234.56|int或float
+true/false|True/False
+null|None
+
+```py
+import json
+d = dict(name='Bob', age=20, score=88)
+json.dumps(d)                   # 返回 str,标准的JSON;  dump() 直接把JSON写入一个file-like Object
+# '{"age": 20, "score": 88, "name": "Bob"}'
+
+json_str = '{"age": 20, "score": 88, "name": "Bob"}'
+json.loads(json_str)            # loads() 把JSON的字符串反序列化; load() 从file-like Object中读取字符串并反序列化
+# {'age': 20, 'score': 88, 'name': 'Bob'}
+
+class Student(object):
+    def __init__(self, name, age, score):
+        self.name = name
+        self.age = age
+        self.score = score
+
+s = Student('Bob', 20, 88)
+print(json.dumps(s))
+# Traceback (most recent call last):
+#   ...
+# TypeError: <__main__.Student object at 0x10603cc50> is not JSON serializable
+
+def student2dict(std):  # Student实例首先被student2dict()函数转换成dict，然后再被顺利序列化为JSON
+    return {
+        'name': std.name,
+        'age': std.age,
+        'score': std.score
+    }
+
+print(json.dumps(s, default=student2dict))  # 可选参数default就是把任意一个对象变成一个可序列为JSON的对象
+# {"age": 20, "name": "Bob", "score": 88}
+
+print(json.dumps(s, default=lambda obj: obj.__dict__))  # 把任意class的实例变为dict
+# {"age": 20, "name": "Bob", "score": 88}
+# 通常class的实例都有一个__dict__属性，它就是一个dict，用来存储实例变量。也有少数例外，比如定义了__slots__的class。
+
+# 把JSON反序列化为一个Student对象实例，loads()方法首先转换出一个dict对象，然后，我们传入的object_hook函数负责把dict转换为Student实例
+def dict2student(d):
+    return Student(d['name'], d['age'], d['score'])
+
+json_str = '{"age": 20, "score": 88, "name": "Bob"}'
+print(json.loads(json_str, object_hook=dict2student))
+# <__main__.Student object at 0x000001D09E4C3190>
+
+obj = dict(name='小明', age=20)
+s = json.dumps(obj, ensure_ascii=True)
+# '{"name": "\\u5c0f\\u660e", "age": 20}'
+s = json.dumps(obj, ensure_ascii=False)
+# '{"name": "小明", "age": 20}'
+```
+
+https://docs.python.org/3/library/json.html#json.dumps
