@@ -3394,3 +3394,650 @@ s = json.dumps(obj, ensure_ascii=False)
 ```
 
 https://docs.python.org/3/library/json.html#json.dumps
+
+## 进程和线程
+
+多任务 多核CPU
+轮流让各个任务交替执行
+一个任务就是一个进程（Process）;进程内的“子任务”称为线程（Thread）
+
+多任务的实现有3种方式：
+
+1. 多进程模式；
+2. 多线程模式；
+3. 多进程+多线程模式。
+
+Python既支持多进程，又支持多线程
+线程是最小的执行单元，而进程由至少一个线程组成。如何调度进程和线程，完全由操作系统决定，程序自己不能决定什么时候执行，执行多长时间。
+多进程和多线程的程序涉及到同步、数据共享的问题，编写起来更复杂
+
+### 多进程(multiprocessing)
+
+Unix/Linux操作系统提供了一个`fork()`系统调用。普通的函数调用，调用一次，返回一次，但`fork()`调用一次，返回两次，因为操作系统自动把当前进程（称为父进程）复制了一份（称为子进程），然后，分别在父进程和子进程内返回。
+子进程永远返回`0`，而父进程返回子进程的ID。一个父进程可以fork出很多子进程,父进程要记下每个子进程的ID，而子进程只需要调用`getppid()`就可以拿到父进程的ID。
+
+```py
+import os
+
+print("Process (%s) start ..." % os.getpid())
+# Only works on Unix/Linux/Mac:
+pid = os.fork()
+if pid == 0:
+    print('I am child process (%s) and my parent is %s.' % (os.getpid(), os.getppid()))
+else:
+    print('I (%s) just created a child process (%s).' % (os.getpid(), pid))
+
+# Process (876) start...
+# I (876) just created a child process (877).
+# I am child process (877) and my parent is 876.
+
+# multiprocessing模块就是跨平台版本的多进程模块
+from multiprocessing import Process
+
+# 子进程要执行的代码
+def run_proc(name):
+    print('Run child process %s (%s)...' % (name, os.getpid()))
+
+if __name__=='__main__':
+    print('Parent process %s.' % os.getpid())
+    p = Process(target=run_proc, args=('test',))  # 入一个执行函数和函数的参数
+    print('Child process will start.')
+    p.start()   # 启动线程
+    p.join()    # join()方法可以等待子进程结束后再继续往下运行，通常用于进程间的同步。
+    print('Child process end.')
+
+# Parent process 21568.
+# Child process will start.
+# Run child process test (39220)...
+# Child process end.
+```
+
+#### Pool
+
+启动大量的子进程，用进程池的方式批量创建子进程
+
+```py
+from multiprocessing import Pool
+import os, time, random
+
+def long_time_task(name):
+    print('Run task %s (%s)...' % (name, os.getpid()))
+    start = time.time()
+    time.sleep(random.random() * 3)
+    end = time.time()
+    print('Task %s runs %0.2f seconds.' % (name, (end - start)))
+
+if __name__=='__main__':
+    print('Parent process %s.' % os.getpid())
+    p = Pool(4)
+    for i in range(5):
+        p.apply_async(long_time_task, args=(i,))
+    print('Waiting for all subprocesses done...')
+    p.close()
+    p.join()        # 对Pool对象调用join()方法会等待所有子进程执行完毕，调用join()之前必须先调用close()，调用close()之后就不能继续添加新的Process了
+    print('All subprocesses done.')
+
+# Parent process 39000.
+# Waiting for all subprocesses done...
+# Run task 0 (30104)...
+# Run task 1 (38712)...
+# Run task 2 (33176)...
+# Run task 3 (40604)...
+# Task 3 runs 0.34 seconds.
+# Run task 4 (40604)...  # task 4要等待前面某个task完成后才执行,Pool的默认大小是4; p=Pool(5) no wait
+# Task 4 runs 0.51 seconds.
+# Task 1 runs 1.13 seconds.
+# Task 0 runs 1.29 seconds.
+# Task 2 runs 2.61 seconds.
+# All subprocesses done.
+```
+
+#### 子进程
+
+`subprocess`模块可以非常方便地启动一个子进程，然后控制其输入和输出
+
+```py
+import subprocess
+
+print('$ nslookup www.python.org')
+r = subprocess.call(['nslookup', 'www.python.org']) # 命令行直接运行 nslookup www.python.org
+print('Exit code:', r)
+
+# $ nslookup www.python.org
+# Server:  UnKnown
+# Address:  172.22.68.1
+# 
+# Non-authoritative answer:
+# Name:    dualstack.python.map.fastly.net
+# Addresses:  2a04:4e42:1a::223
+#           151.101.108.223
+# Aliases:  www.python.org
+# 
+# Exit code: 0
+
+# 子进程需要输入，则可通过communicate()方法输入
+import subprocess
+
+print('$ nslookup')
+p = subprocess.Popen(['nslookup'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+output, err = p.communicate(b'set q=mx\npython.org\nexit\n') # 在命令行执行命令 nslookup 然后手动输入 set q=mx python.org exit
+print(output.decode('utf-8'))
+print('Exit code:', p.returncode)
+
+# $ nslookup
+# Server:		192.168.19.4
+# Address:	192.168.19.4#53
+# 
+# Non-authoritative answer:
+# python.org	mail exchanger = 50 mail.python.org.
+# 
+# Authoritative answers can be found from:
+# mail.python.org	internet address = 82.94.164.166
+# mail.python.org	has AAAA address 2001:888:2000:d::a6
+# 
+# 
+# Exit code: 0
+```
+
+#### 进程间通信
+
+`multiprocessing`模块包装了底层的机制，提供了`Queue`、`Pipes`等多种方式来交换数据
+
+```py
+# 一个往Queue里写数据，一个从Queue里读数据
+from multiprocessing import Process, Queue
+import os, time, random
+
+# 写数据进程执行的代码:
+def write(q):
+    print('Process to write: %s' % os.getpid())
+    for value in ['A', 'B', 'C']:
+        print('Put %s to queue...' % value)
+        q.put(value)
+        time.sleep(random.random())
+
+# 读数据进程执行的代码:
+def read(q):
+    print('Process to read: %s' % os.getpid())
+    while True:
+        value = q.get(True)
+        print('Get %s from queue.' % value)
+
+if __name__=='__main__':
+    # 父进程创建Queue，并传给各个子进程：
+    q = Queue()
+    pw = Process(target=write, args=(q,))
+    pr = Process(target=read, args=(q,))
+    # 启动子进程pw，写入:
+    pw.start()
+    # 启动子进程pr，读取:
+    pr.start()
+    # 等待pw结束:
+    pw.join()
+    # pr进程里是死循环，无法等待其结束，只能强行终止:
+    pr.terminate()
+
+# Process to write: 23252
+# Put A to queue...
+# Process to read: 35356
+# Get A from queue.
+# Put B to queue...
+# Get B from queue.
+# Put C to queue...
+# Get C from queue.
+```
+
+父进程所有Python对象都必须通过`pickle`序列化再传到子进程去，所以，如果`multiprocessing`在Windows下调用失败了，要先考虑是不是`pickle`失败了
+
+在Unix/Linux下，可以使用`fork()`调用实现多进程。
+要实现跨平台的多进程，可以使用`multiprocessing`模块。
+进程间通信是通过`Queue`、`Pipes`等实现的。
+
+### 多线程
+
+Python的线程是真正的Posix Thread，不是模拟出来的线程。
+`_thread`:低级模块，`threading`:高级模块
+
+```py
+import time, threading
+
+# 新线程执行的代码:
+def loop():
+    print('thread %s is running...' % threading.current_thread().name)
+    n = 0
+    while n < 5:
+        n = n + 1
+        print('thread %s >>> %s' % (threading.current_thread().name, n))
+        time.sleep(1)
+    print('thread %s ended.' % threading.current_thread().name)
+
+print('thread %s is running...' % threading.current_thread().name)
+t = threading.Thread(target=loop, name='LoopThread') # 默认线程命名 Thread-1，Thread-2
+t.start()
+t.join()
+print('thread %s ended.' % threading.current_thread().name)
+
+# thread MainThread is running...
+# thread LoopThread is running...
+# thread LoopThread >>> 1
+# thread LoopThread >>> 2
+# thread LoopThread >>> 3
+# thread LoopThread >>> 4
+# thread LoopThread >>> 5
+# thread LoopThread is ended.
+# thread MainThread ended.
+```
+
+#### Lock
+
+```py
+import time, threading
+# 假定这是你的银行存款:
+balance = 0
+def change_it(n):
+    # 先存后取，结果应该为0:
+    global balance
+    balance = balance + n
+    balance = balance - n
+
+def run_thread(n):
+    for i in range(2000000):
+        change_it(n)
+
+t1 = threading.Thread(target=run_thread, args=(5,))
+t2 = threading.Thread(target=run_thread, args=(8,))
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+print(balance)      # 29
+```
+
+```py
+balance = 0
+lock = threading.Lock()
+def run_thread(n):
+    for i in range(100000):       
+        lock.acquire()       # 先要获取锁
+        try:           
+            change_it(n)     # 放心地改吧
+        finally:            
+            lock.release()   # 改完一定要释放锁
+```
+
+锁的好处就是确保了某段关键代码只能由一个线程从头到尾完整地执行，坏处当然也很多，首先是阻止了多线程并发执行，包含锁的某段代码实际上只能以单线程模式执行，效率就大大地下降了。其次，由于可以存在多个锁，不同的线程持有不同的锁，并试图获取对方持有的锁时，可能会造成死锁，导致多个线程全部挂起，既不能执行，也无法结束，只能靠操作系统强制终止。
+
+要想把N核CPU的核心全部跑满，就必须启动N个死循环线程。
+解释器执行代码时，有一个GIL锁：Global Interpreter Lock，任何Python线程执行前，必须先获得GIL锁,然后，每执行100条字节码，解释器就自动释放GIL锁，让别的线程有机会执行。这个GIL全局锁实际上把所有线程的执行代码都给上了锁，所以，多线程在Python中只能交替执行，即使100个线程跑在100核CPU上，也只能用到1个核。
+
+```py
+
+import threading, multiprocessing
+def loop():
+    x = 0
+    while True:
+        x = x ^ 1
+
+for i in range(multiprocessing.cpu_count()):
+    t = threading.Thread(target=loop)
+    t.start()
+```
+
+Python虽然不能利用多线程实现多核任务，但可以通过多进程实现多核任务
+多线程编程，模型复杂，容易发生冲突，必须用锁加以隔离，同时，又要小心死锁的发生。
+Python解释器由于设计时有GIL全局锁，导致了多线程无法利用多核。多线程的并发在Python中就是一个美丽的梦。
+
+### `ThreadLocal`
+
+全局变量修改必须加锁,局部变量在函数调用时传递很麻烦
+
+```py
+def process_student(name):
+    std = Student(name)
+    # std是局部变量，但是每个函数都要用它，因此必须传进去：
+    do_task_1(std)
+    do_task_2(std)
+
+def do_task_1(std):
+    do_subtask_1(std)
+    do_subtask_2(std)
+
+def do_task_2(std):
+    do_subtask_2(std)
+    do_subtask_2(std)
+```
+
+每个线程处理不同的`Student`对象，不能共享
+
+```py
+# 用一个全局dict存放所有的Student对象，然后以thread自身作为key获得线程对应的Student对象(理论上可行)
+global_dict = {}
+
+def std_thread(name):
+    std = Student(name)
+    # 把std放到全局变量global_dict中：
+    global_dict[threading.current_thread()] = std
+    do_task_1()
+    do_task_2()
+
+def do_task_1():
+    # 不传入std，而是根据当前线程查找：
+    std = global_dict[threading.current_thread()]
+    ...
+
+def do_task_2():
+    # 任何函数都可以查找出当前线程的std变量：
+    std = global_dict[threading.current_thread()]
+    ...
+```
+
+```py
+import threading    
+# 创建全局ThreadLocal对象:
+local_school = threading.local()
+
+def process_student():
+    # 获取当前线程关联的student:
+    std = local_school.student
+    print('Hello, %s (in %s)' % (std, threading.current_thread().name))
+
+def process_thread(name):
+    # 绑定ThreadLocal的student:
+    local_school.student = name
+    process_student()  # 线程程中方法参数传递
+
+t1 = threading.Thread(target= process_thread, args=('Alice',), name='Thread-A')
+t2 = threading.Thread(target= process_thread, args=('Bob',), name='Thread-B')
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+
+# Hello, Alice (in Thread-A)
+# Hello, Bob (in Thread-B)
+```
+
+`ThreadLocal`最常用的地方就是为每个线程绑定一个数据库连接，HTTP请求，用户身份信息等，这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
+一个`ThreadLocal`变量虽然是全局变量，但每个线程都只能读写自己线程的独立副本，互不干扰。`ThreadLocal`解决了参数在一个线程中各个函数之间互相传递的问题。
+
+### 进程 vs. 线程
+
+多进程模式最大的优点就是稳定性高，因为一个子进程崩溃了，不会影响主进程和其他子进程。（当然主进程挂了所有进程就全挂了，但是Master进程只负责分配任务，挂掉的概率低）著名的Apache最早就是采用多进程模式
+
+多进程模式的缺点是创建进程的代价大，在Unix/Linux系统下，用`fork`调用还行，在Windows下创建进程开销巨大。另外，操作系统能同时运行的进程数也是有限的，在内存和CPU的限制下，如果有几千个进程同时运行，操作系统连调度都会成问题。
+
+多线程模式致命的缺点就是任何一个线程挂掉都可能直接造成整个进程崩溃，因为所有线程共享进程的内存;“该程序执行了非法操作，即将关闭”，其实往往是某个线程出了问题，但是操作系统会强制结束整个进程。
+
+在Windows下，多线程的效率比多进程要高,IIS服务器默认采用多线程模式
+
+#### 线程切换
+
+无论是多进程还是多线程，只要数量一多，效率肯定上不去；线程切换需要消耗资源
+多任务一旦多到一个限度，就会消耗掉系统所有的资源，结果效率急剧下降
+
+#### 计算密集型 vs. IO密集型
+
+计算密集型任务的特点是要进行大量的计算，消耗CPU资源，比如计算圆周率、对视频进行高清解码等等，全靠CPU的运算能力。这种计算密集型任务虽然也可以用多任务完成，但是任务越多，花在任务切换的时间就越多，CPU执行任务的效率就越低，所以，要最高效地利用CPU，计算密集型任务同时进行的数量应当等于CPU的核心数。
+
+计算密集型任务由于主要消耗CPU资源，因此，代码运行效率至关重要。Python这样的脚本语言运行效率很低，完全不适合计算密集型任务。对于计算密集型任务，最好用C语言编写
+
+O密集型，涉及到网络、磁盘IO的任务都是IO密集型任务，这类任务的特点是CPU消耗很少，任务的大部分时间都在等待IO操作完成（因为IO的速度远远低于CPU和内存的速度）。对于IO密集型任务，任务越多，CPU效率越高，但也有一个限度。常见的大部分任务都是IO密集型任务，比如Web应用。
+
+IO密集型任务执行期间，99%的时间都花在IO上，花在CPU上的时间很少，因此，用运行速度极快的C语言替换用Python这样运行速度极低的脚本语言，完全无法提升运行效率。对于IO密集型任务，最合适的语言就是开发效率最高（代码量最少）的语言，脚本语言是首选，C语言最差。
+
+#### 异步IO
+
+考虑到CPU和IO之间巨大的速度差异，一个任务在执行的过程中大部分时间都在等待IO操作，单进程单线程模型会导致别的任务无法并行执行，因此，才需要多进程模型或者多线程模型来支持多任务并发执行。
+
+现代操作系统对IO操作已经做了巨大的改进，最大的特点就是支持异步IO。如果充分利用操作系统提供的异步IO支持，就可以用单进程单线程模型来执行多任务，这种全新的模型称为事件驱动模型，Nginx就是支持异步IO的Web服务器，它在单核CPU上采用单进程模型就可以高效地支持多任务。在多核CPU上，可以运行多个进程（数量与CPU核心数相同），充分利用多核CPU。由于系统总的进程数量十分有限，因此操作系统调度非常高效。用异步IO编程模型来实现多任务是一个主要的趋势。
+
+对应到Python语言，单线程的异步编程模型称为协程，有了协程的支持，就可以基于事件驱动编写高效的多任务程序。
+
+### 分布式进程
+
+在`Thread`和`Process`中，应当优选`Process`，因为`Process`更稳定且`Process`可以分布到多台机器上，而`Thread`最多只能分布到同一台机器的多个CPU上
+`multiprocessing`模块不但支持多进程，其中`managers`子模块还支持把多进程分布到多台机器上,一个服务进程可以作为调度者，将任务分布到其他多个进程中，依靠网络通信。`managers`模块封装很好，不必了解网络通信的细节，就可以很容易地编写分布式多进程程序。
+
+通过`managers`模块把`Queue`通过网络暴露出去，就可以让其他机器的进程访问`Queue`
+
+```py
+# task_master.py
+
+import random, time, queue
+from multiprocessing.managers import BaseManager
+
+# 发送任务的队列:
+task_queue = queue.Queue()
+# 接收结果的队列:
+result_queue = queue.Queue()
+
+# 从BaseManager继承的QueueManager:
+class QueueManager(BaseManager):
+    pass
+
+# 把两个Queue都注册到网络上, callable参数关联了Queue对象:
+QueueManager.register('get_task_queue', callable=lambda: task_queue)
+QueueManager.register('get_result_queue', callable=lambda: result_queue)
+# 绑定端口5000, 设置验证码'abc':
+manager = QueueManager(address=('', 5000), authkey=b'abc')
+# 启动Queue:
+manager.start()
+# 获得通过网络访问的Queue对象:
+task = manager.get_task_queue()
+result = manager.get_result_queue()
+# 放几个任务进去:
+for i in range(10):
+    n = random.randint(0, 10000)
+    print('Put task %d...' % n)
+    task.put(n)
+# 从result队列读取结果:
+print('Try get results...')
+for i in range(10):
+    r = result.get(timeout=10)
+    print('Result: %s' % r)
+# 关闭:
+manager.shutdown()
+print('master exit.')
+
+# 在一台机器上写多进程程序时，创建的Queue可直接用，但在分布式多进程环境下，添加任务到Queue不可直接对原始task_queue进行操作，那样就绕过了QueueManager的封装，必须通过manager.get_task_queue()获得的Queue接口添加。
+# task_worker.py
+import time, sys, queue
+from multiprocessing.managers import BaseManager
+
+# 创建类似的QueueManager:
+class QueueManager(BaseManager):
+    pass
+
+# 由于这个QueueManager只从网络上获取Queue，所以注册时只提供名字:
+QueueManager.register('get_task_queue')
+QueueManager.register('get_result_queue')
+
+# 连接到服务器，也就是运行task_master.py的机器:
+server_addr = '127.0.0.1'
+print('Connect to server %s...' % server_addr)
+# 端口和验证码注意保持与task_master.py设置的完全一致:
+m = QueueManager(address=(server_addr, 5000), authkey=b'abc')
+# 从网络连接:
+m.connect()
+# 获取Queue的对象:
+task = m.get_task_queue()
+result = m.get_result_queue()
+# 从task队列取任务,并把结果写入result队列:
+for i in range(10):
+    try:
+        n = task.get(timeout=1)
+        print('run task %d * %d...' % (n, n))
+        r = '%d * %d = %d' % (n, n, n*n)
+        time.sleep(1)
+        result.put(r)
+    except Queue.Empty:
+        print('task queue is empty.')
+# 处理结束:
+print('worker exit.')
+
+```
+
+先启动`task_master.py`服务进程：
+
+```bash
+$ python3 task_master.py 
+Put task 3411...
+Put task 1605...
+Put task 1398...
+Put task 4729...
+Put task 5300...
+Put task 7471...
+Put task 68...
+Put task 4219...
+Put task 339...
+Put task 7866...
+Try get results...
+```
+
+`task_master.py`进程发送完任务后，开始等待`result`队列的结果。现在启动`task_worker.py`进程：
+
+```bash
+$ python3 task_worker.py
+Connect to server 127.0.0.1...
+run task 3411 * 3411...
+run task 1605 * 1605...
+run task 1398 * 1398...
+run task 4729 * 4729...
+run task 5300 * 5300...
+run task 7471 * 7471...
+run task 68 * 68...
+run task 4219 * 4219...
+run task 339 * 339...
+run task 7866 * 7866...
+worker exit.
+```
+
+`task_worker.py`进程结束，在`task_master.py`进程中会继续打印出结果：
+
+```bash
+Result: 3411 * 3411 = 11634921
+Result: 1605 * 1605 = 2576025
+Result: 1398 * 1398 = 1954404
+Result: 4729 * 4729 = 22363441
+Result: 5300 * 5300 = 28090000
+Result: 7471 * 7471 = 55815841
+Result: 68 * 68 = 4624
+Result: 4219 * 4219 = 17799961
+Result: 339 * 339 = 114921
+Result: 7866 * 7866 = 61873956
+```
+
+其实这就是一个简单但真正的分布式计算，把代码稍加改造，启动多个worker，就可以把任务分布到几台甚至几十台机器上，比如把计算`n*n`的代码换成发送邮件，就实现了邮件队列的异步发送。
+`task_worker.py`中根本没有创建`Queue`的代码，所以，`Queue`对象存储在`task_master.py`进程中：
+
+```txt
+                                             │
+┌─────────────────────────────────────────┐     ┌──────────────────────────────────────┐
+│task_master.py                           │  │  │task_worker.py                        │
+│                                         │     │                                      │
+│  task = manager.get_task_queue()        │  │  │  task = manager.get_task_queue()     │
+│  result = manager.get_result_queue()    │     │  result = manager.get_result_queue() │
+│              │                          │  │  │              │                       │
+│              │                          │     │              │                       │
+│              ▼                          │  │  │              │                       │
+│  ┌─────────────────────────────────┐    │     │              │                       │
+│  │QueueManager                     │    │  │  │              │                       │
+│  │ ┌────────────┐ ┌──────────────┐ │    │     │              │                       │
+│  │ │ task_queue │ │ result_queue │ │<───┼──┼──┼──────────────┘                       │
+│  │ └────────────┘ └──────────────┘ │    │     │                                      │
+│  └─────────────────────────────────┘    │  │  │                                      │
+└─────────────────────────────────────────┘     └──────────────────────────────────────┘
+                                             │
+
+                                          Network
+```
+
+而`Queue`之所以能通过网络访问，就是通过`QueueManager`实现的。由于`QueueManager`管理的不止一个`Queue`，所以，要给每个`Queue`的网络调用接口起个名字，比如`get_task_queue`。
+
+`authkey`有什么用？这是为了保证两台机器正常通信，不被其他机器恶意干扰。如果`task_worker.py`的`authkey`和`task_master.py`的`authkey`不一致，肯定连接不上。
+
+总结：
+Python的分布式进程接口简单，封装良好，适合需要把繁重任务分布到多台机器的环境下。
+注意`Queue`的作用是用来传递任务和接收结果，每个任务的描述数据量要尽量小。比如发送一个处理日志文件的任务，就不要发送几百兆的日志文件本身，而是发送日志文件存放的完整路径，由Worker进程再去共享的磁盘上读取文件。
+
+```py
+# windows 测试可以过
+# task_master.py
+import queue
+from multiprocessing.managers import BaseManager
+
+class QueueManager(BaseManager):
+    pass
+
+task_queue = queue.Queue()
+result_queue = queue.Queue()
+
+def return_task_queue():
+    return task_queue
+def return_result_queue():
+    return result_queue
+
+QueueManager.register('get_task_queue', callable=return_task_queue)
+QueueManager.register('get_result_queue', callable=return_result_queue)
+
+if __name__ == '__main__':
+    manager = QueueManager(address=('127.0.0.1', 5000), authkey=b'abc')
+    manager.start()
+
+    task = manager.get_task_queue()
+    result = manager.get_result_queue()
+
+    for i in range(100):
+        print('向队列中插入了数字%d' % i)
+        task.put(i)
+
+    print('尝试从结果队列中取出结果')
+    try:
+        for i in range(100):
+            r = result.get(timeout=100)
+            print("结果：%s" % r)
+    except queue.Empty:
+        print('结果队列为空')
+
+    manager.shutdown()
+    print("主服务关闭")
+
+# task_worker.py
+import time, sys, queue
+from multiprocessing.managers import BaseManager
+import os
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+ip = s.getsockname()[0]
+
+class QueueManager(BaseManager):
+    pass
+
+QueueManager.register('get_task_queue')
+QueueManager.register('get_result_queue')
+
+server_addr = '127.0.0.1'
+print('正在连接主服务%s......' % server_addr)
+m = QueueManager(address=(server_addr, 5000), authkey=b'abc')
+m.connect()
+task = m.get_task_queue()
+result = m.get_result_queue()
+
+while True:
+    try:
+        n = task.get(timeout=1)
+        print('从Queue取到了数字 %d' % n)
+        print('正在执行运算 %d * %d' % (n, n))
+        r = '%d * %d = %d  (from %s @ %s)' % (n, n, n * n, os.getpid(), ip)
+        time.sleep(1)
+        result.put(r)
+    except queue.Empty:
+        print('任务队列已空')
+        break
+
+print('工作进程【%s】已结束' % os.getpid())
+```
+
+https://www.liaoxuefeng.com/wiki/1016959663602400/1017639890281664
