@@ -4197,3 +4197,80 @@ def name_of_email(addr):
 name_of_email('<Tom Paris> tom@voyager.org')
 name_of_email('tom@voyager.org')
 ```
+
+## 常用内建模块
+
+batteries included
+
+### `datetime`
+
+仅导入`import datetime`，必须引用全名`datetime.datetime`
+1970年1月1日 00:00:00 UTC+00:00时区的时刻称为`epoch time`，记为`0`(1970年以前的时间timestamp为负数),当前时间就是相对于epoch time的秒数，称为timestamp。
+`timestamp = 0 = 1970-1-1 00:00:00 UTC+0:00`
+BJ Tiem:`timestamp = 0 = 1970-1-1 08:00:00 UTC+8:00`
+timestamp的值与时区毫无关系
+
+```py
+## 获取当前日期和时间
+from datetime import datetime
+now = datetime.now()        # 获取当前datetime
+print(now)          # 2022-07-21 10:58:54.283119
+print(type(now))    # <class 'datetime.datetime'>
+
+## 获取指定日期和时间
+dt = datetime(2022, 5, 20, 13, 14) # 用指定日期时间创建datetime
+print(dt)           # 2022-05-20 13:14:00
+
+## datetime转换为timestamp
+dt.timestamp()      # 1653023640.0    # 整数位表示秒
+
+## timestamp转换为datetime
+t = 1653023640.0
+print(datetime.fromtimestamp(t))           # 2022-05-20 13:14:00  在timestamp和本地时间(当前操作系统设定的时区)做转换
+# 本地时间(BJ UTC+8)：2022-05-20 13:14:00 UTC+8:00 --> 格林威治标准时间：2022-05-20 05:14:00 UTC+0:00
+print(datetime.utcfromtimestamp(t)) # UTC时间
+# 2022-05-20 05:14:00
+
+## str转换为datetime
+cday = datetime.strptime('2022-5-20 05:14:00', '%Y-%m-%d %H:%M:%S') # 需要日期和时间格式  详见 https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+print(cday)         # 2022-05-20 05:14:00
+
+## datetime转换为str
+now = datetime.now()
+print(now.strftime('%a, %b %d %H:%M'))      # 需要一个日期和时间的格式化字符串
+# Thu, Jul 21 11:26
+```
+
+`datetime`类型有时区属性`tzinfo`，默认`None`，无法区分`datetime`是哪个时区，除非给`datetime`设置一个时区
+
+```py
+## datetime加减
+from datetime import datetime, timedelta
+now = datetime.now()
+now                 
+# datetime.datetime(2022, 7, 21, 11, 29, 18, 265551)
+now + timedelta(hours=10)
+# datetime.datetime(2022, 7, 21, 21, 29, 18, 265551)
+now - timedelta(days=1)
+# datetime.datetime(2022, 7, 20, 11, 29, 18, 265551)
+now + timedelta(days=2, hours=12)
+# datetime.datetime(2022, 7, 23, 23, 29, 18, 265551)
+
+## 本地时间转换为UTC时间
+from datetime import datetime, timedelta, timezone
+tz_utc_8 = timezone(timedelta(hours=8)) # 创建时区UTC+8:00
+now = datetime.now()
+now
+# datetime.datetime(2022, 7, 21, 17, 25, 5, 866983)
+dt = now.replace(tzinfo=tz_utc_8) # 强制设置为UTC+8:00(系统时区恰好是UTC+8:00,正确;否则，不能强制设置为UTC+8:00时区)
+# datetime.datetime(2022, 7, 21, 17, 25, 5, 866983, tzinfo=datetime.timezone(datetime.timedelta(seconds=28800)))
+
+## 时区转换
+# 拿到UTC时间，并强制设置时区为UTC+0:00
+utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+print(utc_dt)       # 2022-07-21 09:28:47.426871+00:00
+
+# astimezone()将转换时区为北京时间:
+bj_dt = utc_dt.astimezone(timezone(timedelta(hours=8)))
+print(bj_dt)        # 2022-07-21 17:28:47.426871+08:00
+```
