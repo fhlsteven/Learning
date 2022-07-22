@@ -4266,11 +4266,220 @@ dt = now.replace(tzinfo=tz_utc_8) # 强制设置为UTC+8:00(系统时区恰好�
 # datetime.datetime(2022, 7, 21, 17, 25, 5, 866983, tzinfo=datetime.timezone(datetime.timedelta(seconds=28800)))
 
 ## 时区转换
-# 拿到UTC时间，并强制设置时区为UTC+0:00
+# 拿到UTC时间，并强制设置时区为UTC+0:00；基准时间
 utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
 print(utc_dt)       # 2022-07-21 09:28:47.426871+00:00
 
 # astimezone()将转换时区为北京时间:
 bj_dt = utc_dt.astimezone(timezone(timedelta(hours=8)))
 print(bj_dt)        # 2022-07-21 17:28:47.426871+08:00
+# astimezone()将转换时区为东京时间
+tokyo_dt = utc_dt.astimezone(timezone(timedelta(hours=9)))
+print(tokyo_dt)     # 2022-07-21 18:28:47.426871+09:00
+# astimezone()将bj_dt转换时区为东京时间:
+tokyo_dt2 = bj_dt.astimezone(timezone(timedelta(hours=9)))
+print(tokyo_dt2)    # 2022-07-21 18:28:47.426871+09:00
+```
+
+`datetime`表示的时间需要时区信息才能确定一个特定的时间，否则只能视为本地时间。
+存储`datetime`，最佳方法将其转换为`timestamp`存储，`timestamp`的值与时区完全无关
+
+```py
+import re
+from datetime import datetime, timezone, timedelta
+
+def to_timestamp(dt_str, tz_str):
+    dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+    hour = int(re.match(r'^UTC([\+\-]\d+)\:\d+$', tz_str).group(1))
+    tz = timezone(timedelta(hours=hour))
+    dt = dt.replace(tzinfo=tz)
+    return dt.timestamp() 
+
+t1 = to_timestamp('2015-6-1 08:10:30', 'UTC+7:00')
+assert t1 == 1433121030.0, t1
+t2 = to_timestamp('2015-5-31 16:10:30', 'UTC-09:00')
+assert t2 == 1433121030.0, t2
+```
+
+### `collections`
+
+#### `namedtuple`
+
+创建自定义`tuple`对象，并规定`tuple`元素个数，可用属性而不是索引来引用`tuple`的某个元素
+具备`tuple`不变性，又可根据属性来引用，使用十分方便
+
+```py
+# 创建自定义tuple对象
+from collections import namedtuple
+Point = namedtuple('Point', ['x', 'y'])
+p = Point(1, 2)
+p.x             # 1
+p.y             # 2
+
+isinstance(p, Point)    # True
+isinstance(p, tuple)    # True
+```
+
+#### `deque`
+
+`deque`为了高效实现**插入****和删除**操作的*双向列表*，适合用于队列和栈
+`deque`除实现`list`的`append()`和`pop()`外，还支持`appendleft()`和`popleft()`
+
+```py
+from collections import deque
+q = deque(['a', 'b', 'c'])
+q   # deque(['a', 'b', 'c'])
+q.append('x')
+q.appendleft('y')
+q   # deque(['y', 'a', 'b', 'c', 'x'])
+```
+
+#### `defaultdict`
+
+`dict`，引用的Key不存在，抛出`KeyError`
+`defaultdict` key不存在时，返回调用函数返回的默认值
+
+```py
+from collections import defaultdict
+dd = defaultdict(lambda: 'N/A')
+dd['key1'] = 'abc'
+dd['key1'] # key1存在
+# 'abc'
+dd['key2'] # key2不存在，返回默认值
+# 'N/A'
+```
+
+#### `OrderedDict`
+
+保持Key的顺序，按照Key插入的顺序
+
+```py
+from collections import OrderedDict
+d = dict([('a', 1), ('b', 2), ('c', 3)])
+d       # dict的Key是无序的
+# {'a': 1, 'c': 3, 'b': 2}
+od = OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+od # OrderedDict的Key是有序的
+# OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+
+# FIFO（先进先出）
+from collections import OrderedDict
+class LastUpdatedOrderedDict(OrderedDict):
+    def __init__(self, capacity):
+        super(LastUpdatedOrderedDict, self).__init__()
+        self._capacity = capacity
+    def __setitem__(self, key, value):
+        containsKey = 1 if key in self else 0
+        if len(self) - containsKey >= self._capacity:
+            last = self.popitem(last=False)
+            print('remove:', last)
+        if containsKey:
+            del self[key]
+            print('set:', (key, value))
+        else:
+            print('add:', (key, value))
+        OrderedDict.__setitem__(self, key, value)
+
+d = LastUpdatedOrderedDict(2)
+d['x'] = 3          # add ('x', 3)
+d['y'] = 4          # add ('y', 4)
+print(d)            # LastUpdatedOrderedDict([('x', 3), ('y', 4)])
+d['z'] = 5          # remove: ('x', 3)   add ('z', 5)
+print(d)            # LastUpdatedOrderedDict([('y', 4), ('z', 5)])
+```
+
+#### `ChainMap`
+
+`ChainMap`本身是`dict`,把一组`dict`串起来并组成一个逻辑上的`dict`;按照顺序在内部`dict`依次查找
+应用程序往往都需要传入参数，参数可通过命令行传入，可通过环境变量传入，还可有默认参数。可用`ChainMap`实现参数优先级查找，即先查命令行参数，如果没有传入，再查环境变量，如果没有，就使用默认参数
+
+```py
+from collections import ChainMap
+import os, argparse
+
+from collections import ChainMap
+import os, argparse
+
+# 构造缺省参数:
+defaults = {
+    'color': 'red',
+    'user': 'guest'
+}
+
+# 构造命令行参数:
+parser = argparse.ArgumentParser()
+parser.add_argument('-u', '--user')
+parser.add_argument('-c', '--color')
+namespace = parser.parse_args()
+command_line_args = { k: v for k, v in vars(namespace).items() if v }
+
+# 组合成ChainMap:
+combined = ChainMap(command_line_args, os.environ, defaults)
+
+# 打印参数:
+print('color=%s' % combined['color'])
+print('user=%s' % combined['user'])
+```
+
+```cmd
+> python3 use_chainmap.py 
+color=red
+user=guest
+
+> python3 use_chainmap.py -u bob
+color=red
+user=bob
+
+# 同时传入命令行参数和环境变量，命令行参数的优先级较高
+>user=admin color=green python3 use_chainmap.py -u bob
+color=green
+user=bob
+```
+
+#### `Counter`
+
+```py
+# 简单的计数器
+from collections import Counter  # dict子类
+c = Counter()
+for ch in 'programming':
+    c[ch] = c[ch] + 1
+
+c
+# Counter({'g': 2, 'm': 2, 'r': 2, 'a': 1, 'i': 1, 'o': 1, 'n': 1, 'p': 1})
+c.update('hello') # 也可以一次性update
+c
+# Counter({'r': 2, 'o': 2, 'g': 2, 'm': 2, 'l': 2, 'p': 1, 'a': 1, 'i': 1, 'n': 1, 'h': 1, 'e': 1})#
+```
+
+### base64
+
+Base64是一种用64个字符来表示任意二进制数据的方法
+
+Base64的原理:
+
+1. 准备一个包含64个字符的数组,`['A', 'B', 'C', ... 'a', 'b', 'c', ... '0', '1', ... '+', '/']`
+2. 对二进制数据进行处理，每3个字节一组，一共是`3x8=24`bit，划为4组，每组正好6个bit
+
+    ```txt
+    │       b1      │      b2       │      b3       │
+    ┌───────────────┬───────────────┬───────────────┐
+    │               │# # # # # # # #│               │
+    └───────────────┴───────────────┴───────────────┘
+    ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+    │ │ │ │ │ │ │ │ │#│#│#│#│#│#│#│#│ │ │ │ │ │ │ │ │
+    └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+    ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+    │ │ │ │ │ │ │#│#│#│#│#│#│ │ │ │ │ │ │#│#│#│#│#│#│
+    └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+    │    n1     │     n2    │    n3     │    n4     │
+    ```
+
+3. 得到4个数字作为索引，然后查表，获得相应的4个字符，就是编码后的字符串
+
+Base64编码会把3字节的二进制数据编码为4字节的文本数据，长度增加33%，好处是编码后的文本数据可以在邮件正文、网页等直接显示
+编码的二进制数据不是3的倍数，最后会剩下1个或2个字节？Base64用`\x00`字节在末尾补足后，再在编码的末尾加上1个或2个`=`号，表示补了多少字节，解码的时候，会自动去掉。
+
+```py
+
 ```
