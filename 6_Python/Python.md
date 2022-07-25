@@ -4480,6 +4480,250 @@ Base64的原理:
 Base64编码会把3字节的二进制数据编码为4字节的文本数据，长度增加33%，好处是编码后的文本数据可以在邮件正文、网页等直接显示
 编码的二进制数据不是3的倍数，最后会剩下1个或2个字节？Base64用`\x00`字节在末尾补足后，再在编码的末尾加上1个或2个`=`号，表示补了多少字节，解码的时候，会自动去掉。
 
-```py
+"url safe"的base64编码，把字符`+`和`/`分别变成`-`和`_`
+Base64适用于小段内容编码，比如数字证书签名、Cookie的内容等
+`=`用在URL、Cookie里面会造成歧义，很多Base64编码后会把`=`去掉;解码加上`=`把Base64字符串的长度变为4的倍数
 
+```py
+import base64
+base64.b64encode(b'binary\x00string')
+# b'YmluYXJ5AHN0cmluZw=='
+base64.b64decode(b'YmluYXJ5AHN0cmluZw==')
+# b'binary\x00string'
+
+## "url safe"的base64编码，把字符+和/分别变成-和_
+base64.b64encode(b'i\xb7\x1d\xfb\xef\xff')
+# b'abcd++//'
+base64.urlsafe_b64encode(b'i\xb7\x1d\xfb\xef\xff')
+# b'abcd--__'
+base64.urlsafe_b64decode(b'abcd--__')
+# b'i\xb7\x1d\xfb\xef\xff'
+
+def safe_base64_decode(s):
+    c = len(s) % 4
+    for i in range(c):
+        s = s+"="
+    return base64.b64decode(s)
+
+def safe_base64_decode(s):
+    x = 4-len(s)%4
+    s = s + '=' * x
+    return base64.b64decode(s)
+
+# 不足的=补足就行，多了也不会解错
+def safe_base64_decode(s):
+    return base64.b64decode(s+"====")
+
+assert b'abcd' == safe_base64_decode('YWJjZA=='), safe_base64_decode('YWJjZA==')
+assert b'abcd' == safe_base64_decode('YWJjZA'), safe_base64_decode('YWJjZA')
+print('ok')
+```
+
+### `struct`
+
+没有专门处理字节的数据类型.`b'str'`可以表示字节,字节数组＝二进制str
+`struct` 解决`bytes`和其他二进制数据类型的转换
+`struct`的`pack`函数把任意数据类型变成`bytes`;
+`>I`:`>`表示字节顺序是big-endian，也就是网络序，`I`表示4字节无符号整数
+`>IH`:后面的b`ytes`依次变为`I`：4字节无符号整数和`H`：2字节无符号整数
+https://docs.python.org/3/library/struct.html#format-characters
+
+```py
+# 把一个32位无符号整数变成字节，也就是4个长度的bytes
+n = 10240099
+b1 = (n & 0xff000000) >> 24
+b2 = (n & 0xff0000) >> 16
+b3 = (n & 0xff00) >> 8
+b4 = n & 0xff
+bs = bytes([b1, b2, b3, b4])
+bs  # b'\x00\x9c@c'
+
+import struct
+struct.pack('>I', 10240099)         # b'\x00\x9c@c'
+struct.unpack('>IH', b'\xf0\xf0\xf0\xf0\x80\x80')   #  (4042322160, 32896)
+
+# Windows位图文件（.bmp）
+# 两个字节:'BM'表示Windows位图,'BA'表示OS/2位图;一个4字节整数:表示位图大小;一个4字节整数:保留位，始终为0; 一个4字节整数:实际图像的偏移量;一个4字节整数:Header的字节数;一个4字节整数:图像宽度;一个4字节整数:图像高度;一个2字节整数:始终为1;一个2字节整数:颜色数.
+s = b'\x42\x4d\x38\x8c\x0a\x00\x00\x00\x00\x00\x36\x00\x00\x00\x28\x00\x00\x00\x80\x02\x00\x00\x68\x01\x00\x00\x01\x00\x18\x00'
+struct.unpack('<ccIIIIIIHH', s)
+# (b'B', b'M', 691256, 0, 54, 40, 640, 360, 1, 24)
+## 结果显示，b'B'、b'M'说明是Windows位图，位图大小为640x360，颜色数为24。
+```
+
+```py
+# 检查任意文件是否是位图文件，如果是，打印出图片大小和颜色数
+# -*- coding: utf-8 -*-
+import base64, struct
+bmp_data = base64.b64decode('Qk1oAgAAAAAAADYAAAAoAAAAHAAAAAoAAAABABAAAAAAADICAAASCwAAEgsAA' +
+                   'AAAAAAAAAAA/3//f/9//3//f/9//3//f/9//3//f/9//3//f/9//3//f/9//3//f/9//3/' +
+                   '/f/9//3//f/9//3//f/9/AHwAfAB8AHwAfAB8AHwAfP9//3//fwB8AHwAfAB8/3//f/9/A' +
+                   'HwAfAB8AHz/f/9//3//f/9//38AfAB8AHwAfAB8AHwAfAB8AHz/f/9//38AfAB8/3//f/9' +
+                   '//3//fwB8AHz/f/9//3//f/9//3//f/9/AHwAfP9//3//f/9/AHwAfP9//3//fwB8AHz/f' +
+                   '/9//3//f/9/AHwAfP9//3//f/9//3//f/9//38AfAB8AHwAfAB8AHwAfP9//3//f/9/AHw' +
+                   'AfP9//3//f/9//38AfAB8/3//f/9//3//f/9//3//fwB8AHwAfAB8AHwAfAB8/3//f/9//' +
+                   '38AfAB8/3//f/9//3//fwB8AHz/f/9//3//f/9//3//f/9/AHwAfP9//3//f/9/AHwAfP9' +
+                   '//3//fwB8AHz/f/9/AHz/f/9/AHwAfP9//38AfP9//3//f/9/AHwAfAB8AHwAfAB8AHwAf' +
+                   'AB8/3//f/9/AHwAfP9//38AfAB8AHwAfAB8AHwAfAB8/3//f/9//38AfAB8AHwAfAB8AHw' +
+                   'AfAB8/3//f/9/AHwAfAB8AHz/fwB8AHwAfAB8AHwAfAB8AHz/f/9//3//f/9//3//f/9//' +
+                   '3//f/9//3//f/9//3//f/9//3//f/9//3//f/9//3//f/9//3//f/9//38AAA==')
+
+def bmp_info(data):    
+    t = struct.unpack('<ccIIIIIIHH',bmp_data[0:30])
+    if t[0:2] == (b'B', b'M'):
+        return {
+            'width': t[-4],
+            'height': t[-3],
+            'color': t[-1]
+        }
+
+bi = bmp_info(bmp_data)
+assert bi['width'] == 28
+assert bi['height'] == 10
+assert bi['color'] == 16
+print('ok')
+```
+
+### `haslib`
+
+摘要算法又称哈希算法、散列算法(MD5，SHA1等等);通过一个函数，把任意长度的数据转换为一个长度固定的数据串（通常用16进制的字符串表示）
+
+MD5是最常见的摘要算法，速度很快，生成结果是固定的128 bit/16字节，通常用一个32位的16进制字符串表示
+SHA1的结果是160 bit/20字节，通常用一个40位的16进制字符串表示。
+比SHA1更安全的算法是SHA256和SHA512，越安全的算法不仅越慢，而且摘要长度更长
+碰撞:两个不同的数据通过某个摘要算法得到了相同的摘要
+
+```py
+import hashlib
+
+md5 = hashlib.md5()
+md5.update('how to use md5 in python hashlib?'.encode('utf-8'))
+print(md5.hexdigest())       # d26a53750bc40b38b65a520292f69306
+
+# 分多次调用
+md52 = hashlib.md5()
+md52.update('how to use md5 in '.encode('utf-8'))
+md52.update('python hashlib?'.encode('utf-8'))
+print(md52.hexdigest())      # d26a53750bc40b38b65a520292f69306
+
+# sha1
+sha1 = hashlib.sha1()
+sha1.update('how to use sha1 in '.encode('utf-8'))
+sha1.update('python hashlib?'.encode('utf-8'))
+print(sha1.hexdigest())      # 2c76b57293ce30acef38d98f6046927161b46a44
+```
+
+```py
+# -*- coding: utf-8 -*-
+import hashlib
+db = {
+    'michael': 'e10adc3949ba59abbe56e057f20f883e',
+    'bob': '878ef96e86145580c38c87f0410ad153',
+    'alice': '99b1c2188db85afee403b1536010c2c9'
+}
+
+def login(user, password):
+    md5 = hashlib.md5()
+    md5.update(password.encode('utf-8'))
+    return md5.hexdigest() == db[user]
+
+# 测试:
+assert login('michael', '123456')
+assert login('bob', 'abc999')
+assert login('alice', 'alice2008')
+assert not login('michael', '1234567')
+assert not login('bob', '123456')
+assert not login('alice', 'Alice2008')
+print('ok')
+```
+
+由于常用口令的MD5值很容易被计算出来，所以，要确保存储的用户口令不是那些已经被计算出来的常用口令的MD5，这一方法通过对原始口令加一个复杂字符串来实现，俗称“加盐”：
+
+```py
+def calc_md5(password):
+    return get_md5(password + 'the-Salt')
+
+# 用户无法修改登录名
+def register(username, password):
+    db[username] = get_md5(password + username + 'the-Salt')
+```
+
+```py
+# -*- coding: utf-8 -*-
+import hashlib, random
+
+def get_md5(s):
+    return hashlib.md5(s.encode('utf-8')).hexdigest()
+
+class User(object):
+    def __init__(self, username, password):
+        self.username = username
+        self.salt = ''.join([chr(random.randint(48, 122)) for i in range(20)])
+        self.password = get_md5(password+self.salt)
+
+db = {
+    'michael':User('michael','123456'),
+    'bob':User('bob','abc999'),
+    'alice':User('alice','alice2008')
+}
+
+def login(username, password):
+    user = db[username]
+    return user.password == get_md5(password + user.salt)
+
+# 测试:
+assert login('michael', '123456')
+assert login('bob', 'abc999')
+assert login('alice', 'alice2008')
+assert not login('michael', '1234567')
+assert not login('bob', '123456')
+assert not login('alice', 'Alice2008')
+print('ok')
+```
+
+### `hmac`
+
+Hmac算法：Keyed-Hashing for Message Authentication;通过一个标准算法，在计算哈希的过程中，把key混入计算过程中
+采用Hmac替代salt算法，可使程序算法更标准化，也更安全
+传入的`key`和`message`都是`bytes`类型，`str`类型需要编码为`bytes`
+
+```py
+import hmac
+message = b'Hello, world!'
+key = b'secret'
+h = hmac.new(key, message, digestmod='MD5')
+# 如果消息很长，可以多次调用 h.update(msg)
+h.hexdigest()       # 'fa4ee7d173f2d97ee79022d1a7355bcf'
+```
+
+```py
+# -*- coding: utf-8 -*-
+import hmac, random
+
+def hmac_md5(key, s):
+    return hmac.new(key.encode('utf-8'), s.encode('utf-8'), 'MD5').hexdigest()
+
+class User(object):
+    def __init__(self, username, password):
+        self.username = username
+        self.key = ''.join([chr(random.randint(48, 122)) for i in range(20)])
+        self.password = hmac_md5(self.key, password)
+
+db = {
+    'michael': User('michael', '123456'),
+    'bob': User('bob', 'abc999'),
+    'alice': User('alice', 'alice2008')
+}
+
+def login(username, password):
+    user = db[username]
+    return user.password == hmac_md5(user.key, password)
+
+# 测试:
+assert login('michael', '123456')
+assert login('bob', 'abc999')
+assert login('alice', 'alice2008')
+assert not login('michael', '1234567')
+assert not login('bob', '123456')
+assert not login('alice', 'Alice2008')
+print('ok')
 ```
