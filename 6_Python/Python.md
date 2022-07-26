@@ -4727,3 +4727,901 @@ assert not login('bob', '123456')
 assert not login('alice', 'Alice2008')
 print('ok')
 ```
+
+### `itertools`
+
+用于操作迭代对象的函数
+`count()`创建一个无限迭代器
+`cycle()`把传入的一个序列无限重复下去
+`repeat()`把一个元素无限重复下去，第二个参数可限定重复次数
+通过`takewhile()`等函数根据条件判断来截取出一个有限的序列
+
+`chain()`把一组迭代对象串联起来，形成更大的迭代器
+`groupby()`把迭代器中相邻的重复元素挑出来放在一起;挑选规则通过函数完成,作用于函数的两个元素返回的值相等,两个元素就被认为是在一组,函数返回值作为组的*key*
+
+**`itertools`模块提供的全部是处理迭代的函数，返回值不是`list`，而是`Iterator`，用`for`循环迭代的时候才真正计算**
+
+```py
+# “无限”迭代器
+import itertools
+natuals = itertools.count(1)
+for n in natuals:
+    print(n)
+# ...
+# 1
+# 2
+# 3
+# ...
+
+cs = itertools.cycle('ABC')
+for c in cs:
+    print(c)
+# ...
+# 'A'
+# 'B'
+# 'C'
+# 'A'
+# 'B'
+# 'C'
+# ...
+
+ns = itertools.repeat('A', 3)
+for n in ns:
+    print(n)
+# A
+# A
+# A
+
+natuals = itertools.count(1)
+ns = itertools.takewhile(lambda x:x<=10, natuals)
+list(ns)            # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+for c in itertools.chain('ABC','XYZ'):
+    print(c)
+# 迭代效果：'A' 'B' 'C' 'X' 'Y' 'Z'
+
+for key, group in itertools.groupby('AAABBBCCAAA'):
+    print(key, list(group))
+
+# A ['A', 'A', 'A']
+# B ['B', 'B', 'B']
+# C ['C', 'C']
+# A ['A', 'A', 'A']
+
+for key, group in itertools.groupby('AaaBBbcCAAa', lambda c : c.upper()):
+    print(key, list(group))
+# A ['A', 'a', 'a']
+# B ['B', 'B', 'b']
+# C ['c', 'C']
+# A ['A', 'A', 'a']
+```
+
+```py
+# -*- coding: utf-8 -*-
+import itertools
+
+def pi(N):
+    ' 计算pi的值 '
+    # step 1: 创建一个奇数序列: 1, 3, 5, 7, 9, ...
+    natuals = itertools.count(1)
+    odds = (x for x in natuals if x % 2 == 1)
+    # step 2: 取该序列的前N项: 1, 3, 5, 7, 9, ..., 2*N-1.
+    oddN = itertools.takewhile(lambda x: x <= 2*N-1, odds)
+    # step 3: 添加正负符号并用4除: 4/1, -4/3, 4/5, -4/7, 4/9, ...
+    L = [4/((-1)**i*value) for i,value in enumerate(list(oddN))]    ##  sym = itertools.cycle([1,-1])    L = [4/(i*next(sym)) for i in list(ns)]
+    # step 4: 求和:
+    return sum(L) 
+
+# 测试:
+print(pi(10))
+print(pi(100))
+print(pi(1000))
+print(pi(10000))
+assert 3.04 < pi(10) < 3.05
+assert 3.13 < pi(100) < 3.14
+assert 3.140 < pi(1000) < 3.141
+assert 3.1414 < pi(10000) < 3.1415
+print('ok')
+
+# 创意答案
+def pi(n):
+    odds = itertools.takewhile(lambda x: x < 2 * n, itertools.count(1, 2))    
+    fac = itertools.cycle([1, -1])    
+    sum = 0   
+    for i in odds:
+        sum += 4 * next(fac) / i
+    return sum
+
+def pi(N):
+    odds = itertools.takewhile(lambda x: x < 2 * N, itertools.count(1, 2))
+    fac = itertools.cycle([1, -1])
+    L = [4/i*next(fac) for i in list(odds)]
+    return sum(L)
+```
+
+### `contextlib`
+
+任何对象，正确实现上下文管理，就可用`with`语句
+上下文管理通过`__enter__`和`__exit__`两个方法实现
+
+```py
+# 关闭文件麻烦的写法
+try:
+    f = open('/path/to/file', 'r')
+    f.read()
+finally:
+    if f:
+        f.close
+
+# 简化
+with open('/path/to/file', 'r') as f:
+    f.read()
+
+class Query(object):
+    def __init__(self, name):
+        self.name = name    
+    def __enter__(self):
+        print('Begin')
+        return self    
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type:
+            print('Error')
+        else:
+            print('End')    
+    def query(self):
+        print('Query info about %s...' % self.name)
+
+with Query('Bob') as q:
+    q.query()
+
+# Begin
+# Query info about Bob...
+# End
+```
+
+#### `@contextmanager`
+
+`@contextmanager`这个decorator接受一个generator，用`yield`语句把`with ... as var`把变量输出，然后，`with`语句就可以正常工作
+`@contextmanager`通过编写generator来简化上下文管理
+
+```py
+from contextlib import contextmanager
+
+class Query(object):
+    def __init__(self, name):
+        self.name = name
+    def query(self):
+        print('Query info about %s...' % self.name)
+
+@contextmanager
+def create_query(name):
+    print('Begin')
+    q = Query(name)
+    yield q
+    print('End')
+
+with create_query('Bob') as q:
+    q.query()
+
+# Begin
+# Query info about Bob...
+# End
+
+@contextmanager
+def tag(name):
+    print("<%s>" % name)
+    yield
+    print("</%s>" % name)
+
+with tag("h1"):
+    print("hello")
+    print("world")
+
+# <h1>
+# hello
+# world
+# </h1>
+```
+
+1. `with`语句首先执行`yield`之前的语句，因此打印出`<h1>`；
+2. `yield`调用会执行`with`语句内部的所有语句，因此打印出`hello`和`world`；
+3. 最后执行`yield`之后的语句，打印出`</h1>`
+
+#### `@closing`
+
+把任意对象变为上下文对象，并支持`with`语句
+
+```py
+from contextlib import closing
+from urllib.request import urlopen
+
+with closing(urlopen('https://www.python.org')) as page:
+    for line in page:
+        print(line)
+
+@contextmanager
+def closing(thing):
+    try:
+        yield thing
+    finally:
+        thing.close()
+```
+
+[other with blogs](http://www.cnblogs.com/nnnkkk/p/4309275.html)
+
+### `urllib`
+
+#### Get
+
+```py
+from urllib import request
+
+with request.urlopen('https://api.douban.com/v2/book/2129650') as f:
+    data = f.read()
+    print('Status:', f.status, f.reason)
+    for k, v in f.getheaders():
+        print('%s: %s' % (k, v))
+    print('Data:', data.decode('utf-8'))
+
+# Status: 200 OK
+# Server: nginx
+# Date: Tue, 26 May 2015 10:02:27 GMT
+# Content-Type: application/json; charset=utf-8
+# Content-Length: 2049
+# Connection: close
+# Expires: Sun, 1 Jan 2006 01:00:00 GMT
+# Pragma: no-cache
+# Cache-Control: must-revalidate, no-cache, private
+# X-DAE-Node: pidl1
+# Data: {"rating":{"max":10,"numRaters":16,"average":"7.4","min":0},"subtitle":"","author":["编著"],"pubdate":"2007-6",...}
+
+# 模拟 iphone 6 访问豆瓣
+req = request.Request('http://www.douban.com/')
+req.add_header('User-Agent', 'Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
+
+with request.urlopen(req) as f:
+    print('Status:', f.status, f.reason)
+    for k, v in f.getheaders():
+        print('%s:%s' % (k, v))
+    print('Data:', f.read().decode('utf-8'))
+# ...
+#     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+#     <meta name="format-detection" content="telephone=no">
+#     <link rel="apple-touch-icon" sizes="57x57" href="http://img4.douban.com/pics/cardkit/launcher/57.png" />
+# ...
+```
+
+#### Post
+
+把参数`data`以`bytes`形式传入
+
+```py
+from urllib import request, parse
+
+print('Login to weibo.cn...')
+email = input('Email: ')
+passwd = input('Password: ')
+login_data = parse.urlencode([
+    ('username', email),
+    ('password', passwd),
+    ('entry', 'mweibo'),
+    ('client_id', ''),
+    ('savestate', '1'),
+    ('ec', ''),
+    ('pagerefer', 'https://passport.weibo.cn/signin/welcome?entry=mweibo&r=http%3A%2F%2Fm.weibo.cn%2F')
+])
+
+req = request.Request('https://passport.weibo.cn/sso/login')
+req.add_header('Origin', 'https://passport.weibo.cn')
+req.add_header('User-Agent', 'Mozilla/6.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/8.0 Mobile/10A5376e Safari/8536.25')
+req.add_header('Referer', 'https://passport.weibo.cn/signin/login?entry=mweibo&res=wel&wm=3349&r=http%3A%2F%2Fm.weibo.cn%2F')
+
+with request.urlopen(req, data=login_data.encode('utf-8')) as f:
+    print('Status:', f.status, f.reason)
+    for k, v in f.getheaders():
+        print('%s: %s' % (k, v))
+    print('Data:', f.read().decode('utf-8'))
+
+##### 成功记录
+# Status: 200 OK
+# Server: nginx/1.2.0
+# ...
+# Set-Cookie: SSOLoginState=1432620126; path=/; domain=weibo.cn
+# ...
+# Data: {"retcode":20000000,"msg":"","data":{...,"uid":"1658384301"}}
+
+##### 失败
+# ...
+# Data: {"retcode":50011015,"msg":"\u7528\u6237\u540d\u6216\u5bc6\u7801\u9519\u8bef","data":{"username":"example@python.org","errline":536}}
+```
+
+```py
+# -*- coding: utf-8 -*-
+from urllib import request
+import json
+
+def fetch_data(url):
+    with request.urlopen(url) as f:
+        jsonstr = f.read().decode('utf-8')   
+    return json.loads(jsonstr)
+
+# 测试
+URL = 'https://echarts.apache.org/examples/data/asset/data/life-expectancy-table.json'
+data = fetch_data(URL)
+print(data[0])
+```
+
+#### Handler
+
+需要更复杂的控制，比如通过一个Proxy去访问网站，利用`ProxyHandler`来处理
+
+```py
+proxy_handler = urllib.request.ProxyHandler({'http': 'http://www.example.com:3128/'})
+proxy_auth_handler = urllib.request.ProxyBasicAuthHandler()
+proxy_auth_handler.add_password('realm', 'host', 'username', 'password')
+opener = urllib.request.build_opener(proxy_handler, proxy_auth_handler)
+with opener.open('http://www.example.com/login.html') as f:
+    pass
+```
+
+### XML
+
+操作XML有两种方法：DOM和SAX
+DOM会把整个XML读入内存，解析为树，因此占用内存大，解析慢，优点是可以任意遍历树的节点
+SAX是流模式，边读边解析，占用内存小，解析快，缺点是需要自己处理事件
+
+优先考虑SAX
+
+SAX解析XML非常简洁,关心的事件是`start_element`，`end_element`和`char_data`
+
+当SAX解析器读到一个节点时`<a href="/">python</a>`会产生3个事件：
+
+1. `start_element`事件，在读取`<a href="/">`时；
+2. `char_data`事件，在读取`python`时；
+3. `end_element`事件，在读取`</a`>时
+
+```py
+from xml.parsers.expat import ParserCreate
+
+class DefaultSaxHandler(object):
+    def start_element(self, name, attrs):
+        print('sax:start_element: %s, attrs: %s' % (name, str(attrs)))
+    def end_element(self, name):
+        print('sax:end_element: %s' % name)
+    def char_data(self, text):
+        print('sax:char_data: %s' % text)
+
+xml = r'''<?xml version="1.0"?>
+<ol>
+    <li><a href="/python">Python</a></li>
+    <li><a href="/ruby">Ruby</a></li>
+</ol>
+'''
+
+handler = DefaultSaxHandler()
+parser = ParserCreate()
+parser.StartElementHandler = handler.start_element
+parser.EndElementHandler = handler.end_element
+parser.CharacterDataHandler = handler.char_data
+parser.Parse(xml)
+
+# sax:start_element: ol, attrs: {}
+# sax:char_data:
+# 
+# sax:char_data:
+# sax:start_element: li, attrs: {}
+# sax:start_element: a, attrs: {'href': '/python'}
+# sax:char_data: Python
+# sax:end_element: a
+# sax:end_element: li
+# sax:char_data:
+# 
+# sax:char_data:
+# sax:start_element: li, attrs: {}
+# sax:start_element: a, attrs: {'href': '/ruby'}
+# sax:char_data: Ruby
+# sax:end_element: a
+# sax:end_element: li
+# sax:char_data:
+# 
+# sax:end_element: ol
+# 1
+
+# 生成 XML ；复杂的XML建议改用 JSON
+L = []
+L.append(r'<?xml version="1.0"?>')
+L.append(r'<root>')
+L.append(encode('some & data'))
+L.append(r'</root>')
+return ''.join(L)
+```
+
+读取一大段字符串时，`CharacterDataHandler`可能被多次调用，所以需要保存起来，在`EndElementHandler`里面再合并
+
+```py
+# -*- coding: utf-8 -*-
+from xml.parsers.expat import ParserCreate
+from urllib import request
+
+class DefaultSaxHandler(object):
+    def __init__(self):
+        self.name =''
+        self.data = {}
+    def start_element(self, name, attrs):
+        self.name = name
+        print('sax:start_element:%s, attrs:%s' %(name, str(attrs)))
+    def end_element(self, name):
+        print('sax:end_element:%s' % name)
+    def char_data(self, text):
+        self.data[self.name] = text
+        print('sax:char_data: %s' % text)
+
+
+def parseXml(xml_str):
+    """
+    :param xml_str: XML 格式天气预报
+    :return: 当前城市实时天气预报结果
+    """
+    print(xml_str)
+    handler = DefaultSaxHandler()
+    parser = ParserCreate()
+    parser.StartElementHandler = handler.start_element
+    parser.EndElementHandler = handler.end_element
+    parser.CharacterDataHandler = handler.char_data
+    parser.Parse(xml_str)
+    data = handler.data
+    print(data)
+    # {'status': '1', 'count': '1', 'info': 'OK', 'infocode': '10000', 'province': '北京', 'city': '北京市', 'adcode': '110000', 'weather': '多云', 'temperature': '21', 'winddirection': '东', 'windpower': '≤3', 'humidity': '72', 'reporttime': '2021-05-14 19:33:56'}
+    return {
+        'city': data['city'],
+        'live': {
+            'data': data['reporttime'],
+            'weather': data['weather'],
+            'temperature' : data["temperature"]
+        }
+    }
+
+# 注意空格和换行会影响结果
+data = r'''<response><status>1</status><count>1</count><info>OK</info><infocode>10000</infocode><lives type="list"><live>
+<province>北京</province>
+<city>北京市</city>
+<adcode>110000</adcode>
+<weather>多云</weather>
+<temperature>21</temperature>
+<winddirection>东</winddirection>
+<windpower>≤3</windpower>
+<humidity>72</humidity>
+<reporttime>2021-05-14 19:33:56</reporttime>
+</live>
+</lives>
+</response>
+'''
+
+result = parseXml(data.replace('\n','').replace('\r',''))
+print(result)
+assert result['city'] == '北京市'
+```
+
+### `HTMLParser`
+
+HTML本质上是XML的子集，但HTML的语法没有XML那么严格，所以不能用标准的DOM或SAX来解析HTML
+
+`feed()`方法可多次调用，不一定一次把整个HTML字符串都塞进去，可以一部分一部分塞进去。
+两种特殊字符，一种英文表示的`&nbsp;`，一种数字表示的`&#1234;`，都可通过Parser解析
+
+```py
+from html.parser import HTMLParser
+from html.entities import name2codepoint
+
+class MyHTMLParser(HTMLParser):
+    def handle_starttag(self, tag, attrs):
+        print('<%s>' % tag)
+    def handle_endtag(self, tag):
+        print('</%s>' % tag)
+    def handle_startendtag(self, tag, attrs):
+        print('<%s/>' % tag)
+    def handle_data(self, data):
+        print(data)
+    def handle_comment(self, data):
+        print('<!--', data, '-->')
+    def handle_entityref(self, name):
+        print('&%s;' % name)
+    def handle_charref(self, name):
+        print('&#%s;' % name)
+
+parser = MyHTMLParser()
+parser.feed('''<html>
+<head></head>
+<body>
+<!-- test html parser -->
+    <p>Some <a href=\"#\">html</a> HTML&nbsp;tutorial...<br>END</p>
+</body></html>''')
+```
+
+```py
+# -*- coding: utf-8 -*-
+from html.parser import HTMLParser
+from urllib import request
+import re 
+
+def get_data(url):
+    with request.urlopen(url) as f:
+        print("status:%s, resason:%s" % (f.status, f.reason))
+        return f.read().decode('utf-8')
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.__parsedata='' # 设置一个空的标志位
+        self.info = []
+       
+    def handle_starttag(self, tag, attrs):
+        if ('class', 'event-title') in attrs:
+            self.__parsedata = 'name'  # 通过属性判断如果该标签是我们要找的标签，设置标志位
+        if tag == 'time':
+            self.__parsedata = 'time'
+        if ('class', 'say-no-more') in attrs:
+            self.__parsedata = 'year'
+        if ('class', 'event-location') in attrs:
+            self.__parsedata = 'location'
+    def handle_endtag(self, tag):
+        self.__parsedata = ''# 在HTML 标签结束时，把标志位清空
+    def handle_data(self, data):
+        if self.__parsedata == 'name':
+            # 通过标志位判断，输出打印标签内容
+            self.info.append(f'会议名称:{data}')
+        if self.__parsedata == 'time':
+            self.info.append(f'会议时间:{data}')
+        if self.__parsedata == 'year':
+            if re.match(r'\s\d{4}', data): # 因为后面还有两组 say-no-more 后面的data却不是年份信息,所以用正则检测一下
+                self.info.append(f'会议年份:{data.strip()}')
+        if self.__parsedata == 'location':
+            self.info.append(f'会议地点:{data} \n')
+
+def main():
+    parser = MyHTMLParser()
+    data = get_data('https://www.python.org/events/python-events/')
+    parser.feed(data)
+    for s in parser.info:
+        print(s)
+
+if __name__ == '__main__':
+   main()
+
+## 2 
+Name = r'<h3 class="event-title"><a href=".*">(.*)</a></h3>'    #匹配名称的正则
+Location = r'<span class="event-location">(.*)</span>'          #匹配地点的正则
+Time = r'<time datetime=".*">(.*)<span class="say-no-more">'    #匹配时间的正则
+Year = r'<span class="say-no-more">(.*)</span></time>'          #匹配年份
+
+#处理html内的信息并输出正则到的内容
+
+def delInf(URL):
+    datalist = []
+    strInf = request.urlopen(URL).read().decode('utf-8')  #整个网页的信息采用utf-8的编码格式来
+    name = re.findall(Name, strInf)       #正则匹配内容，返回所有匹配到的项，返回的是一个列表形式
+    location = re.findall(Location, strInf)
+    time = re.findall(Time, strInf)
+    year = re.findall(Year, strInf)
+    for index in range(0, len(name)):
+        print('会议名称:'+name[index])
+        print('会议地点:' + location[index])
+        print('会议时间:' + time[index].replace('&ndash;','-'))  #由于特殊字符的存在，这里要替换一下
+        print('会议年份:' + year[index]+'\n')
+
+```
+
+## 常用第三方模块
+
+所有的第三方模块都会在[PyPI - the Python Package Index](https://pypi.org/)上注册
+
+### Pillow
+
+PIL：Python Imaging Library 图像处理标准库
+
+安装`$ pip install pillow`
+
+图像缩放、切片、旋转、滤镜、输出文字、调色板等
+
+```py
+from PIL import Image
+# 打开一个jpg图像文件，注意是当前路径:
+im = Image.open('test.jpg')
+# 获得图像尺寸:
+w, h = im.size
+print('Original image size: %sx%s' % (w, h))
+# 缩放到50%:
+im.thumbnail((w//2, h//2))
+print('Resize image to: %sx%s' % (w//2, h//2))
+# 把缩放后的图像用jpeg格式保存:
+im.save('thumbnail.jpg', 'jpeg')
+
+######## 
+from PIL import Image, ImageFilter
+# 打开一个jpg图像文件，注意是当前路径:
+im = Image.open('test.jpg')
+# 应用模糊滤镜:
+im2 = im.filter(ImageFilter.BLUR)
+im2.save('blur.jpg', 'jpeg')
+```
+
+```py
+# 绘图方法
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import random
+
+# 随机字母:
+def rndChar():
+    return chr(random.randint(65, 90))
+# 随机颜色1:
+def rndColor():
+    return (random.randint(64, 255), random.randint(64, 255), random.randint(64, 255))
+# 随机颜色2:
+def rndColor2():
+    return (random.randint(32, 127), random.randint(32, 127), random.randint(32, 127))
+
+# 240 x 60:
+width = 60 * 4
+height = 60
+image = Image.new('RGB', (width, height), (255, 255, 255))
+# 创建Font对象:
+font = ImageFont.truetype('arial.ttf', 36) # font = ImageFont.truetype('Arial.ttf', 36)
+# 创建Draw对象:
+draw = ImageDraw.Draw(image)
+# 填充每个像素:
+for x in range(width):
+    for y in range(height):
+        draw.point((x, y), fill=rndColor())
+# 输出文字:
+for t in range(4):
+    draw.text((60 * t + 10, 10), rndChar(), font=font, fill=rndColor2())
+# 模糊:
+image = image.filter(ImageFilter.BLUR)
+image.save('code.jpg', 'jpeg')
+```
+
+https://pillow.readthedocs.io/en/stable/
+
+### requests
+
+处理URL资源特别方便比内置的urllib模块；`$ pip install requests`
+
+```py
+import requests
+#### 简单请求
+r = requests.get('https://www.douban.com/') # 豆瓣首页
+r.status_code   # 200
+r.text          # '<!DOCTYPE HTML>\n<html>\n<head>\n<meta name="description" content="提供图书、电影、音乐唱片的推荐、评论和...'
+
+#### 带参数的URL
+r = requests.get('https://www.douban.com/search', params={'q': 'python', 'cat': '1001'})
+r.url           # 'https://www.douban.com/search?q=python&cat=1001'
+r.encoding      # 'utf-8'
+r.content       ### 无论响应是文本还是二进制内容，都可用content获得bytes对象
+# b'<!DOCTYPE html>\n<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n...'
+
+#### 特定类型响应
+r = requests.get('https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20%3D%202151330&format=json')
+r.json()
+# {'query': {'count': 1, 'created': '2017-11-17T07:14:12Z', ...
+
+#### dict作为headers参数
+r = requests.get('https://www.douban.com/', headers={'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit'})
+r.text # '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n <title>豆瓣(手机版)</title>...'
+
+#### POST请求
+r = requests.post('https://accounts.douban.com/login', data={'form_email': 'abc@example.com', 'form_password': '123456'})
+
+# requests默认使用application/x-www-form-urlencoded对POST数据编码。如果要传递JSON数据，可以直接传入json参数：
+params = {'key': 'value'}
+r = requests.post(url, json=params) # 内部自动序列化为JSON
+
+# 上传文件需要更复杂的编码格式，requests把它简化成files参数
+upload_files = {'file': open('report.xls', 'rb')}   # 务必使用'rb'即二进制模式读取，这样获取的bytes长度才是文件的长度
+r = requests.post(url, files=upload_files)
+
+#### 把post()方法替换为put()，delete()等，就可以以PUT或DELETE方式请求资源。
+
+#### 获取响应头
+r.headers
+# {Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Content-Encoding': 'gzip', ...}
+r.headers['Content-Type']
+# 'text/html; charset=utf-8'
+r.cookies['ts']  ### 获取指定的Cookie
+# 'example_cookie_12345'
+
+#### 请求中传入Cookie 
+cs = {'token': '12345', 'status': 'working'}  # dict
+r = requests.get(url, cookies=cs)
+
+#### 指定超时
+r = requests.get(url, timeout=2.5) # 2.5秒后超时
+```
+
+### chardet
+
+检测编码，简单易用; `$ pip install chardet`
+`chardet`支持检测的编码列表[Supported encodings](https://chardet.readthedocs.io/en/latest/supported-encodings.html)
+
+```py
+import chardet
+chardet.detect(b'Hello World!')
+# {'encoding': 'ascii', 'confidence': 1.0, 'language': ''} ### confidence:表示检测的概率是1.0（即100%）
+
+data = '野火烧不尽，春风吹又生'.encode('gbk')
+chardet.detect(data)
+# {'encoding': 'GB2312', 'confidence': 0.7407407407407407, 'language': 'Chinese'} 
+# GBK是GB2312的超集,检测正确的概率是74%
+
+data = '野火烧不尽，春风吹又生'.encode('utf-8')
+chardet.detect(data)
+# {'encoding': 'utf-8', 'confidence': 0.99, 'language': ''}
+
+data = '最新の主要ニュース'.encode('euc-jp')
+chardet.detect(data)
+# {'encoding': 'EUC-JP', 'confidence': 0.99, 'language': 'Japanese'}
+
+# 获取到编码后，再转换为str
+```
+
+### psutil
+
+用Python来编写脚本简化日常的运维工作是Python的一个重要用途
+。在Linux下，有许多系统命令监控系统运行的状态，如`ps`，`top`，`free`等等。要获取这些系统信息，Python可以通过`subprocess`模块调用并获取结果。但这样做显得很麻烦，要写很多解析代码。
+
+psutil = process and system utilities;支持Linux／UNIX／OSX／Windows等  `$ pip install psutil`
+
+```py
+import psutil
+##### 获取CPU信息
+psutil.cpu_count() # CPU逻辑数量
+# 4
+psutil.cpu_count(logical=False) # CPU物理核心
+# 4  ## 2说明是双核超线程, 4则是4核非超线程
+psutil.cpu_times()  # 统计CPU的用户／系统／空闲时间
+# scputimes(user=54260.28125, system=37183.68750000006, idle=324648.74999999994, interrupt=1552.8125, dpc=566.28125)
+
+# 类似top命令的CPU使用率，每秒刷新一次，累计10次
+for x in range(10):
+    print(psutil.cpu_percent(interval=1, percpu=True))
+# [7.7, 1.6, 1.6, 1.6]
+# [13.6, 7.8, 7.8, 9.4]
+# [20.0, 6.2, 4.7, 4.7]
+# [17.6, 9.4, 6.2, 4.7]
+# [13.6, 4.7, 7.8, 9.2]
+# [10.9, 14.1, 25.0, 29.7]
+# [9.2, 9.4, 20.3, 37.5]
+# [12.3, 17.2, 16.9, 42.2]
+# [15.2, 12.5, 29.7, 32.3]
+# [21.9, 15.6, 18.8, 32.8]
+
+##### 获取内存信息
+psutil.virtual_memory()   # 获取物理内存信息
+# svmem(total=17008623616, available=7462981632, percent=56.1, used=9545641984, free=7462981632)
+psutil.swap_memory()      # 获取交换内存信息
+# sswap(total=15032385536, used=10140028928, free=4892356608, percent=67.5, sin=0, sout=0)
+
+##### 获取磁盘信息
+psutil.disk_partitions()    # 磁盘分区信息
+# [sdiskpart(device='C:\\', mountpoint='C:\\', fstype='NTFS', opts='rw,fixed', maxfile=255, maxpath=260), sdiskpart(device='D:\\', mountpoint='D:\\', fstype='NTFS', opts='rw,fixed', maxfile=255, maxpath=260), sdiskpart(device='E:\\', mountpoint='E:\\', fstype='NTFS', opts='rw,fixed', maxfile=255, maxpath=260), sdiskpart(device='F:\\', mountpoint='F:\\', fstype='NTFS', opts='rw,fixed', maxfile=255, maxpath=260)]
+### journaled表示支持日志
+psutil.disk_usage('/')      # 磁盘使用情况
+# sdiskusage(total=240439554048, used=177875111936, free=62564442112, percent=74.0)
+psutil.disk_io_counters()   # 磁盘IO
+# sdiskio(read_count=1392793, write_count=2740240, read_bytes=42224538624, write_bytes=47443334144, read_time=11516, write_time=7485)
+
+##### 获取网络信息
+psutil.net_io_counters()    # 获取网络读写字节／包的个数
+# snetio(bytes_sent=205000569, bytes_recv=1481447872, packets_sent=1234474, packets_recv=2495996, errin=0, errout=0, dropin=0, dropout=8)
+
+psutil.net_if_addrs()       # 获取网络接口信息
+# {
+#  '以太网': [snicaddr(family=<AddressFamily.AF_LINK: -1>, address='54-E1-AD-00-68-59', netmask=None, broadcast=None, ptp=None), snicaddr(family=<AddressFamily.AF_INET: 2>, address='169.254.154.98', netmask='255.255.0.0', ...)], 
+# 'WLAN': [...],
+# '蓝牙网络连接': [...]
+# }
+
+psutil.net_if_stats()       # 获取网络接口状态
+# {
+#   '蓝牙网络连接': snicstats(isup=False, duplex=<NicDuplex.NIC_DUPLEX_FULL: 2>, speed=3, mtu=1500), 
+#   '以太网': snicstats(isup=False, duplex=<NicDuplex.NIC_DUPLEX_FULL: 2>, speed=0, mtu=1500),  
+#   'WLAN': snicstats(isup=True, duplex=<NicDuplex.NIC_DUPLEX_FULL: 2>, speed=300, mtu=1500)
+# }
+
+psutil.net_connections()    # 获取当前网络连接信息
+# [
+#   sconn(fd=-1, family=<AddressFamily.AF_INET: 2>, type=<SocketKind.SOCK_DGRAM: 2>, laddr=addr(ip='0.0.0.0', port=3389), raddr=(), status='NONE', pid=1700), 
+#   sconn(fd=-1, family=<AddressFamily.AF_INET6: 23>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='::', port=2107), raddr=(), status='LISTEN', pid=5848),
+#   sconn(fd=-1, family=<AddressFamily.AF_INET: 2>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='0.0.0.0', port=1801), raddr=(), status='LISTEN', pid=5848), 
+#   sconn(fd=-1, family=<AddressFamily.AF_INET6: 23>, type=<SocketKind.SOCK_STREAM: 1>, ..., pid=5848), 
+#   sconn(fd=-1, family=<AddressFamily.AF_INET6: 23>, type=<SocketKind.SOCK_STREAM: 1>, ..., pid=2036), 
+#   ...
+#   sconn(fd=-1, family=<AddressFamily.AF_INET: 2>, type=<SocketKind.SOCK_STREAM: 1>, laddr=addr(ip='0.0.0.0', port=445), raddr=(), status='LISTEN', pid=4)
+# ]
+
+##### 获取进程信息
+psutil.pids() # 所有进程ID
+# [0, 4, 96, 420, 444, 588, ..., 24184, 25480, 25684, 26400, 26560]
+p = psutil.Process(23284) # 获取指定进程ID=23284，其实就是当前Python交互环境
+p.name() # 进程名称
+# 'python.exe'
+p.exe() # 进程exe路径
+# 'D:\\Programs\\Python\\Python38\\python.exe'
+p.cwd() # 进程工作目录
+# 'C:\\Users\\Steven\\Downloads'
+p.cmdline() # 进程启动的命令行
+# ['python']
+p.ppid() # 父进程ID
+# 23416
+p.parent() 
+# psutil.Process(pid=23416, name='cmd.exe', status='running', started='2022-07-25 13:44:33')
+p.children() # 子进程列表
+# []
+p.status() # 进程状态
+# 'running'
+p.username() # 进程用户名
+# 'STEVEN\\Steven'
+p.create_time()
+# 1658822773.268577
+p.terminal() # 进程终端
+## '/dev/ttys002'  AttributeError: 'Process' object has no attribute 'terminal'
+p.cpu_times() # 进程使用的CPU时间
+# pcputimes(user=0.109375, system=0.078125, children_user=0.0, children_system=0.0)
+p.memory_info() # 进程使用的内存
+# pmem(rss=13484032, vms=8159232, num_page_faults=6685, peak_wset=14077952, wset=13484032, peak_paged_pool=179664, paged_pool=179264, peak_nonpaged_pool=17280, nonpaged_pool=13760, pagefile=8159232, peak_pagefile=8638464, private=8159232)
+p.open_files() # 进程打开的文件
+# [
+#   popenfile(path='C:\\Program Files\\WindowsApps\\Microsoft.LanguageExperiencePacken-US_17134.66.103.0_neutral__8wekyb3d8bbwe\\Windows\\System32\\en-US\\KernelBase.dll.mui', fd=-1),
+#   popenfile(path='C:\\Program Files\\WindowsApps\\Microsoft.LanguageExperiencePacken-US_17134.66.103.0_neutral__8wekyb3d8bbwe\\Windows\\System32\\en-US\\kernel32.dll.mui', fd=-1)]
+p.connections() # 进程相关网络连接
+# []
+p.num_threads() # 进程的线程数量
+# 3
+p.threads() # 所有线程信息
+# [pthread(id=212, user_time=0.109375, system_time=0.25), pthread(id=21100, user_time=0.0, system_time=0.0), pthread(id=3352, user_time=0.0, system_time=0.0)]
+p.environ() # 进程环境变量
+# {'ALLUSERSPROFILE': 'C:\\ProgramData', 'APPDATA': 'C:\\Users\\Steven\\AppData\\Roaming', 'CLASSPATH': '.;D:\\Program Files\\Java\\jdk1.8.0_301\\lib;D:\\Program Files\\Java\\jdk1.8.0_301\\lib\\tools.jar', 'COMMONPROGRAMFILES': 'C:\\Program Files\\Common Files', ...'C:\\windows'}
+p.terminate() # 结束进程
+# Terminated: 15 <-- 自己把自己结束了
+```
+
+`psutil`还提供了一个`test()`函数，可以模拟出`ps`命令的效果：
+
+```bash
+$ sudo python3
+Password: ******
+Python 3.6.3 ... on darwin
+Type "help", ... for more information.
+>>> import psutil
+>>> psutil.test()
+USER         PID %MEM     VSZ     RSS TTY           START    TIME  COMMAND
+root           0 24.0 74270628 2016380 ?             Nov18   40:51  kernel_task
+root           1  0.1 2494140    9484 ?             Nov18   01:39  launchd
+root          44  0.4 2519872   36404 ?             Nov18   02:02  UserEventAgent
+root          45    ? 2474032    1516 ?             Nov18   00:14  syslogd
+root          47  0.1 2504768    8912 ?             Nov18   00:03  kextd
+root          48  0.1 2505544    4720 ?             Nov18   00:19  fseventsd
+_appleeven    52  0.1 2499748    5024 ?             Nov18   00:00  appleeventsd
+root          53  0.1 2500592    6132 ?             Nov18   00:02  configd
+...
+```
+
+```py
+import psutil
+psutil.Process() # 获取当前运行的进程相关信息
+# psutil.Process(pid=23904, name='python.exe', status='running', started='17:26:47')
+psutil.cpu_freq()  # 返回CPU频率
+# scpufreq(current=2496.0, min=0.0, max=2496.0)
+psutil.cpu_percent()  # 返回当前系统CPU利用率(float类型)
+# 20.0
+psutil.cpu_stats()  # 返回CPU统计数据
+# scpustats(ctx_switches=1838585427, interrupts=2765403574, soft_interrupts=0, syscalls=2517607330)
+psutil.cpu_times_percent() # 对于每个特定的CPU时间提供利用率，由cpu_times()返回。
+# scputimes(user=11.3, system=8.1, idle=79.4, interrupt=0.8, dpc=0.4)
+psutil.boot_time()  # 返回从1970以来以秒表示的系统启动时间
+# 1658718836.6645727
+psutil.users()   # 返回当前连接在系统上的用户列表
+# [suser(name='Steven', terminal=None, host=None, started=1658718855.899352, pid=None)]
+```
+
+[pstuil](https://github.com/giampaolo/psutil)
