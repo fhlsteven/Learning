@@ -5625,3 +5625,67 @@ psutil.users()   # 返回当前连接在系统上的用户列表
 ```
 
 [pstuil](https://github.com/giampaolo/psutil)
+
+## `venv`
+
+[`venv`](https://docs.python.org/zh-cn/3/tutorial/venv.html)用来为一个应用创建一套“隔离”的Python运行环境
+`python3 -m venv <目录>`创建
+Linux/Mac用`source activate`，Windows用`activate.bat`激活该venv环境
+使用`deactivate`退出
+删除:退出后把整个目录proj101env删掉就行
+
+[virtualenv](https://virtualenv.pypa.io/en/latest/user_guide.html)
+> 创建虚拟环境的时候 `virtualenv --no-site-packages venv`，如果virtualenv版本大于20，加上`--no-site-packages`时候会报错，默认版本大于20是不用加的
+
+```bash
+# 创建目录
+~$ mkdir proj101env
+~$ cd proj101env/
+proj101env$
+# 创建一个独立的Python运行环境
+proj101env$ python3 -m venv .
+proj101env$ ls
+bin  include  lib  pyvenv.cfg
+# 观察bin目录的内容，里面有python3、pip3等可执行文件，实际上是链接到Python系统目录的软链接
+# 进入bin目录，激活venv环境
+proj101env$ cd bin
+bin$ source activate
+(proj101env) bin$
+(proj101env) bin$ pip3 install jinja2
+...
+Successfully installed jinja2-xxx
+(proj101env) bin$ python3
+>>> import jinja2
+>>> exit()
+# 用pip安装的包都被安装到proj101env这个环境下，具体目录是proj101env/lib/python3.x/site-packages
+# 退出当前的proj101env环境，使用deactivate
+(proj101env) bin$ deactivate
+bin$
+```
+
+## 图形界面
+
+支持多种图形界面的第三方库:Tk、xWidgets、Qt、GTK等
+
+Tkinter: 自带库支持TK; Tkinter封装了访问Tk的接口;Tk是一个图形库，支持多个操作系统，使用Tcl语言开发;Tk会调用操作系统提供的本地GUI接口，完成最终的GUI。
+
+```py
+from tkinter import *
+
+class Application(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.pack()
+        self.createWidgets()
+    def createWidgets(self):
+        self.helloLabel = Label(self, text='Hello, world!')
+        self.helloLabel.pack()
+        self.quitButton = Button(self, text='Quit', command=self.quit)
+        self.quitButton.pack()
+        
+app = Application()
+# 设置窗口标题:
+app.master.title('Hello World')
+# 主消息循环:
+app.mainloop()
+```
