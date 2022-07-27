@@ -6379,3 +6379,145 @@ print_info(msg)
 # --------------------
 #   Attachment: application/octet-stream
 ```
+
+## 访问数据库
+
+数据库类别
+付费商用数据库:Oracle，典型的高富帅；SQL Server，微软自家产品，Windows定制专款；DB2，IBM的产品，听起来挺高端；Sybase，曾经跟微软是好基友，后来关系破裂，现在家境惨淡。
+免费开源数据库:MySQL，大家都在用，一般错不了；PostgreSQL，学术气息有点重，其实挺不错，但知名度没有MySQL高；sqlite，嵌入式数据库，适合桌面和移动应用。
+
+### 使用SQLite
+
+SQLite是一种嵌入式数据库，数据库就是一个文件。SQLite本身是C写的，体积很小，经常被集成到各种应用程序中，在iOS和Android的App中可集成。
+不能承受高并发访问，适合桌面和移动应用
+Python内置SQLite3
+数据库连接称为`Connection`;通过`Cursor`执行SQL语句,然后，获得执行结果
+Python定义了一套操作数据库的API接口，任何数据库要连接到Python，只需要提供符合Python标准的数据库驱动即可
+
+```py
+# 导入SQLite驱动:
+import sqlite3
+# 连接到SQLite数据库
+# 数据库文件是test.db
+# 如果文件不存在，会自动在当前目录创建:
+conn = sqlite3.connect('test.db')
+# 创建一个Cursor:
+cursor = conn.cursor()
+# 执行一条SQL语句，创建user表:
+cursor.execute('create table user (id varchar(20) primary key, name varchar(20))')
+# <sqlite3.Cursor object at 0x000001FA4504D9D0>
+# 继续执行一条SQL语句，插入一条记录:
+cursor.execute('insert into user (id, name) values (\'1\', \'Michael\')')
+# <sqlite3.Cursor object at 0x000001FA4504D9D0>
+# 通过rowcount获得插入的行数:
+cursor.rowcount         # 执行insert，update，delete语句, 由rowcount返回影响的行数
+# 1
+# 提交事务:
+conn.commit()
+# 关闭Cursor:
+cursor.close()
+# 关闭Connection:
+conn.close()
+
+##### 查询记录
+conn = sqlite3.connect('test.db')
+cursor = conn.cursor()
+# 执行查询语句:
+cursor.execute('select * from user where id=?', ('1',))
+# <sqlite3.Cursor object at 0x000001FA4504DDC0>
+# 获得查询结果集:
+values = cursor.fetchall()
+values
+# [('1', 'Michael')]
+cursor.close()
+conn.close()
+```
+
+使用`Cursor`对象执行`insert`，`update`，`delete`语句，由`rowcount`返回影响的行数。
+使用`Cursor`对象执行`select`语句时，通过`fetchall()`可以拿到结果集。结果集是一个`list`，每个元素都是一个`tuple`，对应一行记录。
+如果SQL语句带有参数，那么需要把参数按照位置传递给`execute()`方法，有几个`?`占位符就必须对应几个参数，例如：
+`cursor.execute('select * from user where name=? and pwd=?', ('abc', 'password'))`
+
+```py
+# -*- coding: utf-8 -*-
+import os, sqlite3
+
+db_file = os.path.join(os.path.dirname(__file__), 'test.db')
+if os.path.isfile(db_file):
+    os.remove(db_file)
+
+# 初始数据:
+conn = sqlite3.connect(db_file)
+cursor = conn.cursor()
+cursor.execute('create table user(id varchar(20) primary key, name varchar(20), score int)')
+cursor.execute(r"insert into user values ('A-001', 'Adam', 95)")
+cursor.execute(r"insert into user values ('A-002', 'Bart', 62)")
+cursor.execute(r"insert into user values ('A-003', 'Lisa', 78)")
+conn.commit()
+cursor.close()
+conn.close()
+
+def get_score_in(low, high):
+    ' 返回指定分数区间的名字，按分数从低到高排序 '
+    conn = sqlite3.connect('test.db')
+    cursor = conn.cursor()
+    cursor.execute('select name, score from user where score>=? and score<=? order by score', (low, high))
+    data = cursor.fetchall()
+    # print(data)   
+    cursor.close()
+    conn.close()
+    L_user = [user[0] for user in data]         # 将数据格式化为判断所需的格式并返回
+    return L_user
+
+# 测试:
+assert get_score_in(80, 95) == ['Adam'], get_score_in(80, 95)
+assert get_score_in(60, 80) == ['Bart', 'Lisa'], get_score_in(60, 80)
+assert get_score_in(60, 100) == ['Bart', 'Lisa', 'Adam'], get_score_in(60, 100)
+
+print('Pass')
+```
+
+### 使用MySQL
+
+MySQL是Web世界中使用最广泛的数据库服务器;最常用引擎是支持数据库事务的InnoDB
+
+在Mac或Linux上，需要编辑MySQL的配置文件，把数据库默认的编码全部改为UTF-8。`/etc/my.cnf`或者`/etc/mysql/my.cnf`：
+
+```conf
+[client]
+default-character-set = utf8
+
+[mysqld]
+default-storage-engine = INNODB
+character-set-server = utf8
+collation-server = utf8_general_ci
+```
+
+```bash
+# 重启MySQL后，可以通过MySQL的客户端命令行检查编码
+$ mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor...
+...
+
+mysql> show variables like '%char%';
++--------------------------+--------------------------------------------------------+
+| Variable_name            | Value                                                  |
++--------------------------+--------------------------------------------------------+
+| character_set_client     | utf8                                                   |
+| character_set_connection | utf8                                                   |
+| character_set_database   | utf8                                                   |
+| character_set_filesystem | binary                                                 |
+| character_set_results    | utf8                                                   |
+| character_set_server     | utf8                                                   |
+| character_set_system     | utf8                                                   |
+| character_sets_dir       | /usr/local/mysql-5.1.65-osx10.6-x86_64/share/charsets/ |
++--------------------------+--------------------------------------------------------+
+8 rows in set (0.00 sec)
+
+# 如果MySQL的版本≥5.5.3，可把编码设置为utf8mb4，utf8mb4和utf8完全兼容，但它支持最新的Unicode标准，可以显示emoji字符
+```
+
+MySQL官方提供了mysql-connector-python驱动，安装的时候需要给pip命令加上参数`--allow-external`：
+`$ pip install mysql-connector-python`
+`$ pip install mysql-connector`
