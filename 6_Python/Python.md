@@ -5669,9 +5669,15 @@ bin$
 
 Tkinter: 自带库支持TK; Tkinter封装了访问Tk的接口;Tk是一个图形库，支持多个操作系统，使用Tcl语言开发;Tk会调用操作系统提供的本地GUI接口，完成最终的GUI。
 
+在GUI中，每个Button、Label、输入框等，都是Widget。Frame可容纳其他Widget的Widget，所有Widget组合起来是一棵树。
+`pack()`方法把Widget加入到父容器中，并实现布局。`pack()`是最简单的布局，`grid()`可以实现更复杂的布局。
+在`createWidgets()`方法中，创建`Label`和`Button`，当`Button`被点击时，触发`self.quit()`使程序退出
+
 ```py
+# 1.导入Tkinter包的所有内容
 from tkinter import *
 
+# 2. 从Frame派生一个Application类，这是所有Widget的父容器
 class Application(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
@@ -5682,10 +5688,228 @@ class Application(Frame):
         self.helloLabel.pack()
         self.quitButton = Button(self, text='Quit', command=self.quit)
         self.quitButton.pack()
-        
+
+# 3. 实例化Application，启动消息循环
 app = Application()
 # 设置窗口标题:
 app.master.title('Hello World')
 # 主消息循环:
 app.mainloop()
+```
+
+GUI程序的主线程负责监听来自操作系统的消息，并依次处理每一条消息。因此，如果消息处理非常耗时，就需要在新线程中处理
+
+```py
+# 输入文本
+from tkinter import *
+import tkinter.messagebox as messagebox
+
+class Application(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.pack()
+        self.createWidgets()
+    def createWidgets(self):
+        self.nameInput = Entry(self)
+        self.nameInput.pack()
+        self.alertButton = Button(self, text='Hello', command=self.hello)
+        self.alertButton.pack()
+    def hello(self):
+        name = self.nameInput.get() or 'world'
+        messagebox.showinfo('Message', 'Hello, %s' % name)
+
+app = Application()
+app.master.title('Hello World')
+app.mainloop()    
+```
+
+```py
+from tkinter import *
+import time
+
+LOG_LINE_NUM = 0
+
+class Application(object):
+    def __init__(self, window):
+        self.mainWin = window
+    def windowBox(self):
+        #标题和标签
+        self.mainWin.title("ASCLL码转换器")
+        self.mainWin.geometry('605x590+550+150')  # width x height + x + y 宽和高 以及屏幕坐标
+        self.LeftWindowLabel = Label(self.mainWin, text="待处理数据", padx=100)
+        self.LeftWindowLabel.grid(column=0, row=0) 
+        self.RightWindowLabel = Label(self.mainWin,text="数据转换结果")
+        self.RightWindowLabel.grid(column=4,row=0)
+        self.LeftLogLabel = Label(self.mainWin,text="数据日志")
+        self.LeftLogLabel.grid(column=0,row=4)
+        self.RightLogLabel = Label(self.mainWin,text="处理日志")
+        self.RightLogLabel.grid(column=4,row=4)
+        #文本框
+        self.LeftText = Text(self.mainWin,width=35,height=30)
+        self.LeftText.grid(column=0,row=1,rowspan=2,columnspan=2)
+        self.RightText = Text(self.mainWin,width=35,height=30)
+        self.RightText.grid(column=4,row=1,rowspan=2,columnspan=2)
+        self.LeftLogText = Text(self.mainWin,width=35,height=10)
+        self.LeftLogText.grid(column=0,row=7,rowspan=2,columnspan=2)
+        self.RightLogText = Text(self.mainWin,width=35,height=10)
+        self.RightLogText.grid(column=4,row=7,rowspan=2,columnspan=2)
+        #按钮
+        self.TransButton = Button(self.mainWin, text="开始转换", command=self.str_to_ascll, width=10)
+        self.TransButton.grid(column=2, row=2)
+    def str_to_ascll(self):
+        src= self.LeftText.get(1.0, END)
+        if src:
+            try:
+                Lsrc = [x.strip() for x in src if x.strip() != '']
+                Osrc = [ord(x) for x in Lsrc ]
+                Tsrc = "".join("%s" %x for x in Osrc)
+                self.RightText.delete(1.0, END)
+                self.RightText.insert(1.0, Tsrc)
+                self.Log_Show("转换成功")
+            except:
+                self.RightText.delete(1.0,END)
+                self.RightText.insert(1.0,"字符转换失败")
+        else:
+            self.Log_Show("转换失败")
+
+    def get_time(self):
+        current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        return current_time
+
+    def Log_Show(self, log_message):
+        global LOG_LINE_NUM
+        current_time = self.get_time()
+        logmessage_in = str(current_time) +" " + str(log_message) + "\n"      #换行
+        if LOG_LINE_NUM <= 7:
+            self.LeftLogText.insert(END, logmessage_in)
+            LOG_LINE_NUM = LOG_LINE_NUM + 1
+        else:
+            self.LeftLogText.delete(1.0,2.0)
+            self.LeftLogText.insert(END, logmessage_in)
+
+def First_GUI():
+    window = Tk()
+    app = Application(window)
+    app.windowBox()
+    window.mainloop()
+
+First_GUI()
+```
+
+![str_to_ascll_app](./images/base/strToAscll.png)
+
+### 海龟绘图
+
+1966,[LOGO语言](https://baike.baidu.com/item/logo/4689862)专门给儿童学习编程;通过编程指挥一个小海龟（turtle）在屏幕上绘图
+[turtle库](https://docs.python.org/3.3/library/turtle.html#turtle-methods)
+`width()`:设置笔刷宽度
+`pencolor()`:设置颜色
+`done()`:让窗口进入消息循环，等待被关闭
+绘制出一个长方形
+
+```py
+# 导入turtle包的所有内容:
+from turtle import *
+
+# 设置笔刷宽度:
+width(4)
+# 前进:
+forward(200)
+# 右转90度:
+right(90)
+# 笔刷颜色:
+pencolor('red')
+forward(100)
+right(90)
+
+pencolor('green')
+forward(200)
+right(90)
+
+pencolor('blue')
+forward(100)
+right(90)
+
+# 调用done()使得窗口等待被关闭，否则将立刻关闭窗口:
+done()
+```
+
+```py
+# 画五个五角星
+from turtle import * 
+def drawStar(x, y):
+    pu()            # penup() Pull the pen up – no drawing when moving. 之后移动的时候就不会画
+    goto(x, y)
+    pd()            # pendown()     # 移动的时候就会画图
+    seth(0)         # # set heading: 0 setheading
+    for i in range(5):
+        fd(40)      # forward
+        rt(144)     # right
+
+for x in range(0, 250, 50):  # range(0, 250, 50) ==> 0 50 100 150 200
+    drawStar(x , 0)
+
+done()
+```
+
+```py
+# 使用递归绘制分型树
+from turtle import *
+
+# 设置色彩模式是RGB:
+colormode(255)
+lt(90)          # left 画笔方向 向上，默认向右的
+
+lv = 14
+l = 120
+s = 45
+
+width(lv)      # pensize() 笔刷大小
+
+# 初始化RGB颜色:
+r = 0
+g = 0
+b = 0
+pencolor(r, g, b)   # 笔刷颜色
+
+penup()             # 笔刷抬起
+bk(l)               # back 向后退 120
+pendown()           # 笔刷放下
+fd(l)               # 前进 120， 画完了树干
+
+def draw_tree(l, level):
+    global r, g, b
+    # save the current pen width
+    w = width()
+
+    # narrow the pen width
+    width(w * 3.0 / 4.0)
+    # set color:
+    r = r + 1
+    g = g + 2
+    b = b + 3
+    pencolor(r % 200, g % 200, b % 200)
+
+    l = 3.0 / 4.0 * l
+
+    lt(s)  # 画笔旋转 45
+    fd(l)
+
+    if level < lv:
+        draw_tree(l, level + 1)
+    bk(l)
+    rt(2 * s) # 右转 90
+    fd(l)
+
+    if level < lv:
+        draw_tree(l, level + 1)
+    bk(l)
+    lt(s)  # 左转 45 
+
+    # restore the previous pen width
+    width(w)
+
+speed("fastest")  # 画图速度 
+draw_tree(l, 4)
+done()
 ```
