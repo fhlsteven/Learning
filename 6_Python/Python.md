@@ -5913,3 +5913,170 @@ speed("fastest")  # 画图速度
 draw_tree(l, 4)
 done()
 ```
+
+## 网络编程
+
+网络通信是两台计算机上的两个进程之间的通信;在Python程序本身这个进程内，连接别的服务器进程的通信端口进行通信。
+
+### TCP/IP简介
+
+互联网协议簇（Internet Protocol Suite）通用协议标准;互联网上每个计算机的唯一标识就是IP地址;P地址对应的实际上是计算机的网络接口，通常是网卡
+IP地址32位整数（称为IPv4）;IPv6地址128位整数
+TCP协议则是建立在IP协议之上;建立可靠连接，保证数据包按顺序到达;浏览器的HTTP协议、发送邮件的SMTP协议都是建立在TCP协议基础上
+TCP报文包含要传输的数据，源IP地址和目标IP地址，源端口和目标端口
+
+### TCP编程
+
+Socket表示“打开了一个网络链接”，打开一个Socket需要知道目标计算机的IP地址和端口号，再指定协议类型即可
+
+客户端:创建TCP连接时,主动发起连接的叫客户端，被动响应连接的叫服务器
+TCP连接创建的是双向通道,双方都可以同时给对方发数据,谁先发谁后发,根据具体的协议来决定;HTTP协议规定客户端必须先发请求给服务器，服务器收到后才发数据给客户端
+
+`AF_INET`指定使用IPv4协议，如果要用更先进的IPv6，就指定为`AF_INET6`;`SOCK_STREAM`指定使用面向流的TCP协议
+`80`端口是Web服务的标准端口;SMTP服务`25`端口，FTP服务`21`;端口号小于1024的是Internet标准服务的端口，大于1024可以任意使用
+`recv(max)`:一次最多接收指定的字节数
+
+```py
+# 导入socket库:
+import socket
+
+# 创建一个socket:
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 建立连接:
+s.connect(('www.sina.com.cn', 80)) # tuple，包含地址和端口号
+# 发送数据:
+s.send(b'GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n')
+# 60
+# 接收数据:
+buffer = []
+while True:
+    # 每次最多接收1k字节:
+    d = s.recv(1024)
+    if d:
+        buffer.append(d)
+    else:
+        break
+data = b''.join(buffer)
+# 关闭连接:
+s.close()
+
+# 数据包括HTTP头和网页本身
+header, html = data.split(b'\r\n\r\n', 1)
+print(header.decode('utf-8'))
+# 把接收的数据写入文件:
+with open('sina.html', 'wb') as f:
+    f.write(html)
+```
+
+```py
+# 获取的HTML文件，把资源地址加上协议名，例如：//url..改成[https://url..](https://url..)就能直接打开了
+import socket
+import ssl
+
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = ssl.wrap_socket(socket.socket())
+s.connect(('www.sina.com.cn', 443))
+s.send(b'GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n')
+
+buffer = []
+d = s.recv(1024)
+while d:
+    buffer.append(d)
+    d = s.recv(1024)
+data = b''.join(buffer)
+
+s.close()
+
+header, html = data.split(b'\r\n\r\n', 1)
+print(header.decode('utf-8'))
+
+with open('sina.html', 'wb') as f:
+    f.write(html)
+```
+
+服务器:
+服务器进程首先要绑定一个端口并监听来自其他客户端的连接。如果某个客户端连接过来了，服务器就与该客户端建立Socket连接，随后的通信就靠这个Socket连接了
+服务器要能够区分一个Socket连接是和哪个客户端绑定的.一个Socket依赖4项：服务器地址、服务器端口、客户端地址、客户端端口来唯一确定一个Socket
+
+服务器可能有多块网卡，可以绑定到某一块网卡的IP地址上，也可用`0.0.0.0`绑定到所有的网络地址，还可用`127.0.0.1`绑定到本机地址。`127.0.0.1`是特殊的IP地址，表示本机地址，如果绑定到这个地址，客户端必须同时在本机运行才能连接，外部的计算机无法连接进来。
+
+```py
+# echo_server.py
+import threading
+import time
+import socket
+# 创建一个基于IPv4和TCP协议的Socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 绑定地址和端口号
+s.bind(('127.0.0.1', 9999))
+# 开始监听端口,参数指定等待连接的最大数量
+s.listen(5)
+print('Waitting for connection ...')
+# 永久循环来接受来自客户端的连接;accept()会等待并返回一个客户端的连接
+while True:
+    # 接受一个新连接:
+    sock, addr = s.accept()
+    # 创建新线程来处理TCP连接:
+    t = threading.Thread(target=tcplink, args=(sock, addr))
+    t.start()
+
+# 每个连接都必须创建新线程（或进程）来处理，单线程在处理连接的过程中，无法接受其他客户端的连接
+def tcplink(sock, addr):
+    print('Accept new connection from %s:%s' % addr)
+    sock.send(b'Welcome!')
+    while True:
+        data = sock.recv(1024)
+        time.sleep(1)
+        if not data or data.decode('utf-8') == 'exit':
+            break
+        sock.send(('Hello, %s!' % data.decode('utf-8')).encode('utf-8'))
+    sock.close()
+    print('Connection from %s:%s closed.' % addr)
+
+# echo_client.py
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 建立连接:
+s.connect(('127.0.0.1', 9999))
+# 接收欢迎消息:
+print(s.recv(1024).decode('utf-8'))
+for data in [b'Michael', b'Tracy', b'Sarah']:
+    # 发送数据:
+    s.send(data)
+    print(s.recv(1024).decode('utf-8'))
+s.send(b'exit')
+s.close()
+```
+
+## UDP编程
+
+UDP面向无连接的协议；不需要建立连接，只需要知道对方的IP地址和端口号，就可以直接发数据包
+传输数据不可靠；优点是比TCP速度快
+
+`SOCK_DGRAM`指定Socket的类型是UDP。绑定端口和TCP一样，但不需要调用`listen()`，而是直接接收来自任何客户端的数据
+`recvfrom()`返回数据和客户端的地址与端口，服务器收到数据后，直接调用`sendto()`就可以把数据用UDP发给客户端
+
+```py
+# udp_server.py
+import socket
+s= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# 绑定端口:
+s.bind(('127.0.0.1', 9999))
+print('Bind UDP on 9999 ...')
+while True:
+    # 接收数据:
+    data, addr = s.recvfrom(1024)
+    print('Received from %s:%s.' % addr)
+    s.sendto(b'Hello, %s!' % data, addr)
+
+# udp_client.py
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+for data in [b'Michael', b'Tracy', b'Sarah']:
+    s.sendto(data, ('127.0.0.1', 9999))  # 不需要调用connect()，直接通过sendto()给服务器发数据
+    print(s.recv(1024).decode('utf-8'))
+
+s.close() 
+```
+
+## 电子邮件
