@@ -6787,7 +6787,7 @@ Flask通过`render_template()`函数来实现模板渲染。Flask默认支持的
 
 常见的模板有：
 [Mako](https://www.makotemplates.org/)：用`<% ... %>`和`${xxx}`的一个模板；
-[Cheetah](https://cheetahtemplate.org/)：也是用`<% ... %>`和`${xxx}`的一个模板；
+[Cheetah](https://cheetahtemplate.org/)：用`<% ... %>`和`${xxx}`的一个模板；
 [Django](https://www.djangoproject.com/)：Django是一站式框架，内置一个用`{% ... %}`和`{{ xxx }}`的模板。
 
 ```py
@@ -6865,4 +6865,340 @@ empty_info={user_address=="":"请输入住址",email=="":"请输入邮箱地址"
             len(username)<6 or username.isalnum()==False:"用户名不能小于6位，且必须是字母、数字组合",username=="":"请输入用户名"}.get(1, "correct")
 
 # 写法简洁,get了.dict里以各种各样的错误判断为键,然后用对应的错误信息提示作为值. 只要能拿到一个key为1(True)的值,就说明密码判断错误,get()返回的就是对应的错误信息提示.没有拿到1,也就是里面所有的判断都通过,correct
+```
+
+## 异步IO
+
+系统切换线程的开销也很大;解决的问题是CPU高速执行能力和IO设备的龟速严重不匹配;
+多线程和多进程只是一种方法,另一种解决IO问题的方法是异步IO(当代码需要执行一个耗时的IO操作时，它只发出IO指令，并不等待IO结果，然后就去执行其他代码了。一段时间后，当IO返回结果时，再通知CPU进行处理)
+
+在异步IO模型下，一个线程就可以同时处理多个IO请求
+
+### 协程
+
+协程，又称微线程，纤程。英文名Coroutine。在一个子程序中中断，去执行其他子程序，不是函数调用，有点类似CPU的中断;一个线程执行
+协程执行效率极高;不需要多线程的锁机制,在协程中控制共享资源不加锁，只需要判断状态就好
+多核CPU(多进程+协程)
+
+Python通过`generator`支持协程,`for`,`next()`,`yield`
+Python的`yield`可返回一个值，还可接收调用者发出的参数
+
+生产者生产消息后，直接通过`yield`跳转到消费者开始执行，待消费者执行完毕后，切换回生产者继续生产
+
+```py
+def consumer():
+    r = ''      # 先行定义一个后来被引用的变量，防止无定义报错
+    while True:
+        # 要理解两个知识点，赋值语句先计算= 右边，由于右边是 yield 语句，所以yield语句执行完以后，进入暂停，而赋值语句在下一次启动生成器的时候首先被执行
+        n = yield r         # 这里的yield既有接受send方法传参的作用，也有向produce传参的作用
+        if not n:           # 用于第一次跳过空变量
+            return
+        print('[CONSUMER] consuming %s...' % n)
+        r = '200 OK'
+
+def produce(c):
+    c.send(None)        # 用于启动生成器，程序规定如此，没有会报错
+    n = 0
+    while n < 5:
+        n = n +1
+        print('[PRODUCER] producing %s...' % n)
+        r = c.send(n)   # 相当于带了参数的next(c)，同时也有接受consumer中yield传参的作用，可以用来打印消费者的状态
+        print('[PRODUCER] Consumer return:%s' % r)
+    c.close()
+
+c = consumer()
+produce(c)
+
+# [PRODUCER] producing 1...
+# [CONSUMER] consuming 1...
+# [PRODUCER] Consumer return:200 OK
+# [PRODUCER] producing 2...
+# [CONSUMER] consuming 2...
+# [PRODUCER] Consumer return:200 OK
+# [PRODUCER] producing 3...
+# [CONSUMER] consuming 3...
+# [PRODUCER] Consumer return:200 OK
+# [PRODUCER] producing 4...
+# [CONSUMER] consuming 4...
+# [PRODUCER] Consumer return:200 OK
+# [PRODUCER] producing 5...
+# [CONSUMER] consuming 5...
+# [PRODUCER] Consumer return:200 OK
+```
+
+注意到`consumer`函数是一个`generator`，把一个`consumer`传入`produce`后：
+
+1. 首先调用`c.send(None)`启动生成器；
+2. 一旦生产了东西，通过`c.send(n)`切换到`consumer`执行；
+3. `consumer`通过`yield`拿到消息，处理，又通过`yield`把结果传回；
+4. `produce`拿到`consumer`处理的结果，继续生产下一条消息；
+5. `produce`决定不生产了，通过`c.close()`关闭`consumer`，整个过程结束。
+
+整个流程无锁，由一个线程执行，`produce`和`consumer`协作完成任务，所以称为“协程”，而非线程的抢占式多任务。
+Donald Knuth的一句话总结协程的特点:**“子程序就是协程的一种特例。”**
+
+1、例子中的`c.send(None)`，其功能类似于`next(c)`，比如：
+
+```py
+def num():
+    yield 1
+    yield 2
+    
+c = num()
+c.send(None)  # 1
+c.send(None)  # 2
+c.send(None) 
+# Traceback (most recent call last):
+#   File "<pyshell#9>", line 1, in <module>
+#     c.send(None)
+# StopIteration
+```
+
+2、`n = yield r`，这条语句，要理解两个知识点，赋值语句先计算`=`右边，由于右边是`yield`语句，所以`yield`语句执行完以后，进入暂停，而赋值语句在下一次启动生成器的时候首先被执行；
+3、`send`在接受`None`参数的情况下，等同于`next(generator)`的功能，但`send`同时也可接收其他参数，比如例子中的`c.send(n)`，要理解这种用法，看个例子：
+
+```py
+def num():
+    a = yield 1
+    while True:
+        a = yield a
+       
+c = num()
+c.send(None)    # 1
+c.send(5)       # 5
+c.send(100)     # 100
+```
+
+在上面的例子中，首先使用`c.send(None)`，返回生成器的第一个值，`a = yield 1` ，也就是`1`（但此时，并未执行赋值语句），
+接着使用`c.send(5)`，再次启动生成器，并同时传入了一个参数`5`，再次启动生成的时候，从上次`yield`语句断掉的地方开始执行，即`a`的赋值语句，由于传入了一个参数`5`，所以`a`被赋值为`5`，接着程序进入`whlie`循环，当程序执行到`a = yield a`，同理，先返回生成器的值`5`，下次启动生成器的时候，再执行赋值语句，以此类推...
+所以`c.send(n)`的用法就是"Python的`yield`不但可以返回一个值，它还可以接收调用者发出的参数"
+**但注意，在一个生成器函数未启动之前，是不能传递值进去。在使用`c.send(n)`之前，必须先使用`c.send(None)`或者`next(c)`来返回生成器的第一个值。**
+最后我们来看上文中的例子，梳理下执行过程：
+
+```py
+def consumer():
+    r = ''
+    while True:
+        n = yield r
+        if not n:
+            return
+        print('[CONSUMER] Consuming %s...' % n)
+        r = '200 OK'
+
+def produce(c):
+    c.send(None)
+    n = 0
+    while n < 5:
+        n = n + 1
+        print('[PRODUCER] Producing %s...' % n)
+        r = c.send(n)
+        print('[PRODUCER] Consumer return: %s' % r)
+    c.close()
+
+c = consumer()
+produce(c)
+```
+
+1. 执行`c.send(None)`，启动生成器返回第一个值`n = yield r`，此时`r`为空，`n`还未赋值，然后生成器暂停，等待下一次启动。
+2. 生成器返回空值后进入暂停，`produce(c)` 接着往下运行，进入`while`循环，此时`n`为`1`，所以打印:`[PRODUCER] Producing 1...`
+3. `produce(c)`往下运行到`r = c.send(1)`，再次启动生成器，并传入了参数`1`，而生成器从上次`n`的赋值语句开始执行，`n`被赋值为`1`，`n`存在，`if`语句不执行，然后打印：`[CONSUMER] Consuming 1...` 接着`r`被赋值为`'200 OK'`，然后又进入循环，执行`n = yield r`，返回生成器的第二个值，`'200 OK'`，然后生成器进入暂停，等待下一次启动。
+4. 生成器返回`'200 OK'`进入暂停后`，produce(c)`往下运行，进入`r`的赋值语句，`r`被赋值为`'200 OK'`，接着往下运行，打印：`[PRODUCER] Consumer return: 200 OK`
+以此类推...
+
+当`n`为`5`跳出循环后，使用`c.close()`结束生成器的生命周期，然后程序运行结束
+
+### `asyncio`
+
+`asyncio`是Python 3.4版本引入的标准库，内置对异步IO的支持
+编程模型是一个消息循环;从`asyncio`模块中获取一个`EventLoop`的引用，把需要执行的协程扔到`EventLoop`中执行，就实现了异步IO
+
+```py
+import asyncio
+
+@asyncio.coroutine
+def hello():
+    print("Hello world!")
+    # 异步调用asyncio.sleep(1):
+    r = yield from asyncio.sleep(1)
+    print("Hello again!")
+
+# 获取EventLoop:
+loop = asyncio.get_event_loop()
+# 执行coroutine
+loop.run_until_complete(hello())
+loop.close()
+```
+
+`@asyncio.coroutine`把一个`generator`标记为`coroutine`类型，然后，把这个`coroutine`扔到`EventLoop`中执行
+`hello()`会首先打印出`Hello world!`，然后，`yield from`语法可以方便地调用另一个`generator`。由于`asyncio.sleep()`也是一个`coroutine`，所以线程不会等待`asyncio.sleep()`，而是直接中断并执行下一个消息循环。当`asyncio.sleep()`返回时，线程就可以从`yield from`拿到返回值（此处是`None`），然后接着执行下一行语句。
+
+把`asyncio.sleep(1)`看成是一个耗时1秒的IO操作，在此期间，主线程并未等待，而是去执行`EventLoop`中其他可以执行的`coroutine`了，因此可以实现并发执行。
+
+```py
+import threading
+import asyncio
+
+@asyncio.coroutine
+def hello():
+    print('Hello world! (%s)' % threading.currentThread())
+    yield from asyncio.sleep(1)
+    print('Hello again! (%s)' % threading.currentThread())
+
+loop = asyncio.get_event_loop()
+tasks = [hello(), hello()]
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
+
+# Hello world! (<_MainThread(MainThread, started 27692)>)
+# Hello world! (<_MainThread(MainThread, started 27692)>)
+# (暂停约1秒)
+# Hello again! (<_MainThread(MainThread, started 27692)>)
+# Hello again! (<_MainThread(MainThread, started 27692)>)
+```
+
+两个`coroutine`是由同一个线程并发执行的
+把`asyncio.sleep()`换成真正的IO操作，则多个`coroutine`就可以由一个线程并发执行
+
+```py
+import asyncio
+
+@asyncio.coroutine
+def wget(host):
+    print('wget %s...' % host)
+    connect = asyncio.open_connection(host, 80)
+    reader, writer = yield from connect
+    header = 'GET / HTTP/1.0\r\nHost: %s\r\n\r\n' % host
+    writer.write(header.encode('utf-8'))
+    yield from writer.drain()
+    while True:
+        line = yield from reader.readline()
+        if line == b'\r\n':
+            break
+        print('%s header > %s' % (host, line.decode('utf-8').rstrip()))
+    # Ignore the body, close the socket
+    writer.close()
+
+loop = asyncio.get_event_loop()
+tasks = [wget(host) for host in ['www.sina.com.cn', 'www.sohu.com', 'www.163.com']]
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
+
+# 3个连接由一个线程通过coroutine并发完成
+# wget www.sina.com.cn...
+# wget www.sohu.com...
+# wget www.163.com...
+# (等待一段时间)
+# (打印出sina的header)
+# www.sina.com.cn header > HTTP/1.1 302 Found
+# www.sina.com.cn header > Server: Tengine
+# ...
+# (打印出sohu的header)
+# www.sohu.com header > HTTP/1.1 302 Found
+# www.sohu.com header > Location: https://www.sohu.com/
+# ...
+# (打印出163的header)
+# www.163.com header > HTTP/1.1 301 Moved Permanently
+# www.163.com header > Date: Thu, 28 Jul 2022 07:57:55 GMT
+# ...
+```
+
+小结：
+`asyncio`提供了完善的异步IO支持
+异步操作需要在`coroutine`中通过`yield from`完成
+多个`coroutine`可以封装成一组Task然后并发执行
+
+### `async/await`
+
+新语法只能用在Python 3.5以及后续版本
+新版本用`async`,`await` 关键词代替`@asyncio.coroutine`,`yield from`(https://realpython.com/async-io-python/)
+
+```py
+import threading
+import asyncio
+
+async def hello():
+    print('hello world! (%s)' % threading.current_thread())
+    await asyncio.sleep(1)
+    print('hello again! (%s)' % threading.current_thread())
+
+# loop = asyncio.new_event_loop()
+loop = asyncio.get_event_loop()
+tasks = [hello(), hello()]
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
+```
+
+### `aiohttp`
+
+`asyncio`实现了TCP、UDP、SSL等协议，`aiohttp`则是基于`asyncio`实现的HTTP框架
+`pip install aiohttp`
+
+注意`aiohttp`的初始化函数`init()`也是一个`coroutine`，`loop.create_server()`则利用`asyncio`创建TCP服务
+
+```py
+import asyncio
+from aiohttp import web
+
+async def index(request):
+    await asyncio.sleep(0.5)
+    return web.Response(body=b'<h1>Index</h1>', content_type='text/html')
+
+async def hello(request):
+    await asyncio.sleep(0.5)
+    text = '<h1>hello, %s!<h1>' % request.match_info['name']
+    return web.Response(body=text.encode('utf-8'), content_type='text/html')
+
+async def init(loop):
+    app = web.Application(loop=loop)
+    app.router.add_route('GET','/', index)
+    app.router.add_route('GET','/hello/{name}', hello)
+    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 8000)
+    print('Server started at http://127.0.0.1:8000...')
+    return srv
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(init(loop))
+loop.run_forever()
+```
+
+```py
+#  Django 风格
+import asyncio
+from aiohttp import web
+
+async def index(request):
+    await asyncio.sleep(0.5)
+    return web.Response(body=b'<h1>Index</h1>', content_type='text/html')
+
+async def hello(request):
+    await asyncio.sleep(0.5)
+    text = '<h1>Hello, %s!</h1>' % request.match_info['name']
+    return web.Response(body=text.encode('utf-8'), content_type='text/html')
+
+app = web.Application()
+app.router.add_routes([web.get('/', index),
+                       web.get('/hello/{name}', hello)])
+web.run_app(app, host='localhost', port=8000)
+```
+
+```py
+# Flask
+import asyncio
+from aiohttp import web
+
+routes = web.RouteTableDef()
+@routes.get('/')
+async def index(request):
+    await asyncio.sleep(0.5)
+    return web.Response(body=b'<h1>Index</h1>', content_type='text/html')
+
+@routes.get('/hello/{name}')
+async def hello(request):
+    await asyncio.sleep(0.5)
+    text = '<h1>Hello, %s!</h1>' % request.match_info['name']
+    return web.Response(body=text.encode('utf-8'), content_type='text/html')
+
+app = web.Application()
+app.add_routes(routes)
+web.run_app(app, host='localhost', port=8000)
 ```
