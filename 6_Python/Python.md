@@ -6521,3 +6521,111 @@ mysql> show variables like '%char%';
 MySQL官方提供了mysql-connector-python驱动，安装的时候需要给pip命令加上参数`--allow-external`：
 `$ pip install mysql-connector-python`
 `$ pip install mysql-connector`
+
+```py
+# 导入MySQL驱动:
+import mysql.connector
+conn = mysql.connector.connect(host='192.168.31.10',user='root', password='123456', database='test')
+cursor = conn.cursor()
+
+cursor.execute('create table user(id varchar(20) primary key, name varchar(20))')
+cursor.execute('insert into user (id, name) values (%s, %s)', ['1', 'Michael'])
+cursor.rowcount     # 1
+# 提交事务:
+conn.commit()
+cursor.close()      # True
+
+# 运行查询:
+cursor = conn.cursor()
+cursor.execute('select * from user where id = %s', ('1',))
+values = cursor.fetchall()
+values              # [('1', 'Michael')]
+# 关闭Cursor和Connection:
+cursor.close()      # True
+conn.close()
+```
+
+1. 执行`INSERT`等操作后要调用`commit()`提交事务
+2. MySQL的SQL占位符是`%s`
+
+### 使用SQLAlchemy
+
+ORM技术：Object-Relational Mapping，把关系数据库的表结构映射到对象上
+`$ pip install sqlalchemy`
+
+`create_engine()`初始化数据库连接,`'数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'`
+
+```py
+# 导入:
+from sqlalchemy import Column, String, create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
+# 创建对象的基类:
+Base = declarative_base()
+# 定义User对象:
+class User(Base):
+    # 表的名字:
+    __tablename__ = 'user'
+    # 表的结构:
+    id = Column(String(20), primary_key=True)
+    name = Column(String(20))
+
+# 初始化数据库连接:
+engine = create_engine('mysql+mysqlconnector://root:password@localhost:3306/test')
+# 创建DBSession类型:
+DBSession = sessionmaker(bind=engine) # DBSession对象可视为当前数据库连接
+
+### 向数据库表中添加一行记录
+# 创建session对象:
+session = DBSession()
+# 创建新User对象:
+new_user = User(id='5', name='Bob')
+# 添加到session:
+session.add(new_user)
+# 提交即保存到数据库:
+session.commit()
+# 关闭session:
+session.close()
+
+### 
+# 创建Session:
+session = DBSession()
+# 创建Query查询，filter是where条件，最后调用one()返回唯一行，如果调用all()则返回所有行:
+user = session.query(User).filter(User.id=='5').one()
+# 打印类型和对象的name属性:
+print('type:', type(user))      # type: <class '__main__.User'>
+print('name:', user.name)       # name: Bob
+# 关闭Session:
+session.close()
+```
+
+关系数据库的多个表还可以用外键实现一对多、多对多等关联，相应地，ORM框架也可以提供两个对象之间的一对多、多对多等功能
+
+```py
+from sqlalchemy import Column, String, create_engine
+from sqlalchemy.ext.declarative import  declarative_base
+
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(String(20), primary_key=True)
+    name = Column(String(20))
+    # 一对多:
+    books = relationship('Book')
+
+class Book(Base):
+    __tablename__ = 'book'
+
+    id = Column(String(20), primary_key=True)
+    name = Column(String(20))
+    # “多”的一方的book表是通过外键关联到user表的:
+    user_id = Column(String(20), ForeignKey('user.id'))
+# 当我们查询一个User对象时，该对象的books属性将返回一个包含若干个Book对象的list
+```
+
+https://www.cnblogs.com/minseo/p/15305003.html
+hive python:https://www.cdata.com/kb/tech/hive-python-sqlalchemy.rst
+
