@@ -7202,3 +7202,188 @@ app = web.Application()
 app.add_routes(routes)
 web.run_app(app, host='localhost', port=8000)
 ```
+
+### 使用MicroPython
+
+[MicroPython](https://micropython.org/),为了运行在单片机这样的性能有限的微控制器上，最小体积仅256K，运行时仅需16K内存
+基于Python 3.4的语法标准,裁剪了大部分标准库，仅保留部分模块如`math`、`sys`的部分函数和类
+此外，很多标准模块如`json`、`re`等在MicroPython中变成了以`u`开头的`ujson`、`ure`，表示针对MicroPython开发的标准库
+运行在[pyboard](https://store.micropython.org/pyb-features)微控制器上
+大量基于ARM的嵌入式系统，如[Arduino](https://www.arduino.cc/)
+通过Python来非常方便地开发自动控制、机器人这样的应用
+
+#### 搭建开发环境
+
+硬件开发环境;树莓派+Arduino控制板;搭建机器人需要的零件比较复杂;乐高EV3机器人作为开发环境;乐高搭建非常容易且乐高的EV3控制器是一个完整的ARM系统
+
+教育版建议买45544+45560套装，零售版就只有31313一种。没有MicroSD卡的可以顺手入一个MicroSD卡+读卡器，还可以再选购一个蓝牙游戏手柄
+
+乐高官方提供了一个完整的EV3运行时镜像，该镜像内置了MicroPython，可以非常方便地运行Python程序,需要从乐高官网[下载镜像](https://education.lego.com/en-us/support/mindstorms-ev3/python-for-ev3)到本地，然后写入到MicroSD卡.Windows和Mac系统可以使用[Etcher](https://www.balena.io/etcher/)写入镜像到MicroSD卡，也可以使用`dd`命令写入
+
+插入SD卡后启动EV3控制器，等待1~2分钟，启动成功后，即可选择“Wireless and Networks”连接电脑：
+
+![lego_EV3](./images/base/LGEV3_connections.jpg)
+
+使用无线网连接需要额外的USB无线网卡，强烈推荐选择蓝牙连接，因为EV3内置了蓝牙模块。配对并连接成功后，可以在电脑上看到已连接的蓝牙设备EV3
+可以直接使用SSH登录EV3，因为这个自带MicroPython的EV3镜像是一个裁剪后的Debian Linux系统。用命令`ssh robot@ev3dev.local`登录，密码`maker`：
+
+```bash
+$ ssh robot@ev3dev.local
+Password: *****
+Linux ev3dev 4.14.96-ev3dev-2.3.2-ev3 #1 PREEMPT Sun Jan 27 21:27:35 CST 2019 armv5tejl
+             _____     _
+   _____   _|___ /  __| | _____   __
+  / _ \ \ / / |_ \ / _` |/ _ \ \ / /
+ |  __/\ V / ___) | (_| |  __/\ V /
+  \___| \_/ |____/ \__,_|\___| \_/
+
+Debian stretch on LEGO MINDSTORMS EV3!
+Last login: Mon Mar  4 18:05:04 2019 from f81e::a7:c54d:4e0b:3af7%bnep0
+robot@ev3dev:~$ ls /usr/lib/micropython/
+README           fcntl.mpy      mailbox.mpy          reprlib.mpy       trace.mpy
+README.rst       ffilib.mpy     mailcap.mpy          runpy.mpy         traceback.mpy
+__future__.mpy   fnmatch.mpy    mimetypes.mpy        sched.mpy         tty.mpy
+_libc.mpy        formatter.mpy  multiprocessing.mpy  sdist_upip.mpy    types.mpy
+_markupbase.mpy  fractions.mpy  nntplib.mpy          select.mpy        typing.mpy
+abc.mpy          ftplib.mpy     numbers.mpy          selectors.mpy     uaiohttpclient.mpy
+argparse.mpy     functools.mpy  operator.mpy         shelve.mpy        uasyncio
+base64.mpy       getopt.mpy     optparse.mpy         shlex.mpy         uasyncio.mpy
+binascii.mpy     getpass.mpy    os                   shutil.mpy        ucontextlib.mpy
+binhex.mpy       gettext.mpy    pathlib.mpy          signal.mpy        ucurses
+bisect.mpy       glob.mpy       pdb.mpy              smtplib.mpy       udnspkt.mpy
+calendar.mpy     gzip.mpy       pickle.mpy           socket.mpy        umqtt
+cgi.mpy          hashlib        pickletools.mpy      socketserver.mpy  unicodedata.mpy
+cmd.mpy          heapq.mpy      pkg_resources.mpy    sqlite3.mpy       unittest.mpy
+code.mpy         hmac.mpy       pkgutil.mpy          ssl.mpy           upip.mpy
+codecs.mpy       html           platform.mpy         stat.mpy          upip_utarfile.mpy
+codeop.mpy       http           poplib.mpy           statistics.mpy    upysh.mpy
+collections      imaplib.mpy    posixpath.mpy        string.mpy        urequests.mpy
+concurrent       imp.mpy        pprint.mpy           stringprep.mpy    urllib
+contextlib.mpy   importlib.mpy  profile.mpy          struct.mpy        urllib.mpy
+copy.mpy         inspect.mpy    pty.mpy              subprocess.mpy    utarfile.mpy
+csv.mpy          io.mpy         pwd.mpy              sys.mpy           uu.mpy
+curses           ipaddress.mpy  pyb.mpy              tarfile.mpy       uuid.mpy
+datetime.mpy     itertools.mpy  pystone.mpy          telnetlib.mpy     venv.mpy
+dbm.mpy          json           pystone_lowmem.mpy   tempfile.mpy      warnings.mpy
+decimal.mpy      keyword.mpy    queue.mpy            test              weakref.mpy
+difflib.mpy      linecache.mpy  quopri.mpy           textwrap.mpy      xmltok.mpy
+email            locale.mpy     random.mpy           threading.mpy     zipfile.mpy
+errno.mpy        logging.mpy    re.mpy               time.mpy          zlib.mpy
+ev3dev2          machine        readline.mpy         timeit.mpy
+```
+
+在`/usr/lib/micropython/`目录下可看到系统自带Python库。MicroPython不直接运行`.py`文件，而是运行`.mpy`这个紧凑的二进制文件
+
+开发EV3机器人程序,VSCode扩展,`lego`并安装`LEGO® MINDSTORMS® EV3 MicroPython`扩展
+
+在VS Code左侧面板选择Lego图标，选择“Create a new project”：创建一个`hellorobot`的工程,EV3插件自动为我们创建了一个包含样板代码的`main.py`
+
+```py
+#!/usr/bin/env pybricks-micropython  ## 注释表示运行环境是MicroPython
+
+from pybricks import ev3brick as brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import (Port, Stop, Direction, Button, Color, SoundFile, ImageFile, Align)
+from pybricks.tools import print, wait, StopWatch
+from pybricks.robotics import DriveBase
+
+# Write your program here
+brick.sound.beep()       # 控制EV3的扬声器发出一声“哔”的声音
+```
+
+可编写任意的Python源码文件，执行时注意程序入口永远是`main.py`
+
+在VS Code 的`Exploer`中，找到`EV3DEV DEVICE BROWSER`，点击`ev3dev`，连接后图标显示为绿色
+
+切换到Run面板，点击`RUN`运行，在`OUTPUT`面板中看到输出结果
+
+VS Code是一个开发环境，电脑上并没有安装MicroPython，整个程序是通过蓝牙网络先传输到EV3主机，再执行，最后取回输出结果显示在VS Code中，因此，这是一个远程执行并允许调试的功能。`print()`函数可以输出到VS Code，主要作为调试使用，`brick.display.text()`则是输出到EV3的主机屏幕上
+
+EV3的Python接口全部在`pybricks`包中，要查看完整的API，请在VS Code新建EV3工程时选择“Open user guide and examples”，即可在本地浏览器打开API文档。
+
+### 控制小车
+
+用EV3主机、大型伺服马达和超声波传感器搭建一个小车
+![LGEV3_Car_components](./images/base/LGEV3_Car.jpg)
+![LGEV3_car_instance](./images/base/LGEV3_car_instance.jpg)
+
+```py
+#!/usr/bin/env pybricks-micropython
+from pybricks import ev3brick as brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import (Port, Stop, Direction, Button, Color, SoundFile, ImageFile, Align)
+from pybricks.tools import print, wait, StopWatch
+from pybricks.robotics import DriveBase
+
+# 根据马达和传感器接入的位置初始化
+motor = Motor(Port.B) # 接在B口
+ultrasonic = UltrasonicSensor(Port.S4) # 接在4号口
+
+brick.sound.beep()
+brick.light(None)
+
+# 设置初始速度0表示静止
+speed = 0
+
+# 通过传入1、-1和0分别表示加速、减速和停止：
+def setSpeed(acc):
+    global speed
+    if acc < 0:
+        speed = max(0, speed - 1)
+    elif acc > 0:
+        speed = min(3, speed + 1)
+    else:
+        speed = 0
+    if speed > 0:
+        motor.run(speed * 90) # 设置每秒转N个90度
+    else:
+        motor.stop()
+    brick.light(colors[speed])
+
+# 因为小车的初始速度为0，可设定响应右键加速，左键减速，中键停止，上键停止并退出，用一个无限循环实现功能
+while True:
+    if not any(brick.buttons()): # 没有按任何按键
+        wait(10)
+    else:
+        if Button.LEFT in brick.buttons():
+            setSpeed(-1)
+        elif Button.RIGHT in brick.buttons():
+            setSpeed(1)
+        elif Button.CENTER in brick.buttons():
+            setSpeed(0)
+        elif Button.UP in brick.buttons():
+            setSpeed(0)
+            break
+        wait(500)
+    if ultrasonic.distance() < 200: # 检测到障碍物不足200毫米时 
+        setSpeed(0)
+
+brick.sound.beep()
+```
+
+因为EV3的控制API没有提供回调，只能通过无限循环主动轮询。使用无限循环时需要注意，务必在每次循环内部通过`wait()`暂停若干毫秒，否则很容易耗尽CPU。最后，我们通过超声波传感器返回的距离判断是否自动停车
+
+### 遥控小车
+
+乐高提供了一个红外线传感器和遥控器：红外遥控器需要很强的方向性，且遥控器太简陋，摇杆都没
+
+使用蓝牙手柄;标准游戏手柄按键
+
+```txt
+   ┌──────┐                   ┌──────┐
+  ┌┴─────┐│                  ┌┴─────┐│
+┌─┴──────┴┴──────────────────┴──────┴┴─┐
+│               ┌─┐ ┌─┐         ┌─┐    │
+│   ┌─┐         └─┘ └─┘      ┌─┐│X│    │
+│ ┌─┘ └─┐        -   +       │Y│└─┘┌─┐ │
+│ └─┐ ┌─┘       ┌─┐ ┌─┐      └─┘┌─┐│A│ │
+│   └─┘         └─┘ └─┘         │B│└─┘ │
+│         ┌─┐    S   H    ┌─┐   └─┘    │
+│       ┌─┘ └─┐         ┌─┘ └─┐        │
+│       └─┐ ┌─┘         └─┐ ┌─┘        │
+│         └─┘             └─┘          │
+│       ────────────────────────       │
+│      /                        \      │
+│     /                          \     │
+└────/                            \────┘
+```
