@@ -6629,3 +6629,240 @@ class Book(Base):
 https://www.cnblogs.com/minseo/p/15305003.html
 hive python:https://www.cdata.com/kb/tech/hive-python-sqlalchemy.rst
 
+## Web开发  ※
+
+Web开发几个阶段
+
+1. 静态Web页面：由文本编辑器直接编辑并生成静态的HTML页面，如果要修改Web页面的内容，就需要再次编辑HTML源文件，早期的互联网Web页面就是静态的；
+2. CGI：由于静态Web页面无法与用户交互，比如用户填写了一个注册表单，静态Web页面就无法处理。要处理用户发送的动态数据，出现了Common Gateway Interface，简称CGI，用C/C++编写。
+3. ASP/JSP/PHP：由于Web应用特点是修改频繁，用C/C++这样的低级语言非常不适合Web开发，而脚本语言由于开发效率高，与HTML结合紧密，因此，迅速取代了CGI模式。ASP是微软推出的用VBScript脚本编程的Web开发技术，而JSP用Java来编写脚本，PHP本身则是开源的脚本语言。
+4. MVC：为了解决直接用脚本语言嵌入HTML导致的可维护性差的问题，Web应用也引入了Model-View-Controller的模式，来简化Web开发。ASP发展为ASP.Net，JSP和PHP也有一大堆MVC框架。
+
+### HTTP协议简介
+
+`Request Headers`
+`GET / HTTP/1.1`；`GET`表示读取请求，将从服务器获得网页数据，`/`表示URL的路径，URL总是以`/`开头，`/`就表示首页，`HTTP/1.1`采用HTTP协议版本是1.1。目前HTTP协议的版本就是1.1，但是大部分服务器也支持1.0版本，主要区别在于1.1版本允许多个HTTP请求复用一个TCP连接，以加快传输速度
+从第二行开始，每一行都类似于`Xxx: abcdefg`：
+`Host: www.sina.com.cn`：请求的域名
+
+`Response Headers`
+
+HTTP请求:
+一个HTTP请求只处理一个资源
+
+HTTP格式:
+
+HTTP GET请求的格式,每个Header一行一个，换行符是`\r\n`
+
+```txt
+GET /path HTTP/1.1
+Header1: Value1
+Header2: Value2
+Header3: Value3
+```
+
+HTTP POST请求的格式,当遇到连续两个`\r\n`时，Header部分结束，后面数据全部是Body;Body数据类型由`Content-Type`头来确定
+
+```txt
+200 OK
+Header1: Value1
+Header2: Value2
+Header3: Value3
+
+body data goes here...
+```
+
+《HTTP: The Definitive Guide》 《HTTP权威指南》
+http://www.w3schools.com/     http://www.w3school.com.cn/
+
+### WSGI接口
+
+接受HTTP请求、解析HTTP请求、发送HTTP响应；
+WSGI：Web Server Gateway Interface
+WSGI接口定义非常简单，它只要求Web开发者实现一个函数，就可以响应HTTP请求
+
+```py
+def application(environ, start_response):
+    start_response('200 OK', [('Content-Type', 'text/html')])
+    return [b'<h1>Hello, web!</h1>']
+```
+
+上面的`application()`函数符合WSGI标准的一个HTTP处理函数，接收两个参数：
+
+* `environ`：包含所有HTTP请求信息的`dict`对象
+* `start_response`：发送HTTP响应的函数,只能调用一次;两个参数，一个HTTP响应码，一个是一组`list`表示的HTTP Header，每个Header用一个包含两个`str`的`tuple`表示
+
+#### 运行WSGI服务
+
+```py
+# hello.py
+# WSGIRequestHandler的get_environ中有如下代码
+# env['PATH_INFO'] = urllib.parse.unquote_to_bytes(path).decode('iso-8859-1')
+def application(environ, start_response):
+    print(environ['PATH_INFO'].encode('iso-8859-1').decode('utf-8'))
+    start_response('200 OK',[('Content-Type','text/html; charset=utf-8')])
+    body = '<h1>Hello,%s!</h1>' % ((environ['PATH_INFO'].encode('iso-8859-1').decode('utf-8'))[1:] or 'web')
+    # start_response('200 OK', [('Content-Type', 'text/html')])
+    # body = '<h1>Hello, %s!</h1>' % (environ['PATH_INFO'][1:] or 'web')
+    return [body.encode('utf-8')]
+
+# server.py 负责启动WSGI服务器
+from wsgiref.simple_server import make_server
+from hello import application
+
+httpd = make_server('', 8000, application)
+print('Serving HTTP on port 8000...')
+httpd.serve_forever()
+```
+
+简化Web开发需要在WSGI之上再抽象出Web框架
+
+### 使用Web框架
+
+[Flask](https://flask.palletsprojects.com/)编写Web App比WSGI接口简单
+常见的Python Web框架有：
+[Django](https://www.djangoproject.com/)：全能型Web框架；
+[web.py](https://webpy.org/)：一个小巧的Web框架；
+[Bottle](http://bottlepy.org/docs/dev/)：和Flask类似的Web框架；
+[Tornado](https://www.tornadoweb.org/en/stable/)：Facebook的开源异步Web框架。
+
+`pip install flask`;写一个`app.py`，处理3个URL，分别是：
+
+* `GET /`：首页，返回`Home`
+* `GET /signin`：登录页，显示登录表单
+* `POST /signin`：处理登录表单，显示登录结果
+
+Flask通过Python的装饰器在内部自动地把URL和函数给关联起来
+
+```py
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    return '<h1>Home<h1>'
+
+@app.route('/signin', methods=['GET'])
+def signin_form():
+    return '''<form action="/signin" method="post">
+              <p>username:<input name="username"></p>
+              <p>password:<input name="password" type="password">
+              <p><button type="submit">Sign In</button></p>
+              </form>'''
+
+@app.route('/signin', methods=["POST"])
+def signin():
+    # 需要从request对象读取表单内容：
+    if request.form["username"] == 'admin' and request.form["password"] == 'password':
+        return '<h3>Hello, admin!</h3>'
+    return '<h3>Bad username or password.</h3>'
+
+if __name__ == '__main__':
+    app.run()
+```
+
+### 使用模板
+
+不懂前端的Python工程师不是好的产品经理
+
+![template_html_py](./images/base/py_template_html.png)
+
+Python处理URL的函数就是C：Controller，Controller负责业务逻辑，比如检查用户名是否存在，取出用户信息等等；
+包含变量`{{ name }}`的模板就是V:View负责显示逻辑，通过简单地替换一些变量，View最终输出的就是用户看到的HTML。
+MVC中的Model在哪？Model是用来传给View的，View在替换变量时，就可从Model中取出相应的数据
+Model就是一个`dict`:`{ 'name': 'Michael' }`
+
+Flask通过`render_template()`函数来实现模板渲染。Flask默认支持的模板是`jinja2`，`$ pip install jinja2`
+
+在Jinja2模板中，用`{{ name }}`表示一个需要替换的变量。需要循环、条件判断等指令语句，用`{% ... %}`表示指令。
+比如循环输出页码：
+
+```html
+{% for i in page_list %}
+    <a href="/page/{{ i }}">{{ i }}</a>
+{% endfor %}
+```
+
+常见的模板有：
+[Mako](https://www.makotemplates.org/)：用`<% ... %>`和`${xxx}`的一个模板；
+[Cheetah](https://cheetahtemplate.org/)：也是用`<% ... %>`和`${xxx}`的一个模板；
+[Django](https://www.djangoproject.com/)：Django是一站式框架，内置一个用`{% ... %}`和`{{ xxx }}`的模板。
+
+```py
+from flask import Flask, request, render_template
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    return render_template('home.html')
+
+@app.route('/signin', methods=['GET'])
+def signin_form():
+    return render_template('form.html')
+
+@app.route('/signin', methods=["POST"])
+def signin():
+    username = request.form['username']
+    password = request.form['password']
+    if username == 'admin' and password == 'password':
+        return render_template('signin-ok.html', username=username)
+    return render_template('form.html', message='Bad username or password', username=username)
+
+if __name__ == '__main__':
+    app.run()  # app.run(debug=True)开启debug模式会自动更新
+```
+
+**一定要把模板放到正确的`templates`目录下，`templates`和`app.py`在同级目录下**
+
+```html
+<!-- home.html -->
+<html>
+<head>
+  <title>Home</title>
+</head>
+<body>
+  <h1 style="font-style:italic">Home</h1>
+</body>
+</html>
+
+<!--form.html--->
+<html>
+<head>
+    <title>Please Sign in</title>
+</head>
+<body>
+    {% if message %}
+    <p style="color:red">{{ message }}</p>
+    {% endif %}
+    <form action="/signin" method="post">
+        <legend>Please Sign in:</legend>
+        <p>username:<input name="username" placeholder="Username" value="{{ username }}"></p>
+        <p>password:<input name="password" type="password" palceholder="Password"></p>
+        <p><button type="submit">Sign In</button></p>
+    </form>
+</body>
+</html>
+
+<!-- signin-ok.html -->
+<html>
+<head>
+    <title>Welcome, {{ username }}</title>
+</head>
+<body>
+    <p>Welcome, {{ username }}!</p>
+</body>
+</html>
+```
+
+```py
+# 小技巧
+empty_info={user_address=="":"请输入住址",email=="":"请输入邮箱地址",telphone=="":"请输入手机号",phone_re.match(telphone)==False:"手机格式不正确",\
+            email_re.match(email)==False:"邮箱格式不正确",confirm_password!=password:"两次密码不一样",\
+            confirm_password=="":"请输入确认密码",password=="":"请输入密码",len(password)<8 or password.isalnum()==False:"密码不能小于8位，且必须是字母、数字组合",\
+            len(username)<6 or username.isalnum()==False:"用户名不能小于6位，且必须是字母、数字组合",username=="":"请输入用户名"}.get(1, "correct")
+
+# 写法简洁,get了.dict里以各种各样的错误判断为键,然后用对应的错误信息提示作为值. 只要能拿到一个key为1(True)的值,就说明密码判断错误,get()返回的就是对应的错误信息提示.没有拿到1,也就是里面所有的判断都通过,correct
+```
