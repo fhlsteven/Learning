@@ -7387,3 +7387,111 @@ brick.sound.beep()
 │     /                          \     │
 └────/                            \────┘
 ```
+
+把游戏手柄和EV3主机用蓝牙连起来很简单，怎么用Python程序读取手柄的输入？
+
+一般，从外部设备读取输入时，应用程序并不直接与外设打交道，而是由操作系统通过驱动程序连接外设，然后，通过操作系统提供的API读取输入。Windows程序可以通过DirectX访问外设，运行在网页的JavaScript程序可以通过浏览器提供的Gamepad API。
+
+EV3主机运行的是Debian Linux，那么Python程序如何在Linux下读取手柄的输入？
+
+在Linux中，系统把每个外设都映射为文件，每个设备的输入也被映射为文件。`/proc`目录挂载的就是Linux的虚拟文件系统，映射Linux的进程信息和设备信息。登录到EV3，查看`/proc/bus/input/devices`文件：
+
+```bash
+$ cat /proc/bus/input/devices 
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="LEGO MINDSTORMS EV3 Speaker"
+P: Phys=
+S: Sysfs=/devices/platform/sound/input/input0
+U: Uniq=
+H: Handlers=kbd event0 
+B: PROP=0
+B: EV=40001
+B: SND=6
+
+I: Bus=0019 Vendor=0001 Product=0001 Version=0100
+N: Name="EV3 Brick Buttons"
+P: Phys=gpio-keys/input0
+S: Sysfs=/devices/platform/gpio_keys/input/input1
+U: Uniq=
+H: Handlers=kbd event1 
+B: PROP=0
+B: EV=3
+B: KEY=1680 0 0 10004000
+```
+
+这个文件列出了目前系统可用的输入设备，上述两段分别代表扬声器和按钮设备。如果我们把蓝牙手柄连接到EV3，再查看文件，发现多了一段内容：
+
+```bash
+I: Bus=0005 Vendor=057e Product=2009 Version=0001
+N: Name="Pro Controller"
+P: Phys=00:17:ec:13:d8:1d
+S: Sysfs=/devices/platform/soc@1c00000/serial8250.2/tty/ttyS2/hci0/hci0:2/0005:057E:2009.0003/input/input4
+U: Uniq=00:90:e3:9b:ec:e9
+H: Handlers=event2 
+B: PROP=0
+B: EV=10001b
+B: KEY=ffff0000 0 0 0 0 0 0 0 0 0
+B: ABS=3001b
+B: MSC=10
+```
+
+通过`N: Name="xxx"`来搜索手柄设备，然后，通过`H: Handlers=xxx`获取设备的输入文件。例如，上述蓝牙手柄的名称是`Pro Controller`，输入是`event2`，对应到系统文件就是`/dev/input/event2`。Python代码实现如下：
+定义`InputDevice`类表示输入设备
+定义函数`listDevices()`通过读取`/proc/bus/input/devices`文件获取所有设备
+定义函数`detectJoystick()`通过名字模糊查找手柄设备
+
+```py
+class InputDevice():
+    def __init__(self):
+        self.name = ''
+        self.handler = ''
+    def __str__(self):
+        return '<Input Device: name=%s, handler=%s>' % (self.name, self.handler)
+    def setName(self, name):
+        if len(name) >= 2 and name.startswith('"') and name.endswith('"'):
+            name = name[1:len(name)-1]
+        self.name = name
+    def setHandler(self, handlers):
+        for handler in handlers.split(' '):
+            if handler.startswith('event'):
+                self.handler = handler
+
+def listDevices():
+    devices = []
+    with open('/proc/bus/input/devices', 'r') as f:
+        device = None
+        while True:
+            s = f.readline()
+            if s == '':
+                break
+            s = s.strip()
+            if s == '':
+                devices.append(device)
+                device = None
+            else:
+                if device is None:
+                    device = InputDevice()
+                if s.startswith('N: Name='):
+                    device.setName(s[8:])
+                elif s.startswith('H: Handlers='):
+                    device.setHandler(s[12:])
+    return devices
+
+def detectJoystick(joystickNames):
+    for device in listDevices():
+        for joystickName in joystickNames:
+            if joystickName in device.name:
+                # 返回输入文件:
+                return '/dev/input/%s' % device.handler
+    # 未找到返回None:
+    return None
+
+# 搜索到手柄设备后打开文件读取输入
+eventFile = detectJoystick(['Controller'])
+if eventFile:
+    with open(eventFile, 'rb') as infile:
+        while True:
+            # 读取输入
+
+```
+
