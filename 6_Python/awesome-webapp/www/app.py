@@ -1,3 +1,12 @@
+# !/usr/bin/enc python3
+# -*- coding: utf-8 -*-
+
+__author__ = 'Steven'
+
+'''
+async web application
+'''
+
 import logging; logging.basicConfig(level=logging.INFO)
 
 import asyncio, os, json, time
