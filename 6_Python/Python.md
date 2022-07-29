@@ -119,7 +119,8 @@ chr(25991)  # '文'
 
 b'ABC'.decode('ascii')                      # 'ABC'
 b'\xe4\xb8\xad\xe6\x96\x87'.decode('utf-8') # '中文'
-b'\xe4\xb8\xad\xff'.decode('utf-8')         # UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 3: invalid start byte
+b'\xe4\xb8\xad\xff'.decode('utf-8')         
+# UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 3: invalid start byte
 b'\xe4\xb8\xad\xff'.decode('utf-8', errors='ignore') # '中'
 
 len('ABC')     # 3
@@ -167,7 +168,8 @@ print('%.2f' % 3.1415926)   # 3.14
 'Hello, {0}, 成绩提升了 {1:.1f}%'.format('小明', 17.125) # 'Hello, 小明, 成绩提升了 17.1%'
 r = 2.5
 s = 3.14 * r ** 2
-print(f'The area of a circle with radius {r} is {s:.2f}') # The area of a circle with radius 2.5 is 19.62
+print(f'The area of a circle with radius {r} is {s:.2f}') 
+# The area of a circle with radius 2.5 is 19.62
 ```
 
 ### `list` 和 `tuple`
@@ -397,9 +399,12 @@ def nop():
 `isinstance()` 数据类型检查
 
 ```py
-my_abs(1, 2) # TypeError: my_abs() takes 1 positional argument but 2 were given
-my_abs('a')  # TypeError: '>=' not supported between instances of 'str' and 'int'
-abs('a')     # TypeError: bad operand type for abs(): 'str'
+my_abs(1, 2) 
+# TypeError: my_abs() takes 1 positional argument but 2 were given
+my_abs('a') 
+ # TypeError: '>=' not supported between instances of 'str' and 'int'
+abs('a')     
+# TypeError: bad operand type for abs(): 'str'
 ```
 
 ```py
@@ -471,7 +476,8 @@ def enroll(name, gender, age=6, city='Beijing'):
     print('city:', city)
 
 enroll('Bob', 'M', 7)
-enroll('Adam', 'M', city='Tianjin') # city参数用传的值,其他默认参数继续使用默认值
+enroll('Adam', 'M', city='Tianjin') 
+# city参数用传的值,其他默认参数继续使用默认值
 ```
 
 ```py
@@ -525,13 +531,17 @@ calc(*nums)  # 14
 def person(name, age, **kw):
     print('name:', name, 'age:', age, 'other:', kw)
 
-person('Michael', 30) # name: Michael age: 30 other: {}
-person('Bob', 35, city='Beijing') # name: Bob age: 35 other: {'city': 'Beijing'}
-person('Adam', 45, gender='M', job='Engineer') # name: Adam age: 45 other: {'gender': 'M', 'job': 'Engineer'}
+person('Michael', 30) 
+# name: Michael age: 30 other: {}
+person('Bob', 35, city='Beijing') 
+# name: Bob age: 35 other: {'city': 'Beijing'}
+person('Adam', 45, gender='M', job='Engineer') 
+# name: Adam age: 45 other: {'gender': 'M', 'job': 'Engineer'}
 
 extra = {'city': 'Beijing', 'job': 'Engineer'}
 # kw获得的dict是extra的一份拷贝,修改 kw 不会影响 extra
-person('Jack', 24, **extra) # name: Jack age: 24 other: {'city': 'Beijing', 'job': 'Engineer'}
+person('Jack', 24, **extra) 
+# name: Jack age: 24 other: {'city': 'Beijing', 'job': 'Engineer'}
 
 ```
 
@@ -557,7 +567,8 @@ person('Jack',24,**a)               # Jack 24 Beijing Engineer
 def person(name, age, *args, city, job):
     print(name, age, args, city, job)
 # 必须传入参数名 不传报错
-person('Jack', 24, 'Beijing', 'Engineer') # TypeError: person() missing 2 required keyword-only arguments: 'city' and 'job'
+person('Jack', 24, 'Beijing', 'Engineer') 
+# TypeError: person() missing 2 required keyword-only arguments: 'city' and 'job'
 
 def person(name, age, *, city='Beijing', job):
     print(name, age, city, job)
@@ -648,7 +659,8 @@ def fact_iter(num, product):
     if num == 1:
         return product
     return fact_iter(num - 1, num * product)
-# return fact_iter(num - 1, num * product)仅返回递归函数本身，num - 1和num * product在函数调用前就会被计算
+# return fact_iter(num - 1, num * product)仅返回递归函数本身
+# ，num - 1和num * product在函数调用前就会被计算
 
 # ===> fact_iter(5, 1)
 # ===> fact_iter(4, 5)
