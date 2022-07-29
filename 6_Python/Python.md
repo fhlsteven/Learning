@@ -7492,6 +7492,515 @@ if eventFile:
     with open(eventFile, 'rb') as infile:
         while True:
             # 读取输入
-
 ```
 
+`eventX`文件应该以何种格式读取? 搜索一下Linux文档，在[input.txt](https://www.kernel.org/doc/Documentation/input/input.txt)中详细说明了`eventX`文件的输入格式;Linux系统把每一个输入事件都封装为一个C结构体
+
+```c
+struct input_event {
+    struct timeval time; // 16字节时间戳
+    unsigned short type; // 2字节事件类型
+    unsigned short code; // 2字节事件代码
+    unsigned int value;  // 4字节事件值
+};
+```
+
+每次读取24字节并按照C的`struct`类型解码，可得到手柄输入的全部信息。在Python程序中，可以用`struct`读取：
+
+```py
+FORMAT = 'llHHI'
+EVENT_SIZE = struct.calcsize(FORMAT)
+with open(eventFile, 'rb') as infile:
+    while True:
+        event = infile.read(EVENT_SIZE)
+        _, _, t, c, v = struct.unpack(FORMAT, event)
+        print('t = %s, c = %s, v = %s' % (t, c, v))
+```
+
+注意到`unpack()`方法的返回值，丢弃前两个8字节整数，保留`t`、`c`、`v`，分别是2字节无符号整数、2字节无符号整数和4字节无符号整数
+
+根据Linux文档，再打印出每个事件的详细数据，把手柄的按键和摇杆都按一遍，就可以得到按键编码如下：
+
+`t==1`时表示按键，此时`v==1`表示按下，`v==0`表示释放，`v==2`表示持续按下，对应的`c`表示按键编码。要检测`A`、`B`按钮按下
+
+```py
+if t == 1 and v == 1:
+    if c == 305:
+        # Button A pressed
+        pass
+    if c == 304:
+        # Button B pressed
+        pass
+```
+
+摇杆数据比较复杂，类型`t==3`表示摇杆，`c==0`，表示左摇杆的左右移动，`c==1`，表示左摇杆的上下移动，`v`介于`0~65535`，`32768`表示中心值，越往两侧偏移越多则越接近最大和最小值：
+
+```txt
+      0
+      ▲
+      │
+0 <───┼───> 65535
+      │
+      ▼
+    65535
+```
+
+通过一个读取手柄的无限循环来控制小车
+
+```py
+def joystickLoop(robot, eventFile):
+    FORMAT = 'llHHI'
+    EVENT_SIZE = struct.calcsize(FORMAT)
+    with open(eventFile, 'rb') as infile:
+        while True:
+            event = infile.read(EVENT_SIZE)
+            _, _, t, c, v = struct.unpack(FORMAT, event)
+            if t == 1 and v == 1:
+                if c == 305:
+                    # A键加速:
+                    robot.setSpeed(1)
+                elif c == 304:
+                    # B键减速:
+                    robot.setSpeed(-1)
+                elif c == 307:
+                    # X键退出:
+                    return robot.inactive()
+            elif t == 3:
+                if c == 1:
+                    # 左摇杆上下移动:
+                    speed = 0
+                    if v < 32768:
+                        # 加速:
+                        speed = 1
+                    elif v > 32768:
+                        # 减速:
+                        speed = -1
+                    robot.setSpeed(speed)
+```
+
+主线程通过死循环读取手柄输入，怎么读取超声波传感器的数据
+利用Python的`threading`启动多线程，在另一个线程中不断检测超声波传感器，并在条件达到的时候自动停车
+
+```py
+def autoStopLoop(robot):
+    while robot.active:
+        if robot.speed > 0 and robot.ultrasonic.distance() < 200:
+            robot.setSpeed(0)
+        wait(100)
+
+joystickEvent = detectJoystick(['Controller'])
+robot = Robot()
+t = threading.Thread(target=autoStopLoop, args=(robot,))
+t.start()
+joystickLoop(robot, joystickEvent)
+```
+
+```py
+# devices.py
+# list input devices
+class InputDevice():
+    def __init__(self):
+        self.name = ''
+        self.handler = ''
+    def __str__(self):
+        return '<Input Device: name=%s, handler=%s>' % (self.name, self.handler)
+    def setName(self, name):
+        if len(name) >= 2 and name.startswith('"') and name.endswith('"'):
+            name = name[1:len(name)-1]
+        self.name = name
+    def setHandler(self, handlers):
+        for handler in handlers.split(' '):
+            if handler.startswith('event'):
+                self.handler = handler
+
+def listDevices():
+    devices = []
+    with open('/proc/bus/input/devices', 'r') as f:
+        device = None
+        while True:
+            s = f.readline()
+            if s == '':
+                break
+            s = s.strip()
+            if s == '':
+                devices.append(device)
+                device = None
+            else:
+                if device is None:
+                    device = InputDevice()
+                if s.startswith('N: Name='):
+                    device.setName(s[8:])
+                elif s.startswith('H: Handlers='):
+                    device.setHandler(s[12:])
+    return devices
+
+def detectJoystick(joystickNames):
+    for device in listDevices():
+        for joystickName in joystickNames:
+            if joystickName in device.name:
+                return '/dev/input/%s' % device.handler
+    return None
+
+# main.py 
+#!/usr/bin/env pybricks-micropython
+import struct, threading
+from pybricks import ev3brick as brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import (Port, Stop, Direction, Button, Color, SoundFile, ImageFile, Align)
+from pybricks.tools import print, wait, StopWatch
+from pybricks.robotics import DriveBase
+from devices import detectJoystick
+
+class Robot():
+    def __init__(self):
+        self.motor = Motor(Port.B)
+        self.ultrasonic = UltrasonicSensor(Port.S4)
+        self.active = True
+        self.speed = 0
+        self.colors = [None, Color.GREEN, Color.YELLOW, Color.RED]
+    def setSpeed(self, acc):
+        if acc < 0:
+            self.speed = max(-3, self.speed - 1)
+        elif acc > 0:
+            self.speed = min(3, self.speed + 1)
+        else:
+            self.speed = 0
+        if self.speed != 0:
+            self.motor.run(self.speed * 90)
+        else:
+            self.motor.stop()
+        brick.light(self.colors[abs(self.speed)])
+    def inactive(self):
+        self.active = False
+        self.setSpeed(0)
+        brick.sound.beep()
+def autoStopLoop(robot):
+    while robot.active:
+        if robot.speed > 0 and robot.ultrasonic.distance() < 200:
+            robot.setSpeed(0)
+        wait(100)
+def joystickLoop(robot, eventFile):
+    FORMAT = 'llHHI'
+    EVENT_SIZE = struct.calcsize(FORMAT)
+    with open(eventFile, 'rb') as infile:
+        while True:
+            event = infile.read(EVENT_SIZE)
+            _, _, t, c, v = struct.unpack(FORMAT, event)
+            # button A, B:
+            if t == 1 and v == 1:
+                if c == 305:   # press A:
+                    robot.setSpeed(1)
+                elif c == 304: # press B:
+                    robot.setSpeed(-1)
+                elif c == 307: # press X:
+                    return robot.inactive()
+            elif t == 3:
+                if c == 1: # Left stick & vertical:
+                    speed = 0
+                    if v < 32768:   # up:
+                        speed = 1
+                    elif v > 32768: # down:
+                        speed = -1
+                    robot.setSpeed(speed)
+def buttonLoop(robot):
+    while True:
+        if not any(brick.buttons()):
+            wait(10)
+        else:
+            if Button.LEFT in brick.buttons():
+                robot.setSpeed(-1)
+            elif Button.RIGHT in brick.buttons():
+                robot.setSpeed(1)
+            elif Button.CENTER in brick.buttons():
+                robot.setSpeed(0)
+            elif Button.UP in brick.buttons():
+                return robot.inactive()
+            wait(500)
+def main():
+    brick.sound.beep()
+    joystickEvent = detectJoystick(['Controller'])
+    robot = Robot()
+    t = threading.Thread(target=autoStopLoop, args=(robot,))
+    t.start()
+    if joystickEvent:
+        joystickLoop(robot, joystickEvent)
+    else:
+        buttonLoop(robot)
+main()
+```
+
+### 遥控转向
+
+拐弯,需要控制前轮转向或者控制两个轮子的转速,转速差实现转向
+
+用两个马达升级一下小车
+![Lego_EV3_Tank](./images/base/LGEV3Tank.jpg)
+
+根据轮子的直径、轮距，就可以计算出在给定速度和转向角度时两个马达的转速;EV3提供`DriveBase`类自动计算并设定两个马达的转速
+
+```py
+class Driver():
+    def __init__(self, leftMotor, rightMotor, diameter, axle):
+        self.driver = DriveBase(leftMotor, rightMotor, diameter, axle)
+        self.x = 0
+        self.y = 0
+        self.speed = 0
+        self.steering = 0
+
+    def drive(self, speed, steering):
+        self.speed = speed
+        self.steering = steering
+        if self.speed == 0:
+            self.driver.stop()
+        else:
+            self.driver.drive(self.speed, self.steering)
+```
+
+`Robot`类中，需要传入必要的参数以构造`Driver`
+
+```py
+class Robot():
+    def __init__(self, leftMotor, rightMotor, diameter, axle, maxSpeed=300, maxSteering=180):
+        self.driver = Driver(leftMotor, rightMotor, diameter, axle)
+        self.speedStep = 32767 // maxSpeed
+        self.steeringStep = 32767 // maxSteering
+        ...
+
+    def drive(self, x, y):
+        speed = -y // self.speedStep
+        steering = x // self.steeringStep
+        self.driver.drive(speed, steering)
+```
+
+当从摇杆接收到`x`、`y`坐标后，先转换成速度和转向角度，再调用`DriveBase.drive(speed, steering)`方法，即可按指定速度和角度转向。注意到`x`、`y`坐标先处理成以`(0, 0)`为原点的坐标，以便于计算。
+
+```py
+# devices.py
+# list input devices
+class InputDevice():
+    def __init__(self):
+        self.name = ''
+        self.handler = ''
+    def __str__(self):
+        return '<Input Device: name=%s, handler=%s>' % (self.name, self.handler)
+    def setName(self, name):
+        if len(name) >= 2 and name.startswith('"') and name.endswith('"'):
+            name = name[1:len(name)-1]
+        self.name = name
+    def setHandler(self, handlers):
+        for handler in handlers.split(' '):
+            if handler.startswith('event'):
+                self.handler = handler
+
+def listDevices():
+    devices = []
+    with open('/proc/bus/input/devices', 'r') as f:
+        device = None
+        while True:
+            s = f.readline()
+            if s == '':
+                break
+            s = s.strip()
+            if s == '':
+                devices.append(device)
+                device = None
+            else:
+                if device is None:
+                    device = InputDevice()
+                if s.startswith('N: Name='):
+                    device.setName(s[8:])
+                elif s.startswith('H: Handlers='):
+                    device.setHandler(s[12:])
+    return devices
+
+def detectJoystick(joystickNames):
+    for device in listDevices():
+        for joystickName in joystickNames:
+            if joystickName in device.name:
+                return '/dev/input/%s' % device.handler
+    return None
+
+# joystick.py
+# joystick control:
+import struct
+# define button code:
+
+BUTTON_A = 305
+BUTTON_B = 304
+BUTTON_X = 307
+BUTTON_Y = 306
+BUTTON_PLUS = 313
+BUTTON_MINUS = 312
+BUTTON_START = 317
+BUTTON_HOME = 316 
+
+class JoyStick():
+    def __init__(self, eventFile):
+        self.eventFile = eventFile
+        self.buttonHandler = None
+        self.joyLeftHandler = None
+        self.joyRightHandler = None
+    def setButtonHandler(self, buttonHandler):
+        self.buttonHandler = buttonHandler
+    def setJoyLeftHandler(self, joyLeftHandler):
+        self.joyLeftHandler = joyLeftHandler
+    def setJoyRightHandler(self, joyRightHandler):
+        self.joyRightHandler = joyRightHandler
+    def startLoop(self):
+        FORMAT = 'llHHI'
+        EVENT_SIZE = struct.calcsize(FORMAT)
+        with open(self.eventFile, 'rb') as infile:
+            lx, ly, rx, ry = 0, 0, 0, 0
+            while True:
+                event = infile.read(EVENT_SIZE)
+                _, _, t, c, v = struct.unpack(FORMAT, event)
+                if t == 1 and v == 1:
+                    # button pressed:
+                    if self.buttonHandler:
+                        if not self.buttonHandler(c):
+                            return
+                if t == 3:
+                    if c == 0 and self.joyLeftHandler:
+                        # left stick & horizontal:
+                        lx = v - 32768
+                        self.joyLeftHandler(lx, ly)
+                    elif c == 1 and self.joyLeftHandler:
+                        # left stick & vertical:
+                        ly = v - 32768
+                        self.joyLeftHandler(lx, ly)
+                    elif c == 3 and self.joyRightHandler:
+                        # right stick & horizontal:
+                        rx = v - 32768
+                        self.joyRightHandler(rx, ry)
+                    elif c == 4 and self.joyRightHandler:
+                        # right stick & vertical:
+                        ry = v - 32768
+                        self.joyRightHandler(rx, ry)
+
+# main.py
+#!/usr/bin/env pybricks-micropython
+import struct, threading
+from pybricks import ev3brick as brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import (Port, Stop, Direction, Button, Color, SoundFile, ImageFile, Align)
+from pybricks.tools import print, wait, StopWatch
+from pybricks.robotics import DriveBase
+from devices import detectJoystick
+from joystick import JoyStick, BUTTON_A, BUTTON_X
+
+SPEED = 100
+STEERING = 90
+STATUS_STOPPED = 0
+STATUS_FORWARD = 1
+STATUS_BACKWARD = 2
+STATUS_STEERING = 3
+COLORS = (None, Color.GREEN, Color.RED, Color.YELLOW)
+
+class Driver():
+    def __init__(self, leftMotor, rightMotor, diameter, axle):
+        self.driver = DriveBase(leftMotor, rightMotor, diameter, axle)
+        self.x = 0
+        self.y = 0
+        self.speed = 0
+        self.steering = 0
+    def drive(self, speed, steering):
+        self.speed = speed
+        self.steering = steering
+        if self.speed == 0:
+            self.driver.stop()
+        else:
+            self.driver.drive(self.speed, self.steering)
+class Robot():
+    def __init__(self, leftMotor, rightMotor, topMotor, diameter, axle, maxSpeed=300, maxSteering=180, port=Port.S4):
+        self.driver = Driver(leftMotor, rightMotor, diameter, axle)
+        self.cannon = topMotor
+        self.ultrasonic = UltrasonicSensor(port)
+        self.speedStep = 32767 // maxSpeed
+        self.steeringStep = 32767 // maxSteering
+        self.active = True
+    def drive(self, x, y):
+        # map y (-32768 ~ +32767) to speed (+maxSpeed ~ -maxSpeed):
+        speed = -y // self.speedStep
+        # map x (-32768 ~ +32767) to steering (-maxSteering ~ +maxSteering):
+        steering = x // self.steeringStep
+        self.driver.drive(speed, steering)
+    def target(self, x):
+        self.cannon.run(-x // 327)
+    def fire(self):
+        brick.sound.file('cannon.wav')
+    def inactive(self):
+        self.active = False
+        self.drive(0, 0)
+        brick.sound.beep()
+def autoStopLoop(robot):
+    while robot.active:
+        if robot.ultrasonic.distance() < 200:
+            robot.drive(0, 0)
+        wait(100)
+def main():
+    brick.sound.beep()
+    joystickEvent = detectJoystick(['Controller'])
+    if joystickEvent:
+        robot = Robot(Motor(Port.D), Motor(Port.A), Motor(Port.B), 55, 200)
+        t = threading.Thread(target=autoStopLoop, args=(robot,))
+        t.start()
+        def onButtonPressed(code):
+            if code == BUTTON_X:
+                robot.inactive()
+                return False
+            if code == BUTTON_A:
+                robot.fire()
+            return True
+        def onLeftJoyChanged(x, y):
+            robot.drive(x, y)
+        def onRightJoyChanged(x, y):
+            robot.target(x)
+        joystick = JoyStick(joystickEvent)
+        joystick.setButtonHandler(onButtonPressed)
+        joystick.setJoyLeftHandler(onLeftJoyChanged)
+        joystick.setJoyRightHandler(onRightJoyChanged)
+        joystick.startLoop()
+    else:
+        brick.sound.beep()
+main()
+```
+
+## 实战
+
+目标是一个Blog网站，包含日志、用户和评论3大部分；项目名称`awesome-webapp`
+
+https://wangwangyz.site/
+https://aodabo.tech/
+
+### Day 1 - 搭建开发环境
+
+```bash
+$ python --version 
+Python 3.8.10
+$ pip install aiohttp # 异步框架aiohttp
+$ pip install jinja2  # 前端模板引擎
+$ docker run -itd --name mysql -v /d/dockerData/mysql:/var/lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:latest ## docker mysql 数据库
+$ pip install aiomysql # MySQL aiomysql
+```
+
+项目结构
+
+```txt
+awesome-webapp/          <-- 根目录
+|
++- backup/               <-- 备份目录
+|
++- conf/                 <-- 配置文件
+|
++- dist/                 <-- 打包目录
+|
++- www/                  <-- Web目录，存放.py文件
+|  |
+|  +- static/            <-- 存放静态文件
+|  |
+|  +- templates/         <-- 存放模板文件
+|
++- ios/                  <-- 存放iOS App工程
+|
++- LICENSE               <-- 代码LICENSE
+```
