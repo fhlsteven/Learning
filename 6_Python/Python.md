@@ -8292,3 +8292,126 @@ await user.save()
 
 完善ORM，对于查找;`findAll()`:根据WHERE条件查找;`findNumber()`:根据WHERE条件查找，但返回的是整数，适用于`select count(*)`类型的SQL
 `update()`,`remove()`
+
+### Day 4 - 编写Model
+
+```py
+import time, uuid
+from orm import Model, StringField, BooleanField, FloatField, TextField
+
+def next_id():
+    return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
+
+class User(Model):
+    __table__ = 'users'
+    id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
+    email = StringField(ddl='varchar(50)')
+    passwd = StringField(ddl='varchar(50)')
+    admin = BooleanField()
+    name = StringField(ddl='varchar(50)')
+    image = StringField(ddl='varchar(500)')
+    created_at = FloatField(default=time.time)
+
+class Blog(Model):
+    __table__ = 'blogs'
+    id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
+    user_id = StringField(ddl='varchar(50)')
+    user_name = StringField(ddl='varchar(50)')
+    user_image = StringField(ddl='varchar(500)')
+    name = StringField(ddl='varchar(50)')
+    summary = StringField(ddl='varchar(200)')
+    content = TextField()
+    created_at = FloatField(default=time.time)
+
+class Comment(Model):
+    __table__ = 'comments'
+    id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
+    blog_id = StringField(ddl='varchar(50)')
+    user_id = StringField(ddl='varchar(50)')
+    user_name = StringField(ddl='varchar(50)')
+    user_image = StringField(ddl='varchar(500)')
+    content = TextField()
+    created_at = FloatField(default=time.time)
+```
+
+在编写ORM时，给一个Field增加`default`参数可让ORM自己填入缺省值。缺省值可作为函数对象传入，在调用`save()`时自动计算
+例如，主键`id`的缺省值是函数`next_id`，创建时间`created_at`的缺省值是函数`time.time`，可以自动设置当前日期和时间
+
+日期和时间用`float`类型存储，而不是`datetime`类型，好处是不必关心数据库的时区以及时区转换问题，排序非常简单，显示时，做一个`float`到`str`的转换
+
+#### 初始化数据库表
+
+```sql
+-- schema.sql
+drop database if exists awesome;
+create database awesome;
+use awesome;
+-- grant select, insert, update, delete on awesome.* to 'www-data'@'localhost' identified by 'www-data';
+create user 'www-data'@'localhost' identified by 'www-data';
+grant select, insert, update, delete on awesome.* to 'www-data'@'localhost' with grant option;
+
+--create user 'www-data'@'%' identified by 'www-data';
+--grant select, insert, update, delete on awesome.* to 'www-data'@'%' with grant option;
+
+-- GRANT ALL ON *.* to 'www-data'@'localhost' with grant option;
+
+create table users (
+    `id` varchar(50) not null,
+    `email` varchar(50) not null,
+    `passwd` varchar(50) not null,
+    `admin` bool not null,
+    `name` varchar(50) not null,
+    `image` varchar(500) not null,
+    `created_at` real not null,
+    unique key `idx_email` (`email`),
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;
+
+create table blogs (
+    `id` varchar(50) not null,
+    `user_id` varchar(50) not null,
+    `user_name` varchar(50) not null,
+    `user_image` varchar(500) not null,
+    `name` varchar(50) not null,
+    `summary` varchar(200) not null,
+    `content` mediumtext not null,
+    `created_at` real not null,
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;
+
+create table comments (
+    `id` varchar(50) not null,
+    `blog_id` varchar(50) not null,
+    `user_id` varchar(50) not null,
+    `user_name` varchar(50) not null,
+    `user_image` varchar(500) not null,
+    `content` mediumtext not null,
+    `created_at` real not null,
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;
+```
+
+初始化命令：`$ mysql -u root -p < schema.sql`
+
+```py
+# 编写数据访问代码
+import orm
+import asyncio
+from models import User, Blog, Comment
+
+async def test(loop):
+    await orm.create_pool(loop=loop, host='192.168.31.10',user='www-data', password='www-data', db='awesome')
+    u = User(name='Test', email='test@example.com', passwd='1234567890', image='about:blank')
+    await u.save()
+    # 添加到数据库后需要关闭连接池，否则会报错 RuntimeError: Event loop is closed
+    orm.__pool.close()
+    await orm.__pool.wait_closed()
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test(loop))
+    loop.close()
+```

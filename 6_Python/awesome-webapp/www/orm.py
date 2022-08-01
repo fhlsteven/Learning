@@ -15,18 +15,18 @@ def log(sql, arg=()):
 
 async def create_pool(loop, **kw):
     logging.info('create database connection pool...')
-    global _pool
-    _pool = await aiomysql.create_pool(
+    global __pool
+    __pool = await aiomysql.create_pool(
         host=kw.get('host', 'localhost'),
         port=kw.get('port', 3306),
-        user= kw['user'],
+        user=kw['user'],
         password=kw['password'],
         db=kw['db'],
-        charset=kw.get('charset','utf-8'),
+        charset=kw.get('charset', 'utf8'),
         autocommit=kw.get('autocommit', True),
         maxsize=kw.get('maxsize', 10),
         minsize=kw.get('minsize', 1),
-        loop = loop
+        loop=loop
     )
 
 async def select(sql, args, size=None):
@@ -43,14 +43,14 @@ async def select(sql, args, size=None):
             logging.info('rows returned: %s' % len(rs))
             return rs
 
-async def execute(sql, args):
+async def execute(sql, args, autocommit=True):
     log(sql)
     async with __pool.get() as conn:
         if not autocommit:
             await conn.begin()
         try:
             async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(sql.repalce('?','%s'), args)
+                await cur.execute(sql.replace('?', '%s'), args)
                 affected = cur.rowcount
             if not autocommit:
                 await conn.commit()
