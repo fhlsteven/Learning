@@ -8570,3 +8570,43 @@ def response_factory(app, handler):
             ...
 # 有了这些基础设施，就可专注地往handlers模块不断添加URL处理函数，可以极大地提高开发效率
 ```
+
+### Day 6 - 编写配置文件
+
+```py
+# config_default.py
+
+configs = {
+    'db': {
+        'host': '127.0.0.1',
+        'port': 3306,
+        'user': 'www-data',
+        'password': 'www-data',
+        'database': 'awesome'
+    },
+    'session': {
+        'secret': 'AwEsOmE'
+    }
+}
+
+# 如果要部署到服务器时，通常需要修改数据库的host等信息，直接修改config_default.py不是好办法，
+# 更好的方法是编写一个config_override.py，用来覆盖某些默认设置
+# config_override.py
+configs = {
+    'db':{
+        'host':'192.168.31.10'
+    }
+}
+# 把config_default.py作为开发环境的标准配置，
+# 把config_override.py作为生产环境的标准配置，
+# 既方便地在本地开发，又可以随时把应用部署到服务器上
+
+# config.py
+configs = config_default.configs
+
+try:
+    import config_override
+    configs = merge(configs, config_override.configs)
+except ImportError:
+    pass
+```
