@@ -8610,3 +8610,258 @@ try:
 except ImportError:
     pass
 ```
+
+### Day 7 - 编写MVC
+
+```py
+# 编写处理首页URL的函数
+@get('/')
+async def index(request):
+    users = await User.findALl()
+    return {
+        '__template__': 'test.html',
+        'users': users
+    }
+```
+
+模板文件
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Test users - Awesome Python Webapp</title>
+</head>
+<body>
+    <h1>All users</h1>
+    {% for u in users %}
+    <p> {{ u.name }} / {{ u.email }} </p>
+    {% endfor %}
+</body>
+</html>
+```
+
+### Day 8 - 构建前端
+
+选择[uikit](https://getuikit.com/)CSS框架,可从[uikit首页](https://getuikit.com/)下载打包的资源文件[uikit2.6](https://www.cdnpkg.com/uikit/2.6.0)
+
+```bash
+static/
++- css/
+|  +- addons/
+|  |  +- uikit.addons.min.css
+|  |  +- uikit.almost-flat.addons.min.css
+|  |  +- uikit.gradient.addons.min.css
+|  +- awesome.css
+|  +- uikit.almost-flat.addons.min.css
+|  +- uikit.gradient.addons.min.css
+|  +- uikit.min.css
++- fonts/
+|  +- fontawesome-webfont.eot
+|  +- fontawesome-webfont.ttf
+|  +- fontawesome-webfont.woff
+|  +- FontAwesome.otf
++- js/
+   +- awesome.js
+   +- html5.js
+   +- jquery.min.js
+   +- uikit.min.js
+```
+
+模板引擎考虑到页面上重复的HTML部分的复用问题, 相同部分`inc_header.html`和`inc_footer.html`可共享;
+include方法不利于页面整体结构的维护
+
+```html
+<html>
+    <% include file="inc_header.html" %>
+    <% include file="index_body.html" %>
+    <% include file="inc_footer.html" %>
+</html>
+```
+
+jinjia2 模板有种“继承”方式，实现模板的复用更简单.
+“继承”模板的方式是通过编写一个“父模板”，在父模板中定义一些可替换的block（块）。然后，编写多个“子模板”，每个子模板都可以只替换父模板定义的block
+
+```html
+<!-- base.html -->
+<html>
+    <head>
+        <title>{% block title%} 这里定义了一个名为title的block {% endblock %}</title>
+    </head>
+    <body>
+        {% block content %} 这里定义了一个名为content的block {% endblock %}
+    </body>
+</html>
+
+<!-- a.html -->
+{% extends 'base.html' %}
+
+{% block title %} A {% endblock %}
+
+{% block content %}
+    <h1>Chapter A</h1>
+    <p>blablabla...</p>
+{% endblock%}
+
+<!-- b.html -->
+{% extends 'base.html' %}
+
+{% block title %} B {% endblock %}
+
+{% block content %} 
+    <h1>Chapter</h1>
+    <ul>
+        <li>list 1</li>
+        <li>list 2</li>
+    </ul>
+{% endblock %}
+```
+
+定义好父模板的整体布局和CSS样式，编写子模板就会非常容易
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    {% block meta %}<!-- block meta 子页面定义一些meta，例如rss feed -->{% endblock %}
+    <title>{% block title %} ? {% endblock %} - Awesome Python Webapp</title><!--覆盖页面的标题-->
+    <link rel="stylesheet" href="/static/css/uikit.min.css">
+    <link rel="stylesheet" href="/static/css/uikit.gradient.min.css">
+    <link rel="stylesheet" href="/static/css/awesome.css" />
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/md5.js"></script>
+    <script src="/static/js/uikit.min.js"></script>
+    <script src="/static/js/awesome.js"></script>
+    {% block beforehead %}<!-- before head  在<head>标签关闭前插入JavaScript代码-->{% endblock %}
+</head>
+<body>
+    <nav class="uk-navbar uk-navbar-attached uk-margin-bottom">
+        <div class="uk-container uk-container-center">
+            <a href="/" class="uk-navbar-brand">Awesome</a>
+            <ul class="uk-navbar-nav">
+                <li data-url="blogs"><a href="/"><i class="uk-icon-home"></i> 日志</a></li>
+                <li><a target="_blank" href="#"><i class="uk-icon-book"></i> 教程</a></li>
+                <li><a target="_blank" href="#"><i class="uk-icon-code"></i> 源码</a></li>
+            </ul>
+            <div class="uk-navbar-flip">
+                <ul class="uk-navbar-nav">
+                {% if user %}
+                    <li class="uk-parent" data-uk-dropdown>
+                        <a href="#0"><i class="uk-icon-user"></i> {{ user.name }}</a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
+                                <li><a href="/signout"><i class="uk-icon-sign-out"></i> 登出</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                {% else %}
+                    <li><a href="/signin"><i class="uk-icon-sign-in"></i> 登陆</a></li>
+                    <li><a href="/register"><i class="uk-icon-edit"></i> 注册</a></li>
+                {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="uk-container uk-container-center">
+        <div class="uk-grid">
+            <!-- content -->
+            {% block content %}
+            {% endblock %}
+            <!-- // content -->
+        </div>
+    </div>
+
+    <div class="uk-margin-large-top" style="background-color:#eee; border-top:1px solid #ccc;">
+        <div class="uk-container uk-container-center uk-text-center">
+            <div class="uk-panel uk-margin-top uk-margin-bottom">
+                <p>
+                    <a target="_blank" href="#" class="uk-icon-button uk-icon-weibo"></a>
+                    <a target="_blank" href="#" class="uk-icon-button uk-icon-github"></a>
+                    <a target="_blank" href="#" class="uk-icon-button uk-icon-linkedin-square"></a>
+                    <a target="_blank" href="#" class="uk-icon-button uk-icon-twitter"></a>
+                </p>
+                <p>Powered by <a href="#">Awesome Python Webapp</a>. Copyright &copy; 2014. [<a href="/manage/" target="_blank">Manage</a>]</p>
+                <p><a href="http://www.liaoxuefeng.com/" target="_blank">www.liaoxuefeng.com</a>. All rights reserved.</p>
+                <a target="_blank" href="#"><i class="uk-icon-html5" style="font-size:64px; color: #444;"></i></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+```
+
+首页改造，从`__base__.html`继承一个`blogs.html`
+
+```py
+{% extends '__base__.html' %}
+
+{% block title %}日志{% endblock %}
+
+{% block content %}
+
+    <div class="uk-width-medium-3-4">
+        {% for blog in blogs %}
+            <article class="uk-article">
+                <h2><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
+                <p class="uk-article-meta">发表于{{ blog.created_at}}</p>
+                <p>{{ blog.summary }}</p>
+                <p><a href="/blog/{{ blog.id }}">继续阅读 <i class="uk-icon-angle-double-right"></i></a></p>
+            </article>
+            <hr class="uk-article-divider">
+        {% endfor %}
+    </div>
+
+    <div class="uk-width-medium-1-4">
+        <div class="uk-panel uk-panel-header">
+            <h3 class="uk-panel-title">友情链接</h3>
+            <ul class="uk-list uk-list-line">
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">编程</a></li>
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">读书</a></li>
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">Python教程</a></li>
+                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="#">Git教程</a></li>
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}
+```
+
+```py
+@get('/')
+def index(request):
+    summary = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+    blogs = [
+        Blog(id='1', name='Test Blog', summary=summary, created_at=time.time()-120),
+        Blog(id='2', name='Something New', summary=summary, created_at=time.time()-3600),
+        Blog(id='3', name='Learn Swift', summary=summary, created_at=time.time()-7200)
+    ]
+    return {
+        '__template__': 'blogs.html',
+        'blogs': blogs
+    }
+```
+
+Blog的创建日期显示的是一个浮点数，因为它是由这段模板渲染出来的：`<p class="uk-article-meta">发表于{{ blog.created_at }}</p>`
+解决方法是通过jinja2的filter（过滤器），把一个浮点数转换成日期字符串。编写一个`datetime`的filter，`<p class="uk-article-meta">发表于{{ blog.created_at|datetime }}</p>`, `|`之后的是filter;filter需要在初始化jinja2时设置
+
+```py
+def datetime_filter(t):
+    delta = int(time.time() - t)
+    if delta < 60:
+        return '1分钟前'
+    if delta < 3600:
+        return '%s分钟前' % (delta // 60)
+    if delta < 86400:
+        return '%s小时前' % (delta // 3600)
+    if delta < 604800:
+        return '%s天前' % (delta // 86400)
+    dt = datetime.fromtimestamp(t)
+    return '%s年%s月%s日' % (dt.year, dt.month, dt.day)
+
+...
+init_jinja2(app, filters=dict(datetime=datetime_filter))
+...
+```
