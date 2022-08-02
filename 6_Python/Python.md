@@ -8865,3 +8865,26 @@ def datetime_filter(t):
 init_jinja2(app, filters=dict(datetime=datetime_filter))
 ...
 ```
+
+### Day 9 - 编写API
+
+Roy Fielding博士在2000年,提出[REST](https://zh.wikipedia.org/wiki/REST)（Representational State Transfer）取代了复杂而笨重的SOAP，成为Web API的标准了
+REST就是一种设计API的模式。最常用的数据格式是JSON;以JSON格式编写的REST风格的API具有简单、易读、易用的特点。
+
+```py
+@get('/api/users')
+def api_get_users(*, page='1'):
+    page_index = get_page_index(page)
+    num = yield from User.findNumber('count(id)')
+    p = Page(num, page_index)
+    if num == 0:
+        return dict(page=p, users=())
+    users = yield from User.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
+    for u in users:
+        u.passwd = '******'
+    return dict(page=p, users=users)
+```
+
+只要返回一个`dict`，后续的`response`这个`middleware`就可以把结果序列化为JSON并返回。定义一个`APIError`,API调用时发生了逻辑错误（比如用户不存在），其他的Error视为Bug，返回的错误代码为`internalerror`。
+
+### Day 10 - 用户注册和登录
