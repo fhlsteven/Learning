@@ -8568,4 +8568,5 @@ def response_factory(app, handler):
             return resp
         if isinstance(r, dict):
             ...
+# 有了这些基础设施，就可专注地往handlers模块不断添加URL处理函数，可以极大地提高开发效率
 ```
