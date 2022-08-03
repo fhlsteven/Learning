@@ -9122,3 +9122,153 @@ def cookie2user(cookie_str):
         logging.exception(e)
         return None
 ```
+
+### Day 11 - 编写日志创建页
+
+编写REST API，用于创建一个Blog;非常容易测试
+
+```py
+@post('/api/blogs')
+def api_create_blog(request, *, name, summary, content):
+    check_admin(request)
+    if not name or not name.strip():
+        raise APIValueError('name', 'name cannot be empty.')
+    if not summary or not summary.strip():
+        raise APIValueError('summary', 'summary cannot be empty.')
+    if not content or not content.strip():
+        raise APIValueError('content', 'content cannot be empty.')
+    blog = Blog(user_id=request.__user__.id, user_name=request.__user__.name, user_image=request.__user__.image, name=name.strip(), summary=summary.strip(), content=content.strip())
+    yield from blog.save()
+    return blog
+```
+
+生成前端页面最早的方式是拼接字符串,完全不具备可维护性;后模板方式. 在页面上大量使用JavaScript,模板方式仍会导致JavaScript代码与后端代码绑得非常紧密,以至于难以维护;根本原因在于负责显示的HTML DOM模型与负责数据和交互的JavaScript代码没有分割清楚。
+
+[MVVM](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel)Model View ViewModel模式应运而生
+
+MVVM最早由微软提出来，它借鉴了桌面应用程序的MVC思想，在前端页面中，把Model用纯JavaScript对象表示：
+
+```html
+<!-- Model -->
+<script>
+    var blog = {
+        name: 'hello',
+        summary: 'this is summary',
+        content: 'this is content...'
+    };
+</script>
+
+<!-- View -->
+<form action="/api/blogs" method="post">
+    <input name="name">
+    <input name="summary">
+    <textarea name="content"></textarea>
+    <button type="submit">OK</button>
+</form>
+```
+
+把Model和View关联起来的就是ViewModel。ViewModel负责把Model的数据同步到View显示出来，还负责把View的修改同步回Model
+
+许多成熟的MVVM框架，例如AngularJS，KnockoutJS等. 选择[Vue](https://vuejs.org/)这个简单易用的MVVM框架来实现创建Blog的页面`templates/manage_blog_edit.html`
+
+```html
+{% extends '__base__.html' %}
+
+{% block title %}编辑日志{% endblock %}
+
+{% block beforehead %}
+<script>
+    var ID = '{{ id }}', action = '{{ action }}'
+
+    function initVM(blog){
+        var vm = new Vue({
+            el: '#vm',
+            data: blog,
+            methods:{
+                submit:function(event){
+                    event.preventDefault();
+                    var $form = $('#vm').find('form');
+                    $form.postJSON(action, this.$data , function(err, r){
+                        if(err){
+                            $form.showFormError(err);
+                        } else {
+                            return location.assign('/api/blogs/' + r.id);
+                        }
+                    });
+                }
+            }
+        });
+        $('#vm').show();
+    }
+
+    $(function(){
+        if(ID){
+            getJSON('/api/blogs/' + ID, function(err, blog){
+                if(err){
+                    return fatal(err);
+                }
+                $('#loading').hide();
+                initVM(blog);
+            });
+        } else {
+            $('#loading').hide();
+            initVM({name:'', summary:'', content:''});
+        }
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="uk-width-1-1 uk-margin-bottom">
+    <div class="uk-panel uk-panel-box">
+        <ul class="uk-breadcrumb">
+            <li><a href="/manage/comments">评论</a></li>
+            <li><a href="/manage/blogs">日志</a></li>
+            <li><a href="/manage/users">用户</a></li>
+        </ul>
+    </div>
+</div>
+<div id="error" class="uk-width-1-1"></div>
+<div id="loading" class="uk-width-1-1 uk-text-center">
+    <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
+</div>
+<div id="vm" class="uk-width-2-3">
+    <form v-on="submit: submit" class="uk-form uk-form-stacked">
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">标题:</label>
+            <div class="uk-form-controls">
+                <input v-model="name" name="name" type="text" placeholder="标题" class="uk-width-1-1">
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">摘要:</label>
+            <div class="uk-form-controls">
+                <textarea v-model="summary" rows="4" name="summary" placeholder="摘要" class="uk-width-1-1" style="resize:none;"></textarea>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">内容:</label>
+            <div class="uk-form-controls">
+                <textarea v-model="content" rows="16" name="content" placeholder="内容" class="uk-width-1-1" style="resize:none;"></textarea>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-save"></i> 保存</button>
+            <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+```
+
+初始化Vue时，指定3个参数：
+
+* `el`：根据选择器查找绑定的View，这里是`#vm`，就是id为`vm`的DOM，对应一个`<div>`标签
+* `data`：JavaScript对象表示的Model，初始化为`{ name: '', summary: '', content: ''}`
+* `methods`：View可以触发的JavaScript函数，`submit`就是提交表单时触发的函数
+
+接下来，在`<form>`标签中，用几个`v-model`，就可以让Vue把Model和View关联起来：`<!-- input的value和Model的name关联起来了 --><input v-model="name" class="uk-width-1-1">`;Form表单通过`<form v-on="submit: submit">`把提交表单的事件关联到`submit`方法
+
+在MVVM中，Model和View是双向绑定的.在Chrome控制台，可通过`vm.name`访问单个属性，或通过`vm.$data`访问整个Model
+
