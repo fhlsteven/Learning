@@ -9410,3 +9410,97 @@ $(function() {
 往Model的`blogs`中增加一个Blog元素，table增加一行；`blogs`的某个元素删除，table减少一行。所有复杂的Model-View的映射逻辑全部由MVVM框架完成，只需要在HTML中写上`v-repeat`指令，就什么都不用管了。
 
 可把`v-repeat="blog: blogs"`看成循环代码，所以，可在一个`<tr>`内部引用循环变量`blog`。`v-text`和`v-attr`指令分别用于生成文本和DOM节点属性
+
+### Day 13 - 提升开发效率
+
+一个Web App的框架完全搭建完成，从后端的API到前端的MVVM，流程已经跑通。让服务器检测到代码修改后自动重新加载。
+
+Django的开发环境在Debug模式下可做到自动重新加载，如果编写的服务器也能实现这个功能，就能大大提升开发效率
+
+Python的第三方库`watchdog`可以利用操作系统的API来监控目录文件的变化，并发送通知:`$ pip3 install watchdog`;利用`watchdog`接收文件变化的通知，如果是`.py`文件，就自动重启`wsgiapp.py`进程;利用Python自带的`subprocess`实现进程的启动和终止，并把输入输出重定向到当前进程的输入输出中
+
+```py
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+__author__ = ''
+import os, sys, time, subprocess
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+def log(s):
+    print('[Monitor] %s' % s)
+
+class MyFileSystemEventHander(FileSystemEventHandler):
+    def __init__(self, fn):
+        super(MyFileSystemEventHander, self).__init__()
+        self.restart = fn
+    def on_any_event(self, event):
+        if event.src_path.endswith('.py'):
+            log('Python source file changed: %s' % event.src_path)
+            self.restart()
+
+command = ['echo', 'ok']
+process = None
+
+def kill_process():
+    global process
+    if process:
+        log('Kill process [%s]...' % process.pid)
+        process.kill()
+        process.wait()
+        log('Process ended with code %s.' % process.returncode)
+        process = None
+
+def start_process():
+    global process, command
+    log('Start process %s...' % ' '.join(command))
+    process = subprocess.Popen(command, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+
+def restart_process():
+    kill_process()
+    start_process()
+
+def start_watch(path, callback):
+    observer = Observer()
+    observer.schedule(MyFileSystemEventHander(restart_process), path, recursive=True)
+    observer.start()
+    log('Watching directory %s...' % path)
+    start_process()
+    try:
+        while True:
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
+
+if __name__ == '__main__':
+    argv = sys.argv[1:]
+    if not argv:
+        print('Usage: ./pymonitor your-script.py')
+        exit(0)
+    if argv[0] != 'python3':
+        argv.insert(0, 'python3')
+    command = argv
+    path = os.path.abspath('.')
+    start_watch(path, None)
+```
+
+`$ python3 pymonitor.py wsgiapp.py`;给`pymonitor.py`加上可执行权限`$ ./pymonitor.py app.py` win(`pymonitor.py app.py`)
+
+```log
+python pymonitor.py app.py
+[Monitor] Watching directory F:\GitHub\Learning\6_Python\awesome-webapp\www...
+[Monitor] Start process python app.py...
+...
+INFO:root:server started at http://127.0.0.1:9000...
+[Monitor] Python source file changed: F:\GitHub\Learning\6_Python\awesome-webapp\www\handlers.py
+[Monitor] Kill process [4160]...
+[Monitor] Process ended with code 1.
+[Monitor] Start process python app.py...
+[Monitor] Python source file changed: F:\GitHub\Learning\6_Python\awesome-webapp\www\handlers.py
+[Monitor] Kill process [12980]...
+[Monitor] Process ended with code 1.
+[Monitor] Start process python app.py...
+...
+INFO:root:server started at http://127.0.0.1:9000...
+```
