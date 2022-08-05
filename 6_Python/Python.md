@@ -9556,3 +9556,240 @@ def auth_factory(app, handler):
 * 注销页：`GET /signout`
 * 首页：`GET /`
 * 日志详情页：`GET /blog/:blog_id`
+
+### Day 15 - 部署Web App
+
+[DevOps](https://zh.wikipedia.org/wiki/DevOps):开发和运维要变成一个整体,理念把运维、监控等功能融入到开发中
+
+#### 部署到Linux服务器
+
+[Ubuntu Server 14.04 LTS](https://ubuntu.com/download/server), 确保ssh服务正在运行`$ sudo apt-get install openssh-server`;公钥复制到服务器端用户的`.ssh/authorized_keys`中,可通过证书实现无密码连接
+
+高性能的Web服务器:Nginx;处理静态资源，同时作为反向代理把动态请求交给Python代码处理
+
+```ascii
+┌───────────────────────────────────────┐
+│ ┌───────┐     ┌─────────┐     ┌─────┐ │
+│ │ Nginx │◄───►│ awesome │◄───►│MySQL│ │
+│ └───────┘     └─────────┘     └─────┘ │
+│                  Linux                │
+└───────────────────────────────────────┘
+```
+
+Nginx负责分发请求
+
+```ascii
+
+   ┌─────────┐
+   │ Browser │
+   └─────────┘
+        ▲
+┌───────│─────────────────────────────────────────────┐
+│       ▼                                             │
+│  ┌─────────┐  url=/static/                          │
+│  │  Nginx  │◄─────────────► /srv/awesome/www/static │
+│  └─────────┘                                        │
+│       ▲                                             │
+│       │ url=/                                       │
+│       ▼                                             │
+│  ┌─────────┐                                        │
+│  │ awesome │◄─────────────► /srv/awesome/www        │
+│  └─────────┘                                        │
+│                                                     │
+│                       Linux                         │
+└─────────────────────────────────────────────────────┘
+```
+
+定义好部署的目录结构
+
+```txt
+/
++- srv/
+   +- awesome/       <-- Web App根目录
+      +- www/        <-- 存放Python源码
+      |  +- static/  <-- 存放静态资源文件
+      +- log/        <-- 存放log
+```
+
+在服务器上部署，要考虑到新版本如果运行不正常，需要回退到旧版本时怎么办。每次用新的代码覆盖掉旧的文件是不行的，需要一个类似版本控制的机制。由于Linux系统提供了软链接功能，所以，把www作为一个软链接，它指向哪个目录，哪个目录就是当前运行的版本：
+
+Nginx和python代码的配置文件只需要指向www目录即可
+
+Nginx可以作为服务进程直接启动，但`app.py`还不行，[Supervisor](http://supervisord.org/)登场:管理进程的工具，可以随系统启动而启动服务,它还时刻监控服务进程，如果服务进程意外退出，Supervisor可以自动重启服务。
+
+需要用到的服务:
+
+* Nginx：高性能Web服务器+负责反向代理
+* Supervisor：监控服务进程的工具
+* MySQL：数据库服务
+
+安装上述服务：`$ sudo apt-get install nginx supervisor python3 mysql-server`；安装Python库`$ sudo pip3 install jinja2 aiomysql aiohttp`；
+初始化数据库：`$ mysql -u root -p < schema.sql`
+
+#### 部署
+
+用FTP还是SCP还是rsync复制文件？如果动复制，用一两次还行，一天如果部署50次不但慢、效率低，而且容易出错
+
+正确的部署方式是使用工具配合脚本完成自动化部署。[Fabric](https://www.fabfile.org/)是一个自动化部署工具。由于Fabric是用Python 2.x开发的，所以，部署脚本要用Python 2.7来编写，本机还必须安装Python 2.7版本
+
+本机（开发机器）安装Fabric `$ easy_install fabric`:`pip install fabric`(2.7`pip install fabric==1.14.0`);Linux服务器上不需要安装Fabric，Fabric使用SSH直接登录服务器并执行部署命令
+
+编写部署脚本`fabfile.py`
+
+```cmd
+awesome-python-webapp/
++- fabfile.py
++- www/
++- ...
+```
+
+```py
+# fabfile.py
+# 设置部署时的变量
+import os, re
+from datetime import datetime
+
+# 导入Fabric API:
+from fabric.api import *
+
+# 服务器登录用户名:
+env.user = 'michael'
+# sudo用户为root:
+env.sudo_user = 'root'
+# 服务器地址，可以有多个，依次部署:
+env.hosts = ['192.168.0.3']
+
+# 服务器MySQL用户名和口令:
+db_user = 'www-data'
+db_password = 'www-data'
+
+###  编写打包的任务
+_TAR_FILE = 'dist-awesome.tar.gz'
+def build():
+    includes = ['static', 'templates', 'transwarp', 'favicon.ico', '*.py']
+    excludes = ['test', '.*', '*.pyc', '*.pyo']
+    local('rm -f dist/%s' % _TAR_FILE)
+    with lcd(os.path.join(os.path.abspath('.'), 'www')):
+        cmd = ['tar', '--dereference', '-czvf', '../dist/%s' % _TAR_FILE]
+        cmd.extend(['--exclude=\'%s\'' % ex for ex in excludes])
+        cmd.extend(includes)
+        local(' '.join(cmd))
+### 
+
+_REMOTE_TMP_TAR = '/tmp/%s' % _TAR_FILE
+_REMOTE_BASE_DIR = '/srv/awesome'
+
+def deploy():
+    newdir = 'www-%s' % datetime.now().strftime('%y-%m-%d_%H.%M.%S')
+    # 删除已有的tar文件:
+    run('rm -f %s' % _REMOTE_TMP_TAR)
+    # 上传新的tar文件:
+    put('dist/%s' % _TAR_FILE, _REMOTE_TMP_TAR)
+    # 创建新目录:
+    with cd(_REMOTE_BASE_DIR):
+        sudo('mkdir %s' % newdir)
+    # 解压到新目录:
+    with cd('%s/%s' % (_REMOTE_BASE_DIR, newdir)):
+        sudo('tar -xzvf %s' % _REMOTE_TMP_TAR)
+    # 重置软链接:
+    with cd(_REMOTE_BASE_DIR):
+        sudo('rm -f www')
+        sudo('ln -s %s www' % newdir)
+        sudo('chown www-data:www-data www')
+        sudo('chown -R www-data:www-data %s' % newdir)
+    # 重启Python服务和nginx服务器:
+    with settings(warn_only=True):
+        sudo('supervisorctl stop awesome')
+        sudo('supervisorctl start awesome')
+        sudo('/etc/init.d/nginx reload')
+```
+
+Fabric提供`local('...')`来运行本地命令，`with lcd(path)`可把当前命令的目录设定为`lcd()`指定的目录，注意Fabric只能运行命令行命令，Windows下可能需要[Cgywin](https://cygwin.com/)环境
+
+打包:在`awesome-webapp`目录下运行：`$ fab build`;在`dist`目录下创建了`dist-awesome.tar.gz`
+
+注意`run()`函数执行的命令是在服务器上运行，`with cd(path)`和`with lcd(path)`类似，把当前目录在服务器端设置为`cd()`指定的目录。如果一个命令需要sudo权限，就不能用`run()`，而是用`sudo()`来执行
+
+#### 配置Supervisor
+
+Supervisor只负责运行`app.py`,编写一个Supervisor的配置文件`awesome.conf`，存放到/`etc/supervisor/conf.d/`目录下：
+
+```config
+[program:awesome]
+
+command     = /srv/awesome/www/app.py
+directory   = /srv/awesome/www
+user        = www-data
+startsecs   = 3
+
+redirect_stderr         = true
+stdout_logfile_maxbytes = 50MB
+stdout_logfile_backups  = 10
+stdout_logfile          = /srv/awesome/log/app.log
+```
+
+配置文件通过`[program:awesome]`指定服务名为`awesome`，`command`指定启动`app.py`
+
+```bash
+$ sudo supervisorctl reload
+$ sudo supervisorctl start awesome
+$ sudo supervisorctl status
+awesome                RUNNING    pid 1401, uptime 5:01:34
+```
+
+other :启动supervisord:`$ /usr/bin/python2 /usr/bin/supervisord -c /etc/supervisord.conf`
+修改 `vi /etc/supervisord.conf`
+
+```conf
+[include]
+files = supervisord.d/*.ini
+files = supervisor/conf.d/*.conf # 增加的内容
+```
+
+#### 配置Nginx
+
+把配置文件`awesome`放到`/etc/nginx/sites-available/`目录下
+
+```config
+server {
+    listen      80; # 监听80端口
+
+    root       /srv/awesome/www;
+    access_log /srv/awesome/log/access_log;
+    error_log  /srv/awesome/log/error_log;
+
+    # server_name awesome.steven.com; # 配置域名
+
+    # 处理静态文件/favicon.ico:
+    location /favicon.ico {
+        root /srv/awesome/www;
+    }
+
+    # 处理静态资源:
+    location ~ ^\/static\/.*$ {
+        root /srv/awesome/www;
+    }
+
+    # 动态请求转发到9000端口:
+    location / {
+        proxy_pass       http://127.0.0.1:9000;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
+
+在`/etc/nginx/sites-enabled/`目录下创建软链接
+
+```bash
+$ pwd
+/etc/nginx/sites-enabled
+$ sudo ln -s /etc/nginx/sites-available/awesome .
+# Nginx重新加载配置文件
+$ sudo /etc/init.d/nginx reload
+# udo service nginx {start|stop|restart|reload|force-reload|status|configtest|rotate|upgrade}
+# sudo /usr/sbin/nginx -s  reload
+```
+
+如果有任何错误，都可在`/srv/awesome/log`查找Nginx和App的log。如果Supervisor启动时报错，可在`/var/log/supervisor`查看Supervisor的log
