@@ -4,7 +4,7 @@
 
 {% block beforehead %}
 <script>
-    var comment_url = 'api/blogs/{{ blog.id }}/comments';
+    var comment_url = '/api/blogs/{{ blog.id }}/comments';
 
     $(function(){
         var $form = $('#form-comment');
