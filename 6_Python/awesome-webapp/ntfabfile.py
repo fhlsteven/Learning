@@ -47,7 +47,6 @@ def build():
             if _dir == 'test':
                 continue
             for f in files:
-                print(_dir)
                 if not (('.pyc' in f) or ('.pyo' in f)):    # 排除开发过程调试产生的文件，为了简单点实现，此处没有完全照搬廖老师的参数
                     fullpath = os.path.join(root,f)
                     tar.add(fullpath)
@@ -55,7 +54,7 @@ def build():
         tar.close()
     else:
         local('rm -f dist/%s' % _TAR_FILE)
-        with lcd(os.path.join(os.path.abspath('.'), 'www')):
+        with lcd(os.path.join(_current_path(), 'www')):
             cmd = ['tar', '--dereference', '-czvf', '../dist/%s' % _TAR_FILE]
             cmd.extend(['--exclude=\'%s\'' % ex for ex in excludes])
             cmd.extend(includes)
