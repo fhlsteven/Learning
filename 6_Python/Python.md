@@ -9623,7 +9623,7 @@ Nginx可以作为服务进程直接启动，但`app.py`还不行，[Supervisor](
 * Supervisor：监控服务进程的工具
 * MySQL：数据库服务
 
-安装上述服务：`$ sudo apt-get install nginx supervisor python3 mysql-server`；安装Python库`$ sudo pip3 install jinja2 aiomysql aiohttp`；
+安装上述服务：`$ sudo apt-get install nginx supervisor python3 mysql-server`；安装Python库`$ sudo pip3 install jinja2 aiomysql aiohttp`;`pip install cryptography`；
 初始化数据库：`$ mysql -u root -p < schema.sql`
 
 #### 部署
@@ -9717,7 +9717,7 @@ Supervisor只负责运行`app.py`,编写一个Supervisor的配置文件`awesome.
 ```config
 [program:awesome]
 
-command     = /srv/awesome/www/app.py
+command     = /srv/awesome/www/app.py # 这里改成了 python3 /srv/awesome/www/app.py
 directory   = /srv/awesome/www
 user        = www-data
 startsecs   = 3
