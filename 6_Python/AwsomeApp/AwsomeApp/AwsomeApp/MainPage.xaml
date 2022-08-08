@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AwsomeApp.MainPage">
+
+    <StackLayout>
+        <Label Text="最新日志" HorizontalOptions="Center" FontSize="12"/>
+        <CollectionView x:Name="blogsCV" SelectionMode="Single" SelectionChanged="blogsCV_SelectionChanged">
+            
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
+            </CollectionView.ItemsLayout>
+            
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout>
+                        <Label Text="{Binding name}"></Label>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Clicked="Button_Clicked" Text="Click Me"></Button>
+    </StackLayout>
+
+</ContentPage>

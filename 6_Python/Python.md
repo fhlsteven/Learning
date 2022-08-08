@@ -9793,3 +9793,29 @@ $ sudo /etc/init.d/nginx reload
 ```
 
 如果有任何错误，都可在`/srv/awesome/log`查找Nginx和App的log。如果Supervisor启动时报错，可在`/var/log/supervisor`查看Supervisor的log
+
+### Day 16 - 编写移动App
+
+包含两个屏幕：列出最新日志和阅读日志的详细内容：
+
+[Xamarin.Forms 文档](https://docs.microsoft.com/zh-cn/xamarin/xamarin-forms/);[Develop Apps for iOS](https://developer.apple.com/ios/)
+
+## FAQ
+
+常见问题
+
+### 如何获取当前路径
+
+当前路径可以用`'.'`表示，再用`os.path.abspath()`将其转换为绝对路径：
+
+### 获取当前模块的文件名
+
+可通过特殊变量`__file__`获取
+
+### 获取命令行参数
+
+通过`sys`模块的`argv`获取;`argv`的第一个元素永远是命令行执行的`.py`文件名
+
+### 获取当前Python命令的可执行文件路径
+
+`sys`模块的`executable`变量就是Python命令可执行文件的路径
