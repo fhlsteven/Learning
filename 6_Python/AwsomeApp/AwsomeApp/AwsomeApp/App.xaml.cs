@@ -8,9 +8,9 @@ namespace AwsomeApp
     {
         public App()
         {
-            InitializeComponent();
-
-            MainPage = new MainPage();
+            InitializeComponent();            
+            // 单页面程序
+            MainPage = new NavigationPage(new MainPage()) { };
         }
 
         protected override void OnStart()

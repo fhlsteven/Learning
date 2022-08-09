@@ -17,11 +17,14 @@ namespace AwsomeApp
 
         public MainPage()
         {
-            InitializeComponent();
+            Title = "最新日志";
+            NavigationPage.SetBackButtonTitle(this, Title); // 这个属性只会在ios上显示，不会在 andriod 上显示，而且不是本页面而是跳转过去的那个页面上的返回按钮
             _restService = new RestService();
+            InitializeComponent();
+            Load();                                  
         }
 
-        private async void Button_Clicked(object sender, EventArgs e)
+        private async void Load()
         {
             this.blogsCV.ItemsSource = await _restService.GetBlogsData(Constants.BlogsApi);
         }
@@ -31,7 +34,7 @@ namespace AwsomeApp
             if(e.CurrentSelection != null)
             {
                 Blog blog = (Blog)e.CurrentSelection.FirstOrDefault();
-                await Shell.Current.GoToAsync($"{nameof(BlogEntry)}?{nameof(BlogEntry.BlogName)}={blog.name}&{nameof(BlogEntry.BlogContent)}={blog.content}");
+                await Navigation.PushAsync(new BlogEntry() { Title = blog.name, BindingContext = blog});
             }
         }
 
