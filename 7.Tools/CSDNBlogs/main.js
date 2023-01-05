@@ -7,6 +7,7 @@ window.addEventListener("load", async()=>{
     console.log("lodaded");
     let getAll = document.getElementById("getAll");
     let saveAsMhtml = document.getElementById("saveMhtml");
+    let clearAd = document.getElementById("clearAd");
 
     getAll.addEventListener("click", async()=>{
         let[tab] = await chrome.tabs.query({active:true, currentWindow:true});
@@ -23,7 +24,20 @@ window.addEventListener("load", async()=>{
             saveAs(mhtmlData, tab.title+'.mhtml');
         });
     });
+
+    clearAd.addEventListener("click", async()=>{
+        let [tab] = await chrome.tabs.query({active:true, currentWindow: true});
+        chrome.scripting.executeScript({
+            target:{tabId:tab.id},
+            function:clearAds
+        });
+    });
 });
+
+function clearAds() {
+    let ads = document.querySelector("#csdn-toolbar>:first-child");
+    ads.style.display = "none";
+}
 
 function findBlogsInfo(articleListClassName){
     let articlists = document.querySelectorAll(`.${articleListClassName} li`);
