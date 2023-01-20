@@ -82,10 +82,10 @@ class HouseJob(object):
         times=0
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
         while True:   
-            if times < PET_TRAVEL_TIMES and get_date_minutes(pre_time, datetime.now()) > 11:            
-                wait_time(60)
+            if times < PET_TRAVEL_TIMES and get_date_minutes(pre_time, datetime.now()) > 11:     
                 pre_time = datetime.now()
                 self.house_to_pettravel()
-                times = times +1
+                times = times +1            
+            wait_time(3)
             clcik_pos_locxy(self.driver, CHALLENGE_POS)
-            wait_time()
+            wait_time(60)

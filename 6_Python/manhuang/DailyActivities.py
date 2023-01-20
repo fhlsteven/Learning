@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from common import wait_time, clcik_pos_locxy
+from common import wait_time, clcik_pos_locxy, get_goods
 
 HD_POS = (257, 630)  
 HD_POS_START = (376, 282)
@@ -20,6 +20,7 @@ TEAM_POS = (1860, 654)
 CREATE_TEAM_POS = (1665, 806) 
 
 #
+TT_MATCH = (338, 648)
 
 DAY_BOSS_GET = (260, 783)
 DAY_MONSTER_GET =(260, 452)
@@ -75,8 +76,7 @@ class DailyActivities(object):
             self.close_hd()
             print("bath end")
             get_goods(self.driver)
-
-    TT_MATCH = (1771,692)
+    
     def tianti(self):    
         if is_between((19,30),(19,43)):
             print("tian ti start")

@@ -12,6 +12,7 @@ from DailyActivities import DailyActivities
 from housejobs import HouseJob
 from bosses import Boss
 from instancezones import InstanceZone
+from topprocess import TopProcess
 
 from common import *
 
@@ -68,7 +69,6 @@ def login(driver):
 def select_server(driver):
     # check term    
     wait_time(2)  
-    print(configs.check_term)  
     chk_term = driver.find_element(by=By.CSS_SELECTOR, value=configs.check_term)
     chk_term.click()
 
@@ -122,11 +122,13 @@ def test_eight_components():
     # waiting loading
     
     # monitor
-
-    rong_lian(driver)
+    driver.save_screenshot('all_test.png')
+    #rong_lian(driver)
     #Boss(driver).main_to_single_boss()
-    callback_click(driver)
+    #callback_click(driver)
     #InstanceZone(driver).main_to_everyday_fb()
+    TopProcess(driver).get_welfare()
+    
     #wait_time()
     #callback_click(driver)
     # DailyActivities(driver).monitor()
