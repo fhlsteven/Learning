@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 
@@ -37,7 +35,9 @@ BAG_POS=(382, 894)
 SMELT_POS=(150, 895)
 
 def get_driver(url="https://baidu.com"):
-    driver = webdriver.Chrome()
+    c_op = webdriver.ChromeOptions()
+    c_op.add_argument("--mute-audio")
+    driver = webdriver.Chrome(chrome_options=c_op)
     driver.set_window_size(500,950)
     driver.set_window_position(BROWSER_POS[0], BROWSER_POS[1])
     driver.get(url)
@@ -122,16 +122,16 @@ def test_eight_components():
     # waiting loading
     
     # monitor
-    driver.save_screenshot('all_test.png')
-    #rong_lian(driver)
-    #Boss(driver).main_to_single_boss()
-    #callback_click(driver)
-    #InstanceZone(driver).main_to_everyday_fb()
-    TopProcess(driver).get_welfare()
+    get_goods(driver)
+    rong_lian(driver)
+    Boss(driver).main_to_single_boss()
+    callback_click(driver)
+    InstanceZone(driver).main_to_everyday_fb()
+    #TopProcess(driver).get_welfare()
     
     #wait_time()
     #callback_click(driver)
-    # DailyActivities(driver).monitor()
+    DailyActivities(driver).monitor()
     # HouseJob(driver).rechallenge_pets()
 
     time.sleep(60*60*2)

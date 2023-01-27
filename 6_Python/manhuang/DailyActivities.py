@@ -52,6 +52,7 @@ class DailyActivities(object):
             self.protect()
             self.god_treasure()
             self.bath()
+            self.boss()
             if d_wkday != 6:
                 self.tianti()
         except Exception as e:
@@ -76,6 +77,17 @@ class DailyActivities(object):
             self.close_hd()
             print("bath end")
             get_goods(self.driver)
+
+    def boss(self):
+        if is_between((12,30), (12,42)):
+            print("boss start")
+            self.start_hd()
+            wait_time(3)
+            clcik_pos_locxy(self.driver, BOSS_POS)
+            
+            wait_time(12*60)
+            self.close_hd()
+            print("boss end")
     
     def tianti(self):    
         if is_between((19,30),(19,43)):
