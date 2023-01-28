@@ -31,13 +31,19 @@ SECOND_FRAME="gameFrame"
 # Position
 BROWSER_POS=(0,0)
 
-BAG_POS=(382, 894)
-SMELT_POS=(150, 895)
-
+# 放到根目录（MicrosoftWebDriver.exe）
+# https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
 def get_driver(url="https://baidu.com"):
-    c_op = webdriver.ChromeOptions()
-    c_op.add_argument("--mute-audio")
-    driver = webdriver.Chrome(chrome_options=c_op)
+    if configs.browser_type == "chrome":
+        c_op = webdriver.ChromeOptions()
+        c_op.add_argument("--mute-audio")
+        driver = webdriver.Chrome(chrome_options=c_op)
+    else:
+        e_op = webdriver.EdgeOptions()
+        e_op.add_argument("--mute-audio")
+        e_op.add_argument("--disable-features=msHubApps")
+        driver = webdriver.Edge(options=e_op)
+
     driver.set_window_size(500,950)
     driver.set_window_position(BROWSER_POS[0], BROWSER_POS[1])
     driver.get(url)
@@ -80,52 +86,30 @@ def switch_frame(driver):
     driver.switch_to.frame(FIRST_FRAME)
     driver.switch_to.frame(SECOND_FRAME)
 
-def click_multi(dr,pos,times=1):
-    c_times = 0
-    while c_times < times:
-        #click_pos(BLACK_POS)
-        #click_locxy(dr, pos[0]+BROWSER_POS[0],pos[1]+BROWSER_POS[1])
-        click_locxy(dr, pos[0], pos[1])
-        wait_time(1)
-        c_times = c_times + 1
-
 def click_pos(pos):
     pa.moveTo(pos[0]+BROWSER_POS[0],pos[1]+BROWSER_POS[1], duration=0.5)
     pa.click(pos[0]+BROWSER_POS[0],pos[1]+BROWSER_POS[1])
-
-# common methods start
-def open_bag(dr):
-    clcik_pos_locxy(dr, BAG_POS)
-
-# common methods end
-
-ONEKEY_SMELT_POS = (256,824)
-def rong_lian(dr):
-    wait_time(2)
-    open_bag(dr)
-    clcik_pos_locxy(dr, SMELT_POS)
-    clcik_pos_locxy(dr, ONEKEY_SMELT_POS)
-    wait_time(10)
-    click_multi(dr, BLACK_POS, 2)
-    callback_click(dr)
 
 def to_main(driver):
     wait_time(3)
     click_multi(driver, BLACK_POS, 4)
 
 def test_eight_components():
-    driver = get_driver("https://h5game.gowan8.com/?yisdk_param=mZpuX9Lm2M_S&ext_param=ZJ1raKOp") 
+    driver = get_driver(configs.login.url) 
     
     #隐式等待 设置隐士等待的目的是为了找元素的时候动态等待页面加载，参数是最大等待时间，单位为秒
     driver.implicitly_wait(3) 
     login(driver)    
     # waiting loading
     
+    wait_time(2*60)
+
     # monitor
     get_goods(driver)
     rong_lian(driver)
-    Boss(driver).main_to_single_boss()
-    callback_click(driver)
+
+    #Boss(driver).main_to_three_realms()
+
     InstanceZone(driver).main_to_everyday_fb()
     #TopProcess(driver).get_welfare()
     
@@ -136,6 +120,28 @@ def test_eight_components():
 
     time.sleep(60*60*2)
     driver.quit()
+
+def main_loop():
+    driver = get_driver(configs.login.url) 
+    
+    #隐式等待 设置隐士等待的目的是为了找元素的时候动态等待页面加载，参数是最大等待时间，单位为秒
+    driver.implicitly_wait(3) 
+    login(driver)    
+    # waiting loading
+    get_goods(driver)
+    rong_lian(driver)
+
+    while True:
+        times=0
+        pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
+        while True:   
+            if times < 10 and get_date_minutes(pre_time, datetime.now()) > 11:     
+                pre_time = datetime.now()
+                HouseJob(driver).house_to_pettravel()
+                times = times +1            
+            wait_time(10)
+            self.click_pos(CHALLENGE_POS)
+            wait_time(100)
 
 if __name__ == "__main__":
     try:

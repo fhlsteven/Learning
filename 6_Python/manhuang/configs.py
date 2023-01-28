@@ -21,13 +21,19 @@ def to_dict(d):
         D[k] = to_dict(v) if isinstance(v, dict) else v
     return D
 
+#转生 [zhuǎn shēng]
+#[reincarnation] 佛教指人或动物的转世轮回,灵魂在人死后投胎再生
+
 default_configs = {
+    'browser_type':'chrome',  # chrome, edge
     'login':{
+        'url':'https://h5game.gowan8.com/?yisdk_param=mZpuX9Lm2M_S&ext_param=ZJ1raKOp',
         'user_name':'fhl1993',
         'pwd':'fhl19930321'
     },
     'check_term':'#serverCon>img:nth-child(7)',
-    'start_button':'#serverCon>img:nth-child(3)'
+    'start_button':'#serverCon>img:nth-child(3)',
+    'reincarnation': 3
 }
 
 configs = to_dict(default_configs)

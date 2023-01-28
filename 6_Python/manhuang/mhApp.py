@@ -4,6 +4,8 @@ from tkinter import *
 import time
 from testSel import get_driver, login
 
+from housejobs import HouseJob
+
 LOG_LINE_NUM = 0
 
 class MHApplication(object):
@@ -53,6 +55,7 @@ class MHApplication(object):
     
     def rechallenge_pets(self):
         self.log_show('rechallenge_pets')
+        HouseJob(self.driver).house_to_pettravel()        
 
     def single_boss(self):
         self.log_show('single bosss')
@@ -79,12 +82,13 @@ class MHApplication(object):
             self.txt_log.insert(END, logmessage_in)
             LOG_LINE_NUM = LOG_LINE_NUM + 1
         else:
-            self.txt_log.delete(1.0,2.0)
+            self.txt_log.delete(1.0, 2.0)
             self.txt_log.insert(END, logmessage_in)
 
 def mh_gui():
     window =  Tk()
     driver = get_driver("https://h5game.gowan8.com/?yisdk_param=mZpuX9Lm2M_S&ext_param=ZJ1raKOp")
+    login(driver)
     app = MHApplication(window, driver)
     app.window_box()
     window.mainloop()

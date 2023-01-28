@@ -21,14 +21,14 @@ class TopProcess(Base):
     def get_welfare(self):
         welfare_pos = self.get_pos_byimg(WELFARE_IMG, WELFARE_POS, 0.8)
         print(welfare_pos)
-        self.clcik_pos(welfare_pos)
+        self.click_pos(welfare_pos)
         wait_time(2)
-        self.clcik_pos(DAY_SIGN_IN)
+        self.click_pos(DAY_SIGN_IN)
         wait_time(1)
-        self.clcik_pos(SIGN_IN)
+        self.click_pos(SIGN_IN)
         wait_time(2)
-        self.clcik_pos(ONLINE_BAGS)
-        self.clcik_pos(ONLINE_GET)
+        self.click_pos(ONLINE_BAGS)
+        self.click_pos(ONLINE_GET)
         self.use_bags()
     
     def get_rank(self):

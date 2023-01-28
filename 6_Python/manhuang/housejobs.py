@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import clcik_pos_locxy,wait_time,get_goods,quit_scene
+from common import wait_time, quit_scene, Base
 from datetime import datetime
 
 CHALLENGE_POS = (59, 796)
@@ -24,41 +24,41 @@ GET_MONEY_REIKI_POS = (257, 637)
 def get_date_minutes(start, end):
     return int((end-start).seconds /60) 
 
-class HouseJob(object):
+class HouseJob(Base):
     def __init__(self, dr):
-        self.driver = dr
+        super(HouseJob, self).__init__(dr)
 
     def get_money_reiki(self):
-        clcik_pos_locxy(self.driver, MONEY_POS)
+        self.click_pos(MONEY_POS)
         wait_time(4)
-        clcik_pos_locxy(self.driver, GET_MONEY_REIKI_POS)
+        self.click_pos(GET_MONEY_REIKI_POS)
         wait_time(1)
-        clcik_pos_locxy(self.driver, REIKI_POS)
+        self.click_pos(REIKI_POS)
         wait_time(4)
-        clcik_pos_locxy(self.driver, GET_MONEY_REIKI_POS)
+        self.click_pos(GET_MONEY_REIKI_POS)
 
     def house_random_event(self):
-        clcik_pos_locxy(self.driver, HOUSE_POS)
+        self.click_pos(HOUSE_POS)
         wait_time(5)
         
-        clcik_pos_locxy(self.driver, HOUSE_CLICK)
+        self.click_pos(HOUSE_CLICK)
         wait_time(25)
         
         # change
-        clcik_pos_locxy(self.driver, HOUSE_SEC)
-        clcik_pos_locxy(self.driver, HOUSE_CLICK)
+        self.click_pos(HOUSE_SEC)
+        self.click_pos(HOUSE_CLICK)
         wait_time(25)
         
         #change
-        clcik_pos_locxy(self.driver, HOUSE_THREE)
-        clcik_pos_locxy(self.driver, HOUSE_CLICK)
+        self.click_pos(HOUSE_THREE)
+        self.click_pos(HOUSE_CLICK)
         wait_time(25)
   
     def house_to_pettravel(self):
-        clcik_pos_locxy(self.driver, HOUSE_POS)
+        self.click_pos(HOUSE_POS)
         wait_time(5)    
         self.get_money_reiki()
-        clcik_pos_locxy(self.driver, HOUSE_THREE)
+        self.click_pos(HOUSE_THREE)
         wait_time(5)    
         self.pet_travel() 
 
@@ -66,16 +66,17 @@ class HouseJob(object):
         times = 0
         while times < 4:
             if times == 3:
-                get_goods(self.driver)        
-            clcik_pos_locxy(self.driver, (PET1[0]+times*STEP_INTERVAL, PET1[1]))
+                self.use_bags()        
+            self.click_pos((PET1[0]+times*STEP_INTERVAL, PET1[1]))
             wait_time(1)
-            clcik_pos_locxy(self.driver, GET_GOODS)
+            self.click_pos(GET_GOODS)
             wait_time(1)
-            clcik_pos_locxy(self.driver, (PET1[0]+times*STEP_INTERVAL, PET1[1]))
+            self.click_pos((PET1[0]+times*STEP_INTERVAL, PET1[1]))
             wait_time(1)
-            clcik_pos_locxy(self.driver, START_TRAVEL)
+            self.click_pos(START_TRAVEL)
             wait_time(1)
             times = times+1
+        self.use_bags()
         quit_scene(self.driver) 
 
     def rechallenge_pets(self):
@@ -87,5 +88,5 @@ class HouseJob(object):
                 self.house_to_pettravel()
                 times = times +1            
             wait_time(3)
-            clcik_pos_locxy(self.driver, CHALLENGE_POS)
+            self.click_pos(CHALLENGE_POS)
             wait_time(60)

@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from common import wait_time, clcik_pos_locxy
-
+from common import wait_time, Base
 
 MAIN_FB_POS =(477, 610)
 
@@ -16,35 +15,36 @@ PAGODA_ZF_CLICK = (255, 707)
 #
 ZF_POS = (367, 805)
 
-
-class InstanceZone(object):
+class InstanceZone(Base):
     def __init__(self, driver):
-        self.driver = driver
+        super(InstanceZone, self).__init__(driver)
 
     def signle_everyday_fb(self):
-        times=0
-        while 7 > times:
-            clcik_pos_locxy(self.driver, FB_START_POS)
-            wait_time(6)
-            clcik_pos_locxy(self.driver, OK_POS)
+        c_times=0
+        while 7 > c_times:
+            self.click_pos(FB_START_POS)
+            wait_time()
+            self.click_pos(OK_POS)
             wait_time(2)
-            times = times + 1 
+            c_times = c_times + 1 
         
-        times  = 0
-        while 7 > times:
-            clcik_pos_locxy(self.driver, FB_START_POS)
-            wait_time(2)
-            times = times + 1
+        c_times = 0
+        while 7 > c_times:
+            self.click_pos(FB_START_POS)
+            wait_time(3)
+            c_times = c_times + 1
     
     def da_huang_pagoda(self):
-        clcik_pos_locxy(self.driver, PAGODA_POS)
-        clcik_pos_locxy(self.driver, PAGODA_ZF_CLICK)
+        self.click_pos(PAGODA_POS)
+        self.click_pos(PAGODA_ZF_CLICK)
 
     def main_to_everyday_fb(self):
+        self.rong_lian()
         self.main_to_fb()
-        clcik_pos_locxy(self.driver, SINGLE_FB_POS)
-        clcik_pos_locxy(self.driver, EVERYDAY_POS)
+        self.click_pos(SINGLE_FB_POS)
+        self.click_pos(EVERYDAY_POS)
         self.signle_everyday_fb()
+        self.click_callback()
 
     def main_to_fb(self):
-        clcik_pos_locxy(self.driver, MAIN_FB_POS)
+        self.click_pos(MAIN_FB_POS)
