@@ -20,6 +20,7 @@ class Boss(Base):
         super(Boss, self).__init__(driver)
     
     def single_boss(self):
+        self.rong_lian()
         times=0
         boss_times = configs.reincarnation + 1
         while boss_times > times:

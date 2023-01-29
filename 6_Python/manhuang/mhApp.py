@@ -5,6 +5,8 @@ import time
 from testSel import get_driver, login
 
 from housejobs import HouseJob
+from bosses import Boss
+from instancezones import InstanceZone
 
 LOG_LINE_NUM = 0
 
@@ -32,6 +34,10 @@ class MHApplication(object):
         self.btn_hd_monitor = Button(self.main_win, text='daily activites monitor', command=self.hd_monitor, width=20)
         self.btn_hd_monitor.grid(row=row_start, column=cur_column)
 
+        cur_column =cur_column + 1
+        self.btn_hd_monitor = Button(self.main_win, text='smelt bag', command=self.smelt_bag, width=20)
+        self.btn_hd_monitor.grid(row=row_start, column=cur_column)
+
         row_start = row_start + 1
         cur_column = 0        
         self.lb_tools = Label(self.main_win, text="tools", fg='green', font=('宋体',16))
@@ -47,18 +53,29 @@ class MHApplication(object):
         cur_column =cur_column + 1
         self.btn_single_boss = Button(self.main_win, text='single boss', command=self.single_boss, width=20)
         self.btn_single_boss.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        self.btn_single_boss = Button(self.main_win, text='instance zone(fb)', command=self.instance_zone_fb, width=20)
+        self.btn_single_boss.grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
     
+    def smelt_bag(self):
+        Boss(self.driver).rong_lian()
+
     def rechallenge_pets(self):
         self.log_show('rechallenge_pets')
         HouseJob(self.driver).house_to_pettravel()        
 
     def single_boss(self):
-        self.log_show('single bosss')
+        self.log_show('single_boss ...')
+        Boss(self.driver).main_to_single_boss()
+
+    def instance_zone_fb(self):
+        self.log_show('instance_zone_fb ...')
+        InstanceZone(self.driver).main_to_everyday_fb()
 
     def login(self):
         self.log_show('login')
@@ -87,8 +104,7 @@ class MHApplication(object):
 
 def mh_gui():
     window =  Tk()
-    driver = get_driver("https://h5game.gowan8.com/?yisdk_param=mZpuX9Lm2M_S&ext_param=ZJ1raKOp")
-    login(driver)
+    driver = get_driver("https://h5game.gowan8.com/?yisdk_param=mZpuX9Lm2M_S&ext_param=ZJ1raKOp")   
     app = MHApplication(window, driver)
     app.window_box()
     window.mainloop()

@@ -12,6 +12,8 @@ from bosses import Boss
 from instancezones import InstanceZone
 from topprocess import TopProcess
 
+from teams import Teams
+
 from common import *
 
 from configs import configs
@@ -101,16 +103,15 @@ def test_eight_components():
     driver.implicitly_wait(3) 
     login(driver)    
     # waiting loading
-    
-    wait_time(2*60)
 
+    Teams(driver).auto_receive()
     # monitor
     get_goods(driver)
     rong_lian(driver)
 
     #Boss(driver).main_to_three_realms()
 
-    InstanceZone(driver).main_to_everyday_fb()
+    #InstanceZone(driver).main_to_everyday_fb()
     #TopProcess(driver).get_welfare()
     
     #wait_time()

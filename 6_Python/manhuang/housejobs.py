@@ -82,8 +82,8 @@ class HouseJob(Base):
     def rechallenge_pets(self):
         times=0
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
-        while True:   
-            if times < PET_TRAVEL_TIMES and get_date_minutes(pre_time, datetime.now()) > 11:     
+        while times < PET_TRAVEL_TIMES:   
+            if get_date_minutes(pre_time, datetime.now()) > 11:     
                 pre_time = datetime.now()
                 self.house_to_pettravel()
                 times = times +1            
