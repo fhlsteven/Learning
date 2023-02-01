@@ -4,7 +4,7 @@ import sys
 
 # https://www.iloveimg.com/zh-cn/crop-image
 
-ALL_IMAGE = 'all.png'
+ALL_IMAGE = 'mh_all.png'
 IMG_PREFIX = 'imgs/'
 def match_img(imgsrc, imgobj, confidencevalue=0.9):  # imgsrc=原始图像，imgobj=待查找的图片   
     img_src =  IMG_PREFIX+imgsrc
@@ -12,7 +12,7 @@ def match_img(imgsrc, imgobj, confidencevalue=0.9):  # imgsrc=原始图像，img
     imsrc = ac.imread(img_src)
     imobj = ac.imread(img_obj)
     match_result = ac.find_all_template(imsrc, imobj, confidencevalue)  
-    print(f'img_src:{img_src},img_obj:{img_obj}.match_result:{match_result}')
+    print(f'img_src:{img_src},img_obj:{img_obj},{confidencevalue}.match_result:{match_result}')
     #[{'result': (61.0, 135.5), 'rectangle': ((36, 110), (36, 161), (86, 110), (86, 161)), 'confidence': 1.0}]
     return match_result
 
@@ -26,11 +26,16 @@ def match_img_pos(imgobj, confidencevalue=0.9):
 
 if __name__ == "__main__":
     imgname = "welfare.png"
+    confidence_val=0.8
+
     argv = sys.argv[1:]
     if argv:
         imgname = argv[0]
+        if len(argv) > 1:
+            print(argv)
+            confidence_val = float(argv[1])
 
-    res = match_img(ALL_IMAGE, imgname, confidencevalue=0.8)
+    res = match_img(ALL_IMAGE, imgname, confidencevalue=confidence_val)
     all_img = Image.open(IMG_PREFIX+ALL_IMAGE)
     for img in res:
         rect = img['rectangle']

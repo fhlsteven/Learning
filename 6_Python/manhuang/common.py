@@ -14,7 +14,6 @@ BLACK_X = 124
 def click_locxy(dr, x, y, left_click=True):
     wait_time(1)
     y = y - BLACK_X
-    #print(f'click_locxy,x:{x},y:{y}')
     if left_click:
         ActionChains(dr).move_by_offset(x, y).click().perform()
     else:
@@ -35,7 +34,7 @@ QUIT_CLICK = (42, 765)
 QUIT_OK =(331, 605)
 def quit_scene(dr):
     wait_time(3)
-    if is_exists_image(self.driver, 'quit_left.png'):
+    if is_exists_image(dr, 'quit_left.png'):
         click_pos_locxy(dr, QUIT_CLICK)
         wait_time(2)
     click_pos_locxy(dr, QUIT_OK)
@@ -56,21 +55,37 @@ IMG_PREFIX = 'imgs/'
 def match_img(imgsrc, imgobj, confidencevalue=0.9):  # imgsrc=原始图像，imgobj=待查找的图片   
     img_src =  IMG_PREFIX+imgsrc
     img_obj = IMG_PREFIX+imgobj
-    imsrc = ac.imread(img_src)
-    imobj = ac.imread(img_obj)
-    match_result = ac.find_all_template(imsrc, imobj, confidencevalue)  
-    print(f'img_src:{img_src},img_obj:{img_obj}.match_result:{match_result}')
-    #[{'result': (61.0, 135.5), 'rectangle': ((36, 110), (36, 161), (86, 110), (86, 161)), 'confidence': 1.0}]
-    return match_result
+    try:
+        imsrc = ac.imread(img_src)
+        imobj = ac.imread(img_obj)
+        match_result = ac.find_all_template(imsrc, imobj, confidencevalue)  
+        print(f'img_src:{img_src},img_obj:{img_obj}.match_result:{match_result},confdend:{confidencevalue}')  
+        #[{'result': (61.0, 135.5), 'rectangle': ((36, 110), (36, 161), (86, 110), (86, 161)), 'confidence': 1.0}]
+        return match_result
+    except Exception as ex:
+        print(ex)
+    return None
 
+'''
+根据图像匹配坐标，获取第一个
+'''
 def match_img_pos(driver, imgobj, confidencevalue=0.9):
     save_all_img(driver)
     xyt = match_img(ALL_IMAGE, imgobj, confidencevalue)    
     if xyt != None and len(xyt) > 0:
         x = xyt[0]['result'][0]
         y = xyt[0]['result'][1]
-        return (int(x), int(y))
+        return (int(x), int(y) + BLACK_X) # 因为后面点击的方法会减去这个值，所以这里的加一下
     return (0,0)
+
+def match_img_pos_all(driver, img_obj, confidence=0.9):
+    save_all_img(driver)
+    res = []
+    xyt = match_img(ALL_IMAGE, img_obj, confidence)
+    for re in xyt:
+        xy = (int(re['result'][0]), int(re['result'][1]) + BLACK_X) # 同上
+        res.append(xy)
+    return res
 
 def is_exists_image(driver, imgobj, confidencevalue=0.8):
     save_all_img(driver)
@@ -78,6 +93,12 @@ def is_exists_image(driver, imgobj, confidencevalue=0.8):
     if result != None and len(result)>0:
         return True
     return False
+
+# 476 526+124
+CLOSE_KILL_GO = (476, 650)
+def clear_kill_go(driver):
+    while is_exists_image(driver, "kill_go.png", confidencevalue=0.7):
+        click_pos_locxy(driver, pos)
 
 def save_all_img(driver):
     driver.save_screenshot(IMG_PREFIX+ALL_IMAGE)
@@ -96,7 +117,8 @@ def rong_lian(dr):
         open_bag(dr)
         click_pos_locxy(dr, SMELT_POS)
         click_pos_locxy(dr, ONEKEY_SMELT_POS)
-        wait_time(10)
+        while is_exists_image(dr, "smelt_ok.png") == False:
+            wait_time(5)
         click_multi(dr, BLACK_POS, 2)
         wait_time(2)
         callback_click(dr)
@@ -122,6 +144,7 @@ class Base(object):
         return defalut_pos
 
     def use_bags(self):
+        clear_kill_go(self.driver)
         get_goods(self.driver)
 
     def is_callback(self):
@@ -136,8 +159,8 @@ class Base(object):
     def click_quit(self):
         quit_scene(self.driver)
 
-    def is_exists_image(self, img_name):
-        return is_exists_image(self.driver, img_name)
+    def is_exists_image(self, img_name, confidence = 0.8):
+        return is_exists_image(self.driver, img_name, confidence)
     
     def click_callback(self):
         callback_click(self.driver)

@@ -15,6 +15,15 @@ PAGODA_ZF_CLICK = (255, 707)
 #
 ZF_POS = (367, 805)
 
+# 249 631
+# 211 775
+ISLAND = (211, 899)
+ISLAND_INFINITE = (127, 808) # 127 684+124
+ISLAND_KILL = (249, 755)
+ISLAND_SEC = (368, 807) # 368 683
+ISLAND_SEC_FENG = (92, 444) # 92, 320 +124
+ISLAND_SEC_LONG = (254, 484) # 254 360
+
 class InstanceZone(Base):
     def __init__(self, driver):
         super(InstanceZone, self).__init__(driver)
@@ -39,7 +48,6 @@ class InstanceZone(Base):
         self.click_pos(PAGODA_ZF_CLICK)
 
     def main_to_everyday_fb(self):
-        self.rong_lian()
         self.main_to_fb()
         self.click_pos(SINGLE_FB_POS)
         self.click_pos(EVERYDAY_POS)
@@ -48,3 +56,34 @@ class InstanceZone(Base):
 
     def main_to_fb(self):
         self.click_pos(MAIN_FB_POS)
+
+    def main_to_shenbeast_island(self):
+        self.main_to_fb()
+        self.shenbeast_island_infinite()
+        self.shenbesat_island_feng()
+        self.click_callback()
+
+    def shenbeast_island_infinite(self):
+        self.click_pos(ISLAND)
+        self.click_pos(ISLAND_INFINITE)
+        self.click_pos(ISLAND_KILL)
+        wait_time(10)
+        while self.is_exists_image("boss_small.png", 0.65):
+            wait_time(20)
+        self.click_quit()  
+    
+    def shenbesat_island_feng(self):
+        self.click_pos(ISLAND_SEC)
+        self.click_pos(ISLAND_SEC_FENG)
+        self.click_pos(ISLAND_KILL)
+        wait_time(15*21)
+        self.click_quit()
+
+    def shenbesat_island_long(self):
+        self.click_pos(ISLAND_SEC)
+        self.click_pos(ISLAND_SEC_LONG)
+        self.click_pos(ISLAND_KILL)
+        wait_time(50)
+        self.click_quit() 
+
+        

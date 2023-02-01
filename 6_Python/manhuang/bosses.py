@@ -20,7 +20,6 @@ class Boss(Base):
         super(Boss, self).__init__(driver)
     
     def single_boss(self):
-        self.rong_lian()
         times=0
         boss_times = configs.reincarnation + 1
         while boss_times > times:
@@ -30,9 +29,11 @@ class Boss(Base):
             wait_time(2)
             times = times + 1
         wait_time(2)
+        self.use_bags()
         self.click_callback()
 
     def main_to_boss(self):
+        self.rong_lian()
         self.click_pos(MAIN_BOSS_POS)
         wait_time(3)
     

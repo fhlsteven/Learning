@@ -39,7 +39,7 @@ class HouseJob(Base):
 
     def house_random_event(self):
         self.click_pos(HOUSE_POS)
-        wait_time(5)
+        wait_time(4)
         
         self.click_pos(HOUSE_CLICK)
         wait_time(25)
@@ -56,10 +56,10 @@ class HouseJob(Base):
   
     def house_to_pettravel(self):
         self.click_pos(HOUSE_POS)
-        wait_time(5)    
+        wait_time(3)    
         self.get_money_reiki()
         self.click_pos(HOUSE_THREE)
-        wait_time(5)    
+        wait_time(2)    
         self.pet_travel() 
 
     def pet_travel(self):
@@ -68,16 +68,20 @@ class HouseJob(Base):
             if times == 3:
                 self.use_bags()        
             self.click_pos((PET1[0]+times*STEP_INTERVAL, PET1[1]))
-            wait_time(1)
             self.click_pos(GET_GOODS)
-            wait_time(1)
             self.click_pos((PET1[0]+times*STEP_INTERVAL, PET1[1]))
-            wait_time(1)
             self.click_pos(START_TRAVEL)
-            wait_time(1)
             times = times+1
         self.use_bags()
         quit_scene(self.driver) 
+    
+    def rechallenge_loop(self):
+        cur_date = datetime.now()
+        while get_date_minutes(cur_date, datetime.now()) < 30:
+            self.click_pos(CHALLENGE_POS)
+            wait_time()
+            while self.is_exists_image("guan_ka.png", 0.7) == False:
+                wait_time(15)
 
     def rechallenge_pets(self):
         times=0

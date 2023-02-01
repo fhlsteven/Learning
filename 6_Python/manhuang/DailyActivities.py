@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from common import wait_time, Base
+from common import wait_time, Base, clear_kill_go
 
 HD_POS = (257, 630)  
 HD_POS_START = (376, 282)
@@ -22,9 +22,14 @@ CREATE_TEAM_POS = (1665, 806)
 #
 TT_MATCH = (338, 648)
 
+# 
+DAY_BTN = (457, 528) # 457 404+124
+DAY_KILL = (213, 891) # 213 769+124
 DAY_BOSS_GET = (260, 783)
 DAY_MONSTER_GET =(260, 452)
 #
+
+XIAN_NV = (249, 714) # 252 605
 
 def is_between(start_at, end_at):
     now_time = datetime.now()
@@ -103,17 +108,49 @@ class DailyActivities(Base):
     
     def protect(self):
         if is_between((16,1),(16,50)):
-            self.click_pos(HD_POS)
+            self.start_hd(False)
+            times = 0
+            while times< 3:
+                self.click_pos(XIAN_NV)
+                self.click_pos(XIAN_NV)
+                wait_time(15 * 60)
+                self.click_pos(XIAN_NV)
+                times = times + 1
+            self.click_callback()
 
-    def start_hd(self):
+    def start_hd(self, need_start=True):        
         self.click_pos(HD_POS)
         wait_time(2)
-        self.click_pos(HD_POS_START)
+        clear_kill_go(self.driver)
+        if need_start:
+            self.click_pos(HD_POS_START)
         wait_time(3)
     
     def close_hd(self):
         self.click_pos(HD_CLOSE)
         wait_time(1)
+
+    def main_to_daily_boss_gets(self):
+        self.click_pos(DAY_BTN)
+        self.click_pos(DAY_KILL)
+        times = 0
+        while times < 20:
+            self.click_pos(DAY_BOSS_GET)
+            times = times + 1
+        times = 0
+        while times < 20:
+            self.click_pos(DAY_MONSTER_GET)
+            times = times + 1
+
+        wait_time(1)
+        self.use_bags()
+        wait_time(2)
+        self.click_callback()
+
+
+
+
+    
 
     
 

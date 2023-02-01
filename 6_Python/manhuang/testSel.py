@@ -4,23 +4,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 
-import pyautogui as pa
-
 from DailyActivities import DailyActivities
 from housejobs import HouseJob
 from bosses import Boss
 from instancezones import InstanceZone
 from topprocess import TopProcess
-
 from teams import Teams
-
 from common import *
 
 from configs import configs
-
-class Languages(object):
-    CHS = 'chi_sim'
-    ENG = 'eng'
 
 # html node name
 ACCOUNT_KEY = "account"
@@ -88,10 +80,6 @@ def switch_frame(driver):
     driver.switch_to.frame(FIRST_FRAME)
     driver.switch_to.frame(SECOND_FRAME)
 
-def click_pos(pos):
-    pa.moveTo(pos[0]+BROWSER_POS[0],pos[1]+BROWSER_POS[1], duration=0.5)
-    pa.click(pos[0]+BROWSER_POS[0],pos[1]+BROWSER_POS[1])
-
 def to_main(driver):
     wait_time(3)
     click_multi(driver, BLACK_POS, 4)
@@ -104,11 +92,10 @@ def test_eight_components():
     login(driver)    
     # waiting loading
 
-    Teams(driver).auto_receive()
+    #Teams(driver).auto_receive()
     # monitor
     get_goods(driver)
     rong_lian(driver)
-
     #Boss(driver).main_to_three_realms()
 
     #InstanceZone(driver).main_to_everyday_fb()
