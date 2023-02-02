@@ -7,6 +7,7 @@ MAIN_FB_POS =(477, 610)
 SINGLE_FB_POS = (75, 893)
 EVERYDAY_POS = (260, 804)
 FB_START_POS = (398, 549)
+FB_FIRST_POS = (390, 279) # 155+124
 OK_POS = (263, 806)
 # 宝塔 pagoda
 PAGODA_POS = (148,798)
@@ -40,8 +41,8 @@ class InstanceZone(Base):
         c_times = 0
         while 7 > c_times:
             self.click_pos(FB_START_POS)
-            wait_time(3)
-            c_times = c_times + 1
+            wait_time(2)
+            c_times = c_times + 1            
     
     def da_huang_pagoda(self):
         self.click_pos(PAGODA_POS)

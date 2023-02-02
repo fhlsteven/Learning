@@ -134,7 +134,7 @@ class DailyActivities(Base):
         self.click_pos(DAY_BTN)
         self.click_pos(DAY_KILL)
         times = 0
-        while times < 20:
+        while times < 11:
             self.click_pos(DAY_BOSS_GET)
             times = times + 1
         times = 0

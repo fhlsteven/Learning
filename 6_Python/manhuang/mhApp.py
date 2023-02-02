@@ -13,6 +13,8 @@ from teams import Teams
 from DailyActivities import DailyActivities
 from common import clear_kill_go
 
+from monitor import Monitors
+
 LOG_LINE_NUM = 0
 
 def send_msg(msg='gamewin'):
@@ -151,10 +153,30 @@ class MHApplication(object):
         self.btn_get_yb = Button(self.main_win, text='get yuanbao', command=self.get_yuanbao, width=20)
         self.btn_get_yb.grid(row=row_start, column=cur_column)
 
+
+        row_start = row_start + 1
+        cur_column = 0        
+        self.lb_monitor = Label(self.main_win, text="monitor", fg='green', font=('宋体',16))
+        self.lb_monitor.grid(row=row_start, column=cur_column) 
+
+        row_start = row_start + 1
+        cur_column = 0
+        self.btn_monitor_msg = Button(self.main_win, text='monitor msg', command=self.monitor_msg_click, width=20)
+        self.btn_monitor_msg.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        self.btn_monitor_fb = Button(self.main_win, text='monitor fb', command=self.monitor_fb_click, width=20)
+        self.btn_monitor_fb.grid(row=row_start, column=cur_column)
+
         row_start = row_start + 1
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def monitor_fb_click(self):
+        Monitors(self.driver).monitor_fb()
+
+    def monitor_msg_click(self):
+        Monitors(self.driver).monitor_msg()
 
     def island_kill_click(self):
         InstanceZone(self.driver).main_to_shenbeast_island()
@@ -194,7 +216,7 @@ class MHApplication(object):
         send_msg()
 
     def top_all(self):
-        TopProcess(driver).process_top()
+        TopProcess(self.driver).process_top()
         send_msg()
 
     def find_god(self):

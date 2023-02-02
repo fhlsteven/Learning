@@ -75,13 +75,12 @@ class HouseJob(Base):
         self.use_bags()
         quit_scene(self.driver) 
     
-    def rechallenge_loop(self):
-        cur_date = datetime.now()
-        while get_date_minutes(cur_date, datetime.now()) < 30:
+    def rechallenge_loop(self):        
+        while self.is_exists_image("chat_box.png") == False:
             self.click_pos(CHALLENGE_POS)
             wait_time()
             while self.is_exists_image("guan_ka.png", 0.7) == False:
-                wait_time(15)
+                wait_time(20)
 
     def rechallenge_pets(self):
         times=0

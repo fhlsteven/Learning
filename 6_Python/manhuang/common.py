@@ -2,6 +2,8 @@
 import time
 from selenium.webdriver.common.action_chains import ActionChains
 import aircv as ac
+import pytesseract as ocr_act
+from PIL import Image
 
 BLACK_POS = (324, 184)
 ALL_IMAGE = 'mh_all.png'
@@ -33,18 +35,15 @@ def click_black(dr, times=2):
 QUIT_CLICK = (42, 765)
 QUIT_OK =(331, 605)
 def quit_scene(dr):
-    wait_time(3)
     if is_exists_image(dr, 'quit_left.png'):
         click_pos_locxy(dr, QUIT_CLICK)
-        wait_time(2)
     click_pos_locxy(dr, QUIT_OK)
 
 BAG_USE = (375, 781)    
 def get_goods(dr):
     while is_exists_image(dr, 'use_btn.png'):
-        wait_time(3)
+        wait_time(2)
         click_pos_locxy(dr, BAG_USE)
-        wait_time(1)
 
 CALLBACK_POS=(450, 916)
 def callback_click(dr):
@@ -164,3 +163,35 @@ class Base(object):
     
     def click_callback(self):
         callback_click(self.driver)
+
+
+class Languages(object):
+    CHS = 'chi_sim'
+    ENG = 'eng'
+
+def get_ocr_txt(image, lang=Languages.CHS):
+    result = ''
+    content = ocr_act.image_to_string(image, lang)
+    for x in content:
+        result += x.strip(' ')
+    return result
+
+class BaseOCR(object):
+    def __init__(self, driver):
+        self.driver = driver
+
+    def recognize(self, img):
+        img = img.convet('L')
+        img.save(IMG_PREFIX+'chat_detail.png')
+        return get_ocr_txt(img)
+
+    def is_exists_image(self, img_name, confidence = 0.8):
+        return is_exists_image(self.driver, img_name, confidence)
+
+    def crop_by_region(self, imgsrc, region):
+        try:            
+            all_img = Image.open(imgsrc)
+            return all_img.crop((region[0], region[1], region[0]+region[2], region[1]+region[3]))            
+        except Exception as e:
+            print(e)
+            return None
