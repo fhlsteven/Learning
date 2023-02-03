@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import Base, wait_time, BLACK_X
+from common import Base, wait_time, BLACK_X, BaseOCR
 
 SPORT = (467, 568+ BLACK_X)
 SINGLE_SPORT = (69, 762 + BLACK_X) # 69 762
@@ -11,6 +11,7 @@ KILL_POS = (390,337 +BLACK_X)
 class ESports(Base):
     def __init__(self, driver):
         super(ESports, self).__init__(driver)
+        self.ocr_obj = BaseOCR(driver)
 
     def single_sport(self):
         self.main_to_sport()

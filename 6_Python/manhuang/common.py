@@ -47,7 +47,7 @@ def get_goods(dr):
 
 CALLBACK_POS=(450, 916)
 def callback_click(dr):
-    if is_exists_image(dr, "callback.png"):
+    while is_exists_image(dr, "callback.png"):
         click_pos_locxy(dr, CALLBACK_POS)
 
 IMG_PREFIX = 'imgs/'
@@ -86,8 +86,9 @@ def match_img_pos_all(driver, img_obj, confidence=0.9):
         res.append(xy)
     return res
 
-def is_exists_image(driver, imgobj, confidencevalue=0.8):
-    save_all_img(driver)
+def is_exists_image(driver, imgobj, confidencevalue=0.8, need_screen= True):
+    if need_screen:
+        save_all_img(driver)
     result = match_img(ALL_IMAGE, imgobj, confidencevalue)
     if result != None and len(result)>0:
         return True
@@ -111,7 +112,7 @@ def open_bag(dr):
 
 ONEKEY_SMELT_POS = (256,824)
 def rong_lian(dr):
-    wait_time(2)
+    wait_time(1)
     if is_exists_image(dr, "bag.png"):
         open_bag(dr)
         click_pos_locxy(dr, SMELT_POS)
@@ -164,6 +165,9 @@ class Base(object):
     def click_callback(self):
         callback_click(self.driver)
 
+    def is_exit_loop(self):
+        return is_exists_image(self.driver, "chat_box.png", need_screen=False) == False
+
 
 class Languages(object):
     CHS = 'chi_sim'
@@ -181,7 +185,7 @@ class BaseOCR(object):
         self.driver = driver
 
     def recognize(self, img):
-        img = img.convet('L')
+        img = img.convert('L')
         img.save(IMG_PREFIX+'chat_detail.png')
         return get_ocr_txt(img)
 

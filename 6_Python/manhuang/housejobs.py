@@ -39,7 +39,7 @@ class HouseJob(Base):
 
     def house_random_event(self):
         self.click_pos(HOUSE_POS)
-        wait_time(4)
+        wait_time(3)
         
         self.click_pos(HOUSE_CLICK)
         wait_time(25)
@@ -81,12 +81,14 @@ class HouseJob(Base):
             wait_time()
             while self.is_exists_image("guan_ka.png", 0.7) == False:
                 wait_time(20)
+                if self.is_exit_loop():
+                    break
 
     def rechallenge_pets(self):
         times=0
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
-        while times < PET_TRAVEL_TIMES:   
-            if get_date_minutes(pre_time, datetime.now()) > 11:     
+        while self.is_exit_loop():   
+            if get_date_minutes(pre_time, datetime.now()) > 8 and times < PET_TRAVEL_TIMES:     
                 pre_time = datetime.now()
                 self.house_to_pettravel()
                 times = times +1            

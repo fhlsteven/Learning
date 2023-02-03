@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from common import wait_time, Base, clear_kill_go
+from common import wait_time, Base, clear_kill_go, BLACK_X
 
 HD_POS = (257, 630)  
 HD_POS_START = (376, 282)
@@ -16,8 +16,12 @@ PICK_POS = (258, 720)
 
 # boss
 BOSS_POS =(324, 720)  
-TEAM_POS = (1860, 654) 
+TEAM_POS = (1860, 654) # 469 479
 CREATE_TEAM_POS = (1665, 806) 
+
+FIRST_BOSS = (425,555 + BLACK_X) # 419 554
+SEC_BOSS = (425, 575 + BLACK_X) 
+THIRD_BOSS = (425, 595)
 
 #
 TT_MATCH = (338, 648)
@@ -30,6 +34,14 @@ DAY_MONSTER_GET =(260, 452)
 #
 
 XIAN_NV = (249, 714) # 252 605
+
+# xianmenzhengba : 6 20:40-21:10 jinying
+# xianmenzhengba : 5 20:40-21:10 jifen
+# xiandaohui : 4 20:40-21:10
+# xianyuan : 1 20:40-21:10
+# zhandui: 3 20:40-21:10
+# shenmo : 2 20:40-21:10
+# fengyunleitai : 7 20:40-21:05
 
 def is_between(start_at, end_at):
     now_time = datetime.now()
@@ -60,6 +72,7 @@ class DailyActivities(Base):
             self.boss()
             if d_wkday != 6:
                 self.tianti()
+            
         except Exception as e:
             print(f'exception:{e},{d_now}')        
     # down 
@@ -90,7 +103,12 @@ class DailyActivities(Base):
             wait_time(3)
             self.click_pos(BOSS_POS)
 
-            wait_time(12*60)
+            wait_time(482 + 25)
+            for x in range(1, 4):                
+                self.click_pos((FIRST_BOSS[0], FIRST_BOSS[1] + x*20))
+                wait_time(25)
+
+            wait_time(4*60)
             self.close_hd()
             self.click_callback()
             print("boss end")
@@ -101,7 +119,7 @@ class DailyActivities(Base):
             self.start_hd()
             wait_time(4)
             self.click_pos(TT_MATCH)
-            wait_time(13 * 60)
+            wait_time(10 * 60)
             self.close_hd()
             self.click_callback()
             print("tian ti end")
@@ -117,6 +135,26 @@ class DailyActivities(Base):
                 self.click_pos(XIAN_NV)
                 times = times + 1
             self.click_callback()
+
+    def xuanhuo(self):
+        if is_between((19,45), (20,1)):
+            print("xuan huo")
+            self.start_hd()
+            wait_time(3)
+
+            wait_time(15 * 60)
+            self.close_hd()
+            self.click_callback()
+
+    def xianmo(self):
+        if is_between((20,0), (20,20)):
+            print('xian mo')
+
+
+    def jiutian(self):
+        if is_between((20, 20), (20,40)):
+            print('jiu tian')
+
 
     def start_hd(self, need_start=True):        
         self.click_pos(HD_POS)

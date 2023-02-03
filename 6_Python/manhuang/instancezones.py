@@ -8,13 +8,18 @@ SINGLE_FB_POS = (75, 893)
 EVERYDAY_POS = (260, 804)
 FB_START_POS = (398, 549)
 FB_FIRST_POS = (390, 279) # 155+124
-OK_POS = (263, 806)
+OK_POS = (263, 806) # 806 - 124 = 682
+OK_POS_SEC = (253, 759)# 253 635 + 124
 # 宝塔 pagoda
 PAGODA_POS = (148,798)
 PAGODA_ZF_CLICK = (255, 707)
 
 #
-ZF_POS = (367, 805)
+YGFZ_POS = (367, 805) # 357 678 + 124 
+
+
+# 
+MULTI_POS = (138, 900) # 138 766+124
 
 # 249 631
 # 211 775
@@ -29,20 +34,35 @@ class InstanceZone(Base):
     def __init__(self, driver):
         super(InstanceZone, self).__init__(driver)
 
+    def single_fb_time_kill(self):
+        self.click_pos(FB_FIRST_POS)
+        wait_time(100)
+        self.click_pos(OK_POS_SEC)
+        wait_time(1)
+
+    def single_fb_kill(self):
+        self.click_pos(FB_START_POS)
+        wait_time()
+        self.click_pos(OK_POS)
+        wait_time(2)
+
     def signle_everyday_fb(self):
         c_times=0
-        while 7 > c_times:
-            self.click_pos(FB_START_POS)
-            wait_time()
-            self.click_pos(OK_POS)
-            wait_time(2)
+        while 7 > c_times:            
+            self.single_fb_kill()
             c_times = c_times + 1 
         
-        c_times = 0
-        while 7 > c_times:
-            self.click_pos(FB_START_POS)
+        # money and reki
+        self.single_fb_time_kill()
+        self.single_fb_time_kill()
+
+        # 补救
+        self.single_fb_kill()
+        self.single_fb_kill()
+        
+        while self.is_exists_image("fb_quick_kill.png", 0.95):
+            self.click_pos(FB_FIRST_POS)
             wait_time(2)
-            c_times = c_times + 1            
     
     def da_huang_pagoda(self):
         self.click_pos(PAGODA_POS)
@@ -86,5 +106,3 @@ class InstanceZone(Base):
         self.click_pos(ISLAND_KILL)
         wait_time(50)
         self.click_quit() 
-
-        

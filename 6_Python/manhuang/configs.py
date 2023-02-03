@@ -33,7 +33,8 @@ default_configs = {
     },
     'check_term':'#serverCon>img:nth-child(7)',
     'start_button':'#serverCon>img:nth-child(3)',
-    'reincarnation': 3
+    'reincarnation': 3,
+    'svip_level':0
 }
 
 configs = to_dict(default_configs)

@@ -12,6 +12,7 @@ from topprocess import TopProcess
 from teams import Teams
 from DailyActivities import DailyActivities
 from common import clear_kill_go
+from roles import Roles
 
 from monitor import Monitors
 
@@ -155,9 +156,17 @@ class MHApplication(object):
 
 
         row_start = row_start + 1
-        cur_column = 0        
+        self.lb_role = Label(self.main_win, text="role", fg='green', font=('宋体',16))
+        self.lb_role.grid(row=row_start, column=0) 
+
+        row_start = row_start + 1
+        cur_column = 0
+        self.btn_eat_elixir = Button(self.main_win, text='eat Elixir', command=self.eat_elixir_click, width=20)
+        self.btn_eat_elixir.grid(row=row_start, column=cur_column)
+
+        row_start = row_start + 1
         self.lb_monitor = Label(self.main_win, text="monitor", fg='green', font=('宋体',16))
-        self.lb_monitor.grid(row=row_start, column=cur_column) 
+        self.lb_monitor.grid(row=row_start, column=0) 
 
         row_start = row_start + 1
         cur_column = 0
@@ -172,6 +181,9 @@ class MHApplication(object):
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
 
+    def eat_elixir_click(self):
+        Roles(self.driver).main_to_eat_Elixir()
+    
     def monitor_fb_click(self):
         Monitors(self.driver).monitor_fb()
 
@@ -189,7 +201,31 @@ class MHApplication(object):
 
     def one_long_service(self):
         duration = int(self.txt_one_long.get("1.0","end"))
+
+        boss = Boss(self.driver)
+        # single_boss
+        self.log_show("main_to_single_boss")
+        boss.main_to_single_boss()
+        # pets_travel
+        self.log_show("house_to_pettravel")
+        HouseJob(self.driver).house_to_pettravel()
+        # fb
+        self.log_show("main_to_everyday_fb")
+        InstanceZone(self.driver).main_to_everyday_fb()
+        # island
+        self.log_show("main_to_shenbeast_island")
+        InstanceZone(self.driver).main_to_shenbeast_island()
+        # eat  
+        self.log_show("eat_elixir_click")      
+        self.eat_elixir_click()
+
+        # single_boss
+        self.log_show("main_to_single_boss")
+        boss.main_to_single_boss()
+
         self.log_show(duration)
+
+        send_msg()
     
     def clear_kill_go_click(self):
         clear_kill_go(self.driver)
