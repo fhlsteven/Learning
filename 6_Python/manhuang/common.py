@@ -4,6 +4,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import aircv as ac
 import pytesseract as ocr_act
 from PIL import Image
+from configs import configs
 
 BLACK_POS = (324, 184)
 ALL_IMAGE = 'mh_all.png'
@@ -57,8 +58,9 @@ def match_img(imgsrc, imgobj, confidencevalue=0.9):  # imgsrc=原始图像，img
     try:
         imsrc = ac.imread(img_src)
         imobj = ac.imread(img_obj)
-        match_result = ac.find_all_template(imsrc, imobj, confidencevalue)  
-        print(f'img_src:{img_src},img_obj:{img_obj}.match_result:{match_result},confdend:{confidencevalue}')  
+        match_result = ac.find_all_template(imsrc, imobj, confidencevalue)
+        if configs.runtime == 'debug':
+            print(f'img_src:{img_src},img_obj:{img_obj}.match_result:{match_result},confdend:{confidencevalue}')  
         #[{'result': (61.0, 135.5), 'rectangle': ((36, 110), (36, 161), (86, 110), (86, 161)), 'confidence': 1.0}]
         return match_result
     except Exception as ex:
@@ -86,9 +88,8 @@ def match_img_pos_all(driver, img_obj, confidence=0.9):
         res.append(xy)
     return res
 
-def is_exists_image(driver, imgobj, confidencevalue=0.8, need_screen= True):
-    if need_screen:
-        save_all_img(driver)
+def is_exists_image(driver, imgobj, confidencevalue=0.8):
+    save_all_img(driver)
     result = match_img(ALL_IMAGE, imgobj, confidencevalue)
     if result != None and len(result)>0:
         return True
@@ -166,7 +167,7 @@ class Base(object):
         callback_click(self.driver)
 
     def is_exit_loop(self):
-        return is_exists_image(self.driver, "chat_box.png", need_screen=False) == False
+        return is_exists_image(self.driver, "chat_box.png") == False
 
 
 class Languages(object):

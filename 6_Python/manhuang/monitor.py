@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from common import BaseOCR, wait_time, IMG_PREFIX
 from socket import socket
+from DailyActivities import DailyActivities
 
 YUAN_SHEN = [b'\xe7\x83\x81\xe9\x87\x91', b'\xe7\x8e\x84\xe8\x8b\x8d', b'\xe5\xb9\xbb\xe6\xb5\xb7', b'\xe7\x82\xbd\xe5\xa4\xa9', b'\xe6\x98\x86\xe5\xa2\x9f']
 BA_GUA = [b'\xe7\x8e\x84\xe9\xbe\x9f', b'\xe6\x83\x8a\xe9\x9b\xb7', b'\xe7\x99\xbd\xe6\xb3\xbd', b'\xe7\x82\x8e\xe5\x87\xb0', b'\xe8\x8b\x8d\xe9\xbe\x99']
@@ -24,7 +25,7 @@ class Monitors(BaseOCR):
     
     def send_msg(self, msg):
         self.get_socket()
-        self.socket.send(msg.encode('ascii'))
+        self.socket.send(msg.encode('utf-8'))
 
     def close_socket(self):
         if self.socket is not None:
@@ -52,14 +53,25 @@ class Monitors(BaseOCR):
             wait_time(15)
         self.close_socket()          
 
-    def monitor_yuan_shen(self):          
-        self.monitor_msg(YUAN_SHEN)
+    def monitor_yuan_shen(self):       
+        self.monitor_msg(b''.join(YUAN_SHEN))
 
     def monitor_ba_gua(self):
-        self.monitor_msg(BA_GUA)
+        self.monitor_msg(b''.join(BA_GUA))
 
     def monitor_yi_bao(self):
-        self.monitor_msg(YI_BAO)
+        self.monitor_msg(b''.join(YI_BAO))
     
     def monitor_fb(self):
-        self.monitor_msg(OTHER_FB)
+        self.monitor_msg(b''.join(OTHER_FB))
+
+    def monitor_hd(self):
+        hd_monitor = DailyActivities(self.driver)
+        while self.is_need_exit():
+            wait_time()
+            hd_monitor.hd_process()            
+            if datetime.now().hour == 22:
+                break
+    
+    def is_need_exit(self):
+        return self.is_exists_image('chat_box.png')

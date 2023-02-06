@@ -76,14 +76,17 @@ class HouseJob(Base):
         quit_scene(self.driver) 
     
     def rechallenge_loop(self):        
-        while self.is_exists_image("chat_box.png") == False:
-            self.click_pos(CHALLENGE_POS)
-            wait_time()
-            while self.is_exists_image("guan_ka.png", 0.7) == False:
-                wait_time(20)
-                if self.is_exit_loop():
-                    break
+        while self.is_exists_image("chat_box.png") == False:            
+            self.kill_tian_guan()
 
+    def kill_tian_guan(self):
+        self.click_pos(CHALLENGE_POS)
+        wait_time()
+        while self.is_exists_image("guan_ka.png", 0.7) == False:
+            wait_time(20)
+            if self.is_exit_loop():
+                break
+    
     def rechallenge_pets(self):
         times=0
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
@@ -93,5 +96,4 @@ class HouseJob(Base):
                 self.house_to_pettravel()
                 times = times +1            
             wait_time(3)
-            self.click_pos(CHALLENGE_POS)
-            wait_time(60)
+            self.kill_tian_guan()

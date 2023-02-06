@@ -3,6 +3,7 @@
 
 from datetime import datetime
 from common import wait_time, Base, clear_kill_go, BLACK_X
+from teams import Teams
 
 HD_POS = (257, 630)  
 HD_POS_START = (376, 282)
@@ -35,8 +36,16 @@ DAY_MONSTER_GET =(260, 452)
 
 XIAN_NV = (249, 714) # 252 605
 
+# xuanhuo 1-6
+XUANHUO_GO = (250, 591 + BLACK_X)
+FIND_XUANHUO = (288, 473 + BLACK_X)
+
+# xianmo 
+XIANMO = (320, 593 + BLACK_X)
+
 # xianmenzhengba : 6 20:40-21:10 jinying
 # xianmenzhengba : 5 20:40-21:10 jifen
+XIANMEN_TEAM = (451, 500+BLACK_X)
 # xiandaohui : 4 20:40-21:10
 # xianyuan : 1 20:40-21:10
 # zhandui: 3 20:40-21:10
@@ -70,9 +79,14 @@ class DailyActivities(Base):
             self.god_treasure()
             self.bath()
             self.boss()
-            if d_wkday != 6:
+            if d_wkday != 6:  # 0:Mon 6:sunday
                 self.tianti()
-            
+            if d_wkday != 6:
+                self.xuanhuo()
+            self.xianmo()
+            self.jiutian()
+            if d_wkday == 1:
+                self.shen_mo_battlefield()
         except Exception as e:
             print(f'exception:{e},{d_now}')        
     # down 
@@ -137,26 +151,49 @@ class DailyActivities(Base):
             self.click_callback()
 
     def xuanhuo(self):
-        if is_between((19,45), (20,1)):
+        if is_between((19,45), (20,0)):
             print("xuan huo")
-            self.start_hd()
+            self.start_hd(False)
             wait_time(3)
-
+            self.click_pos(XUANHUO_GO)
+            wait_time(3)
+            self.click_pos(FIND_XUANHUO)
             wait_time(15 * 60)
-            self.close_hd()
             self.click_callback()
 
     def xianmo(self):
-        if is_between((20,0), (20,20)):
+        if is_between((20,0), (20,20)):            
             print('xian mo')
-
+            self.start_hd(False)
+            self.click_pos(XIANMO)
+            team = Teams(self.driver)
+            team.create_team()
+            team.auto_match()
+            team.auto_go()
+            wait_time(15*60)
+            self.use_bags()
+            clear_kill_go(self.driver)
+            self.click_callback()
 
     def jiutian(self):
         if is_between((20, 20), (20,40)):
             print('jiu tian')
+            self.start_hd(False)
+            self.click_pos(XUANHUO_GO)
+            wait_time(18 * 60)
+            self.use_bags()
+            self.click_callback()
 
+    def shen_mo_battlefield(self):
+        if is_between((20,40), (21,10)):
+            print("shen mo battlefiled")
+            self.click_pos(XUANHUO_GO)
+            wait_time(25*60)
+            self.use_bags()
+            self.click_callback()
 
-    def start_hd(self, need_start=True):        
+    def start_hd(self, need_start=True): 
+        self.driver.save_screenshot("imgs/hd_"+ str(datetime.now()).replace(':','_'))       
         self.click_pos(HD_POS)
         wait_time(2)
         clear_kill_go(self.driver)
@@ -183,13 +220,4 @@ class DailyActivities(Base):
         wait_time(1)
         self.use_bags()
         wait_time(2)
-        self.click_callback()
-
-
-
-
-    
-
-    
-
-    
+        self.click_callback()    

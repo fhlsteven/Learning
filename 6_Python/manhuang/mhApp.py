@@ -154,7 +154,6 @@ class MHApplication(object):
         self.btn_get_yb = Button(self.main_win, text='get yuanbao', command=self.get_yuanbao, width=20)
         self.btn_get_yb.grid(row=row_start, column=cur_column)
 
-
         row_start = row_start + 1
         self.lb_role = Label(self.main_win, text="role", fg='green', font=('宋体',16))
         self.lb_role.grid(row=row_start, column=0) 
@@ -175,11 +174,17 @@ class MHApplication(object):
         cur_column =cur_column + 1
         self.btn_monitor_fb = Button(self.main_win, text='monitor fb', command=self.monitor_fb_click, width=20)
         self.btn_monitor_fb.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        self.btn_monitor_huod = Button(self.main_win, text='monitor huod', command=self.monitor_huod_click, width=20)
+        self.btn_monitor_huod.grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+    
+    def monitor_huod_click(self):
+        Monitors(self.driver).monitor_hd()
 
     def eat_elixir_click(self):
         Roles(self.driver).main_to_eat_Elixir()
@@ -290,7 +295,7 @@ class MHApplication(object):
 
     def rechallenge_pets(self):
         self.log_show('rechallenge_pets')
-        HouseJob(self.driver).house_to_pettravel()        
+        HouseJob(self.driver).rechallenge_pets()       
 
     def single_boss(self):
         self.log_show('single_boss ...')

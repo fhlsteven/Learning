@@ -1,19 +1,32 @@
 # -*- coding: utf-8 -*-
 
-from common import wait_time, Base
+from common import wait_time, Base, BLACK_X
 from configs import configs
 
 MAIN_BOSS_POS =(476, 652)
 
+# CUR server
 CUR_SERVER_BOSS = (72, 889)
 SINGLE_BOSS =(137, 805)
 KILL_SINGLE_BOSS=(398, 261)
+ONE_KEY_KILL_SBOSS = (396, 596 + BLACK_X)
 
 OK_POS = (255, 789)
 
+MULTI_POS = (253, 686 + BLACK_X)
+YUN_MEN_POS =(373,683 + BLACK_X)
+# kua fu 
 KUA_FU_BOSS = (150, 892)
 THREE_REALM_BOSS = (93, 809)
 KILL_THREE_REALM = (257, 719)
+
+#kua qu
+KUA_QU_BOSS = (213, 766+BLACK_X)
+
+# huan jing
+HUANJING_BOSS = (287,766+BLACK_X)
+
+
 
 class Boss(Base):
     def __init__(self, driver):
@@ -22,6 +35,10 @@ class Boss(Base):
     def single_boss(self):
         times=0
         boss_times = configs.reincarnation + 1
+        if configs.svip_level > 1:
+            self.click_pos(ONE_KEY_KILL_SBOSS)
+            times = boss_times+1        
+        
         while boss_times > times:
             self.click_pos(KILL_SINGLE_BOSS)
             wait_time(3)
@@ -35,7 +52,7 @@ class Boss(Base):
     def main_to_boss(self):
         self.rong_lian()
         self.click_pos(MAIN_BOSS_POS)
-        wait_time(3)
+        wait_time(2)
     
     def main_to_three_realms(self):
         self.main_to_boss()
