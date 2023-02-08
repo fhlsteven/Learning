@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from common import wait_time, Base, clear_kill_go, BLACK_X
+from common import wait_time, Base, clear_kill_go, BLACK_X, click_black
 from teams import Teams
 
 HD_POS = (257, 630)  
@@ -182,6 +182,7 @@ class DailyActivities(Base):
             self.click_pos(XUANHUO_GO)
             wait_time(18 * 60)
             self.use_bags()
+            click_black(self.driver, )
             self.click_callback()
 
     def shen_mo_battlefield(self):

@@ -15,6 +15,7 @@ from common import clear_kill_go
 from roles import Roles
 
 from monitor import Monitors
+from configs import configs
 
 LOG_LINE_NUM = 0
 
@@ -336,7 +337,7 @@ class MHApplication(object):
 
 def mh_gui():
     window =  Tk()
-    driver = get_driver("https://h5game.gowan8.com/?yisdk_param=mZpuX9Lm2M_S&ext_param=ZJ1raKOp")   
+    driver = get_driver(configs.login.url)   
     app = MHApplication(window, driver)
     app.window_box()
     window.mainloop()
