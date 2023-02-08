@@ -2,6 +2,7 @@
 from common import BaseOCR, wait_time, IMG_PREFIX
 from socket import socket
 from DailyActivities import DailyActivities
+from datetime import datetime
 
 YUAN_SHEN = [b'\xe7\x83\x81\xe9\x87\x91', b'\xe7\x8e\x84\xe8\x8b\x8d', b'\xe5\xb9\xbb\xe6\xb5\xb7', b'\xe7\x82\xbd\xe5\xa4\xa9', b'\xe6\x98\x86\xe5\xa2\x9f']
 BA_GUA = [b'\xe7\x8e\x84\xe9\xbe\x9f', b'\xe6\x83\x8a\xe9\x9b\xb7', b'\xe7\x99\xbd\xe6\xb3\xbd', b'\xe7\x82\x8e\xe5\x87\xb0', b'\xe8\x8b\x8d\xe9\xbe\x99']
@@ -67,11 +68,11 @@ class Monitors(BaseOCR):
 
     def monitor_hd(self):
         hd_monitor = DailyActivities(self.driver)
-        while self.is_need_exit():
+        while self.is_exit(False):
             wait_time()
             hd_monitor.hd_process()            
-            if datetime.now().hour == 22:
+            if datetime.now().hour == 22 or self.is_exit(True):
                 break
     
-    def is_need_exit(self):
-        return self.is_exists_image('chat_box.png')
+    def is_exit(self, status):
+        return self.is_exists_image('chat_box.png') == status

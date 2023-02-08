@@ -128,7 +128,7 @@ class DailyActivities(Base):
             print("boss end")
     
     def tianti(self):    
-        if is_between((19,30),(19,43)):
+        if is_between((19,30),(19,40)):
             print("tian ti start")
             self.start_hd()
             wait_time(4)
@@ -193,7 +193,7 @@ class DailyActivities(Base):
             self.click_callback()
 
     def start_hd(self, need_start=True): 
-        self.driver.save_screenshot("imgs/hd_"+ str(datetime.now()).replace(':','_'))       
+        self.driver.save_screenshot("temp/hd_"+ str(datetime.now()).replace(':','_')+'.png')       
         self.click_pos(HD_POS)
         wait_time(2)
         clear_kill_go(self.driver)

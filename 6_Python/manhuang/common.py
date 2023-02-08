@@ -35,10 +35,11 @@ def click_black(dr, times=2):
 
 QUIT_CLICK = (42, 765)
 QUIT_OK =(331, 605)
-def quit_scene(dr):
+def quit_scene(dr, is_need_ok):
     if is_exists_image(dr, 'quit_left.png'):
         click_pos_locxy(dr, QUIT_CLICK)
-    click_pos_locxy(dr, QUIT_OK)
+    if is_need_ok:
+        click_pos_locxy(dr, QUIT_OK)
 
 BAG_USE = (375, 781)    
 def get_goods(dr):
@@ -98,8 +99,8 @@ def is_exists_image(driver, imgobj, confidencevalue=0.8):
 # 476 526+124
 CLOSE_KILL_GO = (476, 650)
 def clear_kill_go(driver):
-    while is_exists_image(driver, "kill_go.png", confidencevalue=0.7):
-        click_pos_locxy(driver, pos)
+    while is_exists_image(driver, "kill_go.png", confidencevalue=0.8):
+        click_pos_locxy(driver, CLOSE_KILL_GO)
 
 def save_all_img(driver):
     driver.save_screenshot(IMG_PREFIX+ALL_IMAGE)
@@ -115,14 +116,24 @@ ONEKEY_SMELT_POS = (256,824)
 def rong_lian(dr):
     wait_time(1)
     if is_exists_image(dr, "bag.png"):
-        open_bag(dr)
-        click_pos_locxy(dr, SMELT_POS)
-        click_pos_locxy(dr, ONEKEY_SMELT_POS)
-        while is_exists_image(dr, "smelt_ok.png") == False:
-            wait_time(5)
-        click_multi(dr, BLACK_POS, 2)
+        if one_key_semlt(dr) == False:
+            open_bag(dr)
+            click_pos_locxy(dr, SMELT_POS)
+            click_pos_locxy(dr, ONEKEY_SMELT_POS)
+            while is_exists_image(dr, "smelt_ok.png") == False:
+                wait_time(6)
+                if is_exists_image(dr, "smelt_up.png"):
+                    break
+        click_multi(dr, BLACK_POS, 3)
         wait_time(2)
         callback_click(dr)
+
+def one_key_semlt(dr):
+    pos = match_img_pos(dr, "smelt.png")
+    if pos != None and pos[0]>0:
+        click_pos_locxy(dr, pos)
+        return True
+    return False       
 
 def click_multi(dr,pos,times=1):
     c_times = 0
@@ -147,6 +158,7 @@ class Base(object):
     def use_bags(self):
         clear_kill_go(self.driver)
         get_goods(self.driver)
+        clear_kill_go(self.driver)
 
     def is_callback(self):
         return is_exists_image(self.driver, 'callback.png')
@@ -155,10 +167,11 @@ class Base(object):
         return is_exists_image(self.driver, 'quit_left.png')
     
     def rong_lian(self):
+        self.use_bags()
         rong_lian(self.driver)
 
-    def click_quit(self):
-        quit_scene(self.driver)
+    def click_quit(self, is_need_ok=True):
+        quit_scene(self.driver, is_need_ok)
 
     def is_exists_image(self, img_name, confidence = 0.8):
         return is_exists_image(self.driver, img_name, confidence)
@@ -166,9 +179,8 @@ class Base(object):
     def click_callback(self):
         callback_click(self.driver)
 
-    def is_exit_loop(self):
-        return is_exists_image(self.driver, "chat_box.png") == False
-
+    def is_exit_loop(self, status = False):
+        return is_exists_image(self.driver, "chat_box.png") == status
 
 class Languages(object):
     CHS = 'chi_sim'

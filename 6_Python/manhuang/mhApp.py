@@ -19,11 +19,14 @@ from monitor import Monitors
 LOG_LINE_NUM = 0
 
 def send_msg(msg='gamewin'):
-    s = socket.socket()
-    s.connect(('192.168.200.205',13148))
-    s.send(msg.encode('ascii'))
-    time.sleep(3)
-    s.close()
+    try:
+        s = socket.socket()
+        s.connect(('192.168.200.205',13148))
+        s.send(msg.encode('ascii'))
+        time.sleep(3)
+        s.close()
+    except Exception as e:
+        print(e)
 
 class MHApplication(object):
     def __init__(self, window, driver):
@@ -46,6 +49,7 @@ class MHApplication(object):
         self.lb_one_long.grid(row=row_start,column=cur_column)
         cur_column =cur_column + 1
         self.txt_one_long = Text(self.main_win, width=10, height=1)
+        self.txt_one_long.insert('0.0', '1')
         self.txt_one_long.grid(row=row_start,column=cur_column) 
 
         row_start = row_start + 1

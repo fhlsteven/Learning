@@ -26,7 +26,7 @@ MULTI_POS = (138, 900) # 138 766+124
 ISLAND = (211, 899)
 ISLAND_INFINITE = (127, 808) # 127 684+124
 ISLAND_KILL = (249, 755)
-ISLAND_SEC = (368, 807) # 368 683
+ISLAND_SEC = (368, 808) # 368 683
 ISLAND_SEC_FENG = (92, 444) # 92, 320 +124
 ISLAND_SEC_LONG = (254, 484) # 254 360
 
@@ -81,6 +81,7 @@ class InstanceZone(Base):
     def main_to_shenbeast_island(self):
         self.main_to_fb()
         self.shenbeast_island_infinite()
+        wait_time(3)
         self.shenbesat_island_feng()
         self.click_callback()
 
@@ -91,18 +92,23 @@ class InstanceZone(Base):
         wait_time(10)
         while self.is_exists_image("boss_small.png", 0.65):
             wait_time(20)
-        self.click_quit()  
+        self.click_quit(False)
     
     def shenbesat_island_feng(self):
+        wait_time(2)
         self.click_pos(ISLAND_SEC)
+        wait_time(1)
         self.click_pos(ISLAND_SEC_FENG)
         self.click_pos(ISLAND_KILL)
         wait_time(15*21)
-        self.click_quit()
+        self.use_bags()
+        self.click_quit(False)
+       
 
     def shenbesat_island_long(self):
         self.click_pos(ISLAND_SEC)
         self.click_pos(ISLAND_SEC_LONG)
         self.click_pos(ISLAND_KILL)
         wait_time(50)
-        self.click_quit() 
+        self.use_bags()
+        self.click_quit(False) 
