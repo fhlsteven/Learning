@@ -182,12 +182,19 @@ class MHApplication(object):
         cur_column =cur_column + 1
         self.btn_monitor_huod = Button(self.main_win, text='monitor huod', command=self.monitor_huod_click, width=20)
         self.btn_monitor_huod.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        self.btn_monitor_three_real = Button(self.main_win, text='monitor three real', command=self.btn_monitor_three_real, width=20)
+        self.btn_monitor_three_real.grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
     
+    def btn_monitor_three_real(self):
+        Monitors(self.driver).monitor_three_boss()
+        # Monitors(self.driver).quick_mode()
+
     def monitor_huod_click(self):
         Monitors(self.driver).monitor_hd()
 

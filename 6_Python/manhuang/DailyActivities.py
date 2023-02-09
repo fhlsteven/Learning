@@ -8,6 +8,7 @@ from teams import Teams
 HD_POS = (257, 630)  
 HD_POS_START = (376, 282)
 HD_CLOSE = (468, 199)
+HD_POS_MINI =(455, 325 + BLACK_X)
 
 #treasure
 XF_GOODS_POS =(295, 739)
@@ -155,6 +156,7 @@ class DailyActivities(Base):
             print("xuan huo")
             self.start_hd(False)
             wait_time(3)
+            self.click_pos(HD_POS_MINI)
             self.click_pos(XUANHUO_GO)
             wait_time(3)
             self.click_pos(FIND_XUANHUO)
@@ -172,17 +174,19 @@ class DailyActivities(Base):
             team.auto_go()
             wait_time(15*60)
             self.use_bags()
-            clear_kill_go(self.driver)
             self.click_callback()
 
     def jiutian(self):
         if is_between((20, 20), (20,40)):
             print('jiu tian')
             self.start_hd(False)
+            self.log_img()
+            Teams(self.driver).quit_team_status()
+            self.click_pos(HD_POS_MINI)
+            self.click_pos(HD_POS_MINI)
             self.click_pos(XUANHUO_GO)
             wait_time(18 * 60)
             self.use_bags()
-            click_black(self.driver, )
             self.click_callback()
 
     def shen_mo_battlefield(self):
@@ -194,9 +198,9 @@ class DailyActivities(Base):
             self.click_callback()
 
     def start_hd(self, need_start=True): 
-        self.driver.save_screenshot("temp/hd_"+ str(datetime.now()).replace(':','_')+'.png')       
+        self.log_img()       
         self.click_pos(HD_POS)
-        wait_time(2)
+        wait_time(2)               
         clear_kill_go(self.driver)
         if need_start:
             self.click_pos(HD_POS_START)
@@ -221,4 +225,7 @@ class DailyActivities(Base):
         wait_time(1)
         self.use_bags()
         wait_time(2)
-        self.click_callback()    
+        self.click_callback()  
+    
+    def log_img(self):
+        self.driver.save_screenshot("temp/hd_"+ str(datetime.now()).replace(':','_')+'.png')

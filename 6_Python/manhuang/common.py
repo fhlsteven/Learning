@@ -46,6 +46,7 @@ def get_goods(dr):
     while is_exists_image(dr, 'use_btn.png'):
         wait_time(2)
         click_pos_locxy(dr, BAG_USE)
+    click_black(dr, times=1)
 
 CALLBACK_POS=(450, 916)
 def callback_click(dr):
@@ -99,8 +100,10 @@ def is_exists_image(driver, imgobj, confidencevalue=0.8):
 # 476 526+124
 CLOSE_KILL_GO = (476, 650)
 def clear_kill_go(driver):
-    while is_exists_image(driver, "kill_go.png", confidencevalue=0.8):
+    c_times = 0
+    while is_exists_image(driver, "kill_go.png", confidencevalue=0.8) and c_times < 6:
         click_pos_locxy(driver, CLOSE_KILL_GO)
+        c_times= c_times + 1
 
 def save_all_img(driver):
     driver.save_screenshot(IMG_PREFIX+ALL_IMAGE)

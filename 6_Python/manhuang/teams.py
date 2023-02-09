@@ -16,6 +16,8 @@ EMAIL_GET = (319, 826) # 319 702+124
 KICK_OUT = (362, 637) # 362 523
 KICK_OUT_OK = (325, 603) # 325 479+124
 
+QUIT_OK = (325, 480+BLACK_X)
+
 class Teams(Base):
     def __init__(self, driver):
         super(Teams, self).__init__(driver)
@@ -52,4 +54,7 @@ class Teams(Base):
     def kick_out(self):
         self.click_pos(KICK_OUT)
         self.click_pos(KICK_OUT_OK)
+
+    def quit_team_status(self):
+        self.click_pos(QUIT_OK)
 

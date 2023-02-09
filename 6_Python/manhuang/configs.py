@@ -1,4 +1,4 @@
-# -*- conding:utf-8 -*-
+﻿# -*- conding:utf-8 -*-
 
 class Dict(dict):
     def __init__(self, names=(), values=(), **kw):
@@ -33,7 +33,7 @@ default_configs = {
     },
     'check_term':'#serverCon>img:nth-child(7)',
     'start_button':'#serverCon>img:nth-child(3)',
-    'reincarnation': 3,
+    'reincarnation': 4,
     'svip_level':0,
     'runtime':'debug'
 }

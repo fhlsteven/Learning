@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from common import wait_time, Base
+from configs import configs
 
 MAIN_FB_POS =(477, 610)
 
@@ -42,7 +43,7 @@ class InstanceZone(Base):
 
     def single_fb_kill(self):
         self.click_pos(FB_START_POS)
-        wait_time()
+        wait_time(8)
         self.click_pos(OK_POS)
         wait_time(2)
 
@@ -59,6 +60,16 @@ class InstanceZone(Base):
         # 补救
         self.single_fb_kill()
         self.single_fb_kill()
+
+        quick_times = 10
+        c_times = 0
+        if configs.svip_level > 0:
+            quick_times = 45
+        
+        while c_times < quick_times:
+            self.click_pos(FB_FIRST_POS)
+            wait_time(2)
+            c_times = c_times + 1
         
         while self.is_exists_image("fb_quick_kill.png", 0.95):
             self.click_pos(FB_FIRST_POS)
@@ -83,6 +94,7 @@ class InstanceZone(Base):
         self.shenbeast_island_infinite()
         wait_time(3)
         self.shenbesat_island_feng()
+        wait_time(3)
         self.click_callback()
 
     def shenbeast_island_infinite(self):
