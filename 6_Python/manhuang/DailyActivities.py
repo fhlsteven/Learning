@@ -8,7 +8,7 @@ from teams import Teams
 HD_POS = (257, 630)  
 HD_POS_START = (376, 282)
 HD_CLOSE = (468, 199)
-HD_POS_MINI =(455, 325 + BLACK_X)
+HD_POS_MINI =(471, 322 + BLACK_X)
 
 #treasure
 XF_GOODS_POS =(295, 739)
@@ -152,10 +152,11 @@ class DailyActivities(Base):
             self.click_callback()
 
     def xuanhuo(self):
-        if is_between((19,45), (20,0)):
+        if is_between((19,46), (20,0)):
             print("xuan huo")
             self.start_hd(False)
             wait_time(3)
+            self.click_pos(HD_POS_MINI)
             self.click_pos(HD_POS_MINI)
             self.click_pos(XUANHUO_GO)
             wait_time(3)
@@ -177,7 +178,7 @@ class DailyActivities(Base):
             self.click_callback()
 
     def jiutian(self):
-        if is_between((20, 20), (20,40)):
+        if is_between((20, 24), (20,40)):
             print('jiu tian')
             self.start_hd(False)
             self.log_img()

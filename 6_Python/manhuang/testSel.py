@@ -13,7 +13,7 @@ from teams import Teams
 from common import *
 
 from configs import configs
-
+from monitor import Monitors
 # html node name
 ACCOUNT_KEY = "account"
 PWD_KEY = "password"
@@ -95,7 +95,6 @@ def test_eight_components():
     #Teams(driver).auto_receive()
     # monitor
     get_goods(driver)
-    rong_lian(driver)
     #Boss(driver).main_to_three_realms()
 
     #InstanceZone(driver).main_to_everyday_fb()
@@ -103,10 +102,9 @@ def test_eight_components():
     
     #wait_time()
     #callback_click(driver)
-    DailyActivities(driver).monitor()
+    #DailyActivities(driver).monitor()
+    Monitors(driver).quick_mode()
     # HouseJob(driver).rechallenge_pets()
-
-    time.sleep(60*60*2)
     driver.quit()
 
 def main_loop():
