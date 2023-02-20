@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
-from common import wait_time, Base
+from common import wait_time, Base, BLACK_X
 from configs import configs
+from teams import Teams
 
 MAIN_FB_POS =(477, 610)
 
@@ -30,6 +31,9 @@ ISLAND_KILL = (249, 755)
 ISLAND_SEC = (368, 808) # 368 683
 ISLAND_SEC_FENG = (92, 444) # 92, 320 +124
 ISLAND_SEC_LONG = (254, 484) # 254 360
+
+
+QUICK_MATCH = (251, 615 + BLACK_X)
 
 class InstanceZone(Base):
     def __init__(self, driver):
@@ -123,4 +127,9 @@ class InstanceZone(Base):
         self.click_pos(ISLAND_KILL)
         wait_time(50)
         self.use_bags()
-        self.click_quit(False) 
+        self.click_quit(False)
+
+    def go_you_ming(self):
+        self.click_pos(QUICK_MATCH)
+        wait_time(180-3)
+        self.click_quit()

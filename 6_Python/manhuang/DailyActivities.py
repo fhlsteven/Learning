@@ -39,7 +39,8 @@ XIAN_NV = (249, 714) # 252 605
 
 # xuanhuo 1-6
 XUANHUO_GO = (250, 591 + BLACK_X)
-FIND_XUANHUO = (288, 473 + BLACK_X)
+# FIND_XUANHUO = (288, 473 + BLACK_X)
+FIND_XUANHUO = (264, 488 + BLACK_X)
 
 # xianmo 
 XIANMO = (320, 593 + BLACK_X)
@@ -80,8 +81,7 @@ class DailyActivities(Base):
             self.god_treasure()
             self.bath()
             self.boss()
-            if d_wkday != 6:  # 0:Mon 6:sunday
-                self.tianti()
+            self.tianti()
             if d_wkday != 6:
                 self.xuanhuo()
             self.xianmo()
@@ -129,7 +129,7 @@ class DailyActivities(Base):
             print("boss end")
     
     def tianti(self):    
-        if is_between((19,30),(19,40)):
+        if is_between((19,31),(19,40)):
             print("tian ti start")
             self.start_hd()
             wait_time(4)
@@ -137,6 +137,7 @@ class DailyActivities(Base):
             wait_time(10 * 60)
             self.close_hd()
             self.click_callback()
+            self.rong_lian()  # smelt
             print("tian ti end")
     
     def protect(self):
@@ -152,12 +153,13 @@ class DailyActivities(Base):
             self.click_callback()
 
     def xuanhuo(self):
-        if is_between((19,46), (20,0)):
+        if is_between((19,43), (19,59)):
             print("xuan huo")
             self.start_hd(False)
             wait_time(3)
-            self.click_pos(HD_POS_MINI)
-            self.click_pos(HD_POS_MINI)
+            if self.is_exists_image("xuanhuo.png") == False:                
+                self.click_pos(HD_POS_MINI)
+                wait_time(3)
             self.click_pos(XUANHUO_GO)
             wait_time(3)
             self.click_pos(FIND_XUANHUO)
@@ -165,15 +167,28 @@ class DailyActivities(Base):
             self.click_callback()
 
     def xianmo(self):
-        if is_between((20,0), (20,20)):            
+        if is_between((20,0), (20,13)):            
             print('xian mo')
             self.start_hd(False)
             self.click_pos(XIANMO)
             team = Teams(self.driver)
             team.create_team()
             team.auto_match()
-            team.auto_go()
-            wait_time(15*60)
+            # team.auto_go()
+            times = 0
+            team.quick_match()
+            wait_time(15)
+            team.quick_match()
+            while times < 9:
+                if self.is_exists_image("team.png") == False:
+                    wait_time(30)
+                else:
+                    team.quick_match()
+                    wait_time(15)
+                    team.quick_match()
+                    times = times + 1
+            
+            Teams(self.driver).quit_team_status()
             self.use_bags()
             self.click_callback()
 
@@ -229,4 +244,4 @@ class DailyActivities(Base):
         self.click_callback()  
     
     def log_img(self):
-        self.driver.save_screenshot("temp/hd_"+ str(datetime.now()).replace(':','_')+'.png')
+        self.driver.save_screenshot("temp/hd_"+ str(datetime.now()).replace(':','_')+'.png')    

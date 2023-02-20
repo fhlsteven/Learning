@@ -19,6 +19,8 @@ KICK_OUT_OK = (325, 603) # 325 479+124
 QUIT = (252,414+BLACK_X)
 QUIT_OK = (325, 480+BLACK_X)
 
+QUICK_MATCH = (251, 615 + BLACK_X)
+
 class Teams(Base):
     def __init__(self, driver):
         super(Teams, self).__init__(driver)
@@ -56,8 +58,12 @@ class Teams(Base):
         self.click_pos(KICK_OUT)
         self.click_pos(KICK_OUT_OK)
 
-    def quit_team_status(self):
+    def quit_team_status(self, is_need_cb=True):
         self.click_pos(QUIT)
         self.click_pos(QUIT_OK)
-        self.click_callback()
+        if is_need_cb:
+            self.click_callback()
+
+    def quick_match(self):
+        self.click_pos(QUICK_MATCH)
 

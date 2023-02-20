@@ -111,6 +111,9 @@ class MHApplication(object):
         self.btn_island = Button(self.main_win, text='island kill', command=self.island_kill_click, width=20)
         self.btn_island.grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
+        self.btn_go_youm = Button(self.main_win, text='go youming', command=self.go_youm_click, width=20)
+        self.btn_go_youm.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
 
         row_start = row_start + 1
         cur_column = 0 
@@ -190,6 +193,10 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def go_youm_click(self):
+        InstanceZone(self.driver).go_you_ming()
+        send_msg()
     
     def btn_monitor_three_real(self):
         Monitors(self.driver).monitor_three_boss()

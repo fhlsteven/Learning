@@ -53,6 +53,8 @@ class HouseJob(Base):
         self.click_pos(HOUSE_THREE)
         self.click_pos(HOUSE_CLICK)
         wait_time(25)
+        
+        self.click_quit()
   
     def house_to_pettravel(self):
         self.click_pos(HOUSE_POS)
