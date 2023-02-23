@@ -88,6 +88,15 @@ class HouseJob(Base):
             wait_time(20)
             if self.is_exit_loop(True):
                 break
+
+    def process_pets_travels(self):
+        times=0
+        while self.is_exit_loop(False):             
+            self.house_to_pettravel()
+            times = times +1              
+            if times>PET_TRAVEL_TIMES:
+                break
+            wait_time(5*60+1)
     
     def rechallenge_pets(self):
         times=0
@@ -102,6 +111,9 @@ class HouseJob(Base):
             if get_date_minutes(r_pre_time, datetime.now()) > 15:
                 self.rong_lian()
                 r_pre_time = datetime.now()
+
+            if times > PET_TRAVEL_TIMES:
+                break
 
             wait_time(3)
             self.kill_tian_guan()

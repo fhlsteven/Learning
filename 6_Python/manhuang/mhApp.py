@@ -134,6 +134,9 @@ class MHApplication(object):
         cur_column =cur_column + 1
         self.btn_house_event = Button(self.main_win, text='house event', command=self.house_event_p, width=20)
         self.btn_house_event.grid(row=row_start, column=cur_column) 
+        cur_column =cur_column + 1
+        self.btn_pets_travels_all = Button(self.main_win, text='pets travels all', command=self.pets_travels_all_click, width=20)
+        self.btn_pets_travels_all.grid(row=row_start, column=cur_column) 
 
         row_start = row_start + 1
         cur_column = 0        
@@ -193,6 +196,11 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def pets_travels_all_click(self):
+        self.log_show("pets_travels_all_click")
+        HouseJob(self.driver).process_pets_travels()
+        send_msg()
 
     def go_youm_click(self):
         InstanceZone(self.driver).go_you_ming()
@@ -350,6 +358,7 @@ class MHApplication(object):
             self.txt_log.insert(END, logmessage_in)
 
 def mh_gui():
+    # 调用Tk()创建主窗口
     window =  Tk()
     driver = get_driver(configs.login.url)   
     app = MHApplication(window, driver)

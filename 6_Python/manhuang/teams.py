@@ -35,10 +35,7 @@ class Teams(Base):
         self.click_pos(AUTO_GO)
     
     def auto_receive(self):
-        self.click_pos(TEAM_EMAIL_POS)
-        wait_time(2)
-        self.click_pos(TEAM_POS)
-        wait_time(2)
+        self.go_to_team()
         self.click_pos(AUTO_RECEIVE_POS)
         wait_time(2)
         self.click_callback()
@@ -53,6 +50,10 @@ class Teams(Base):
         wait_time(1)
         self.click_pos(EMAIL_GET) # some need to click blank 
         self.click_callback()
+
+    def go_to_team(self):
+        self.click_pos(TEAM_EMAIL_POS)
+        self.click_pos(TEAM_POS)
 
     def kick_out(self):
         self.click_pos(KICK_OUT)

@@ -153,7 +153,7 @@ class DailyActivities(Base):
             self.click_callback()
 
     def xuanhuo(self):
-        if is_between((19,43), (19,59)):
+        if is_between((19,45), (19,59)):
             print("xuan huo")
             self.start_hd(False)
             wait_time(3)
@@ -165,30 +165,43 @@ class DailyActivities(Base):
             self.click_pos(FIND_XUANHUO)
             wait_time(15 * 60)
             self.click_callback()
+    
+    def xianmo_start(self, team):
+        team.quick_match()
+        self.log_img()
+        wait_time(15)
+        self.log_img()
+        team.quick_match()
+        self.log_img()
 
     def xianmo(self):
-        if is_between((20,0), (20,13)):            
+        if is_between((20,1), (20,8)):            
             print('xian mo')
             self.start_hd(False)
+            if self.is_exists_image("xianmo.png") == False:
+                self.log_img()
+                self.click_pos(HD_POS_MINI)
+                self.log_img()
+                wait_time(2)
             self.click_pos(XIANMO)
+            self.log_img()
             team = Teams(self.driver)
             team.create_team()
             team.auto_match()
+            self.log_img()
             # team.auto_go()
             times = 0
-            team.quick_match()
-            wait_time(15)
-            team.quick_match()
+            self.xianmo_start(team)            
             while times < 9:
+                self.log_img()
                 if self.is_exists_image("team.png") == False:
                     wait_time(30)
                 else:
-                    team.quick_match()
-                    wait_time(15)
-                    team.quick_match()
+                    self.xianmo_start(team)
                     times = times + 1
             
             Teams(self.driver).quit_team_status()
+            self.log_img()
             self.use_bags()
             self.click_callback()
 
@@ -196,14 +209,16 @@ class DailyActivities(Base):
         if is_between((20, 24), (20,40)):
             print('jiu tian')
             self.start_hd(False)
-            self.log_img()
-            Teams(self.driver).quit_team_status()
-            self.click_pos(HD_POS_MINI)
-            self.click_pos(HD_POS_MINI)
+            if self.is_exists_image("jiutian.png") == False:
+                Teams(self.driver).quit_team_status() 
+                self.click_pos(HD_POS_MINI)                
+                wait_time(3)
+                      
             self.click_pos(XUANHUO_GO)
             wait_time(18 * 60)
             self.use_bags()
             self.click_callback()
+            print("jiu tian end")
 
     def shen_mo_battlefield(self):
         if is_between((20,40), (21,10)):
@@ -213,8 +228,7 @@ class DailyActivities(Base):
             self.use_bags()
             self.click_callback()
 
-    def start_hd(self, need_start=True): 
-        self.log_img()       
+    def start_hd(self, need_start=True):   
         self.click_pos(HD_POS)
         wait_time(2)               
         clear_kill_go(self.driver)

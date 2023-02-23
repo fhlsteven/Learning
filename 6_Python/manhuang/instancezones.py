@@ -131,5 +131,5 @@ class InstanceZone(Base):
 
     def go_you_ming(self):
         self.click_pos(QUICK_MATCH)
-        wait_time(180-3)
+        wait_time(180-5)
         self.click_quit()
