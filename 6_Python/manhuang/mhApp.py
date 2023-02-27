@@ -11,7 +11,7 @@ from instancezones import InstanceZone
 from topprocess import TopProcess
 from teams import Teams
 from DailyActivities import DailyActivities
-from common import clear_kill_go
+from common import clear_kill_go,is_exists_image
 from roles import Roles
 
 from monitor import Monitors
