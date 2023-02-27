@@ -56,10 +56,11 @@ class HouseJob(Base):
         
         self.click_quit()
   
-    def house_to_pettravel(self):
+    def house_to_pettravel(self, money_reiki=False):
         self.click_pos(HOUSE_POS)
-        wait_time(3)    
-        self.get_money_reiki()
+        wait_time(3)   
+        if money_reiki: 
+            self.get_money_reiki()
         self.click_pos(HOUSE_THREE)
         wait_time(2)    
         self.pet_travel() 
@@ -103,9 +104,9 @@ class HouseJob(Base):
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
         r_pre_time = pre_time 
         while self.is_exit_loop(False):   
-            if get_date_minutes(pre_time, datetime.now()) > 6 and times < PET_TRAVEL_TIMES:     
+            if get_date_minutes(pre_time, datetime.now()) > 5 and times < PET_TRAVEL_TIMES: 
+                self.house_to_pettravel(times%5==0)
                 pre_time = datetime.now()
-                self.house_to_pettravel()
                 times = times +1  
             
             if get_date_minutes(r_pre_time, datetime.now()) > 15:

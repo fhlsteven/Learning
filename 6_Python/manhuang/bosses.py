@@ -77,3 +77,20 @@ class Boss(Base):
         self.click_pos(CUR_SERVER_BOSS)
         self.click_pos(SINGLE_BOSS)
         self.single_boss()
+
+    def process_three_realms(self):        
+        cur_time =  datetime.now()
+        try:
+            if cur_time.hour == 23:
+                nxt = cur_time + timedelta(days=1)
+                next_time = datetime(nxt.year, nxt.month, nxt.day,0,0,10)
+            else:
+                next_time = datetime(cur_time.year, cur_time.month, cur_time.day, cur_time.hour + 1, 0, 10)
+            wait_secs = (next_time - cur_time).seconds  
+            if wait_secs<5*60:              
+                wait_time(wait_secs)
+                self.main_to_three_realms()  
+                return 1         
+        except Exception as e:
+            print(e)
+        return 0

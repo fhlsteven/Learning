@@ -133,6 +133,7 @@ class DailyActivities(Base):
             print("tian ti start")
             self.start_hd()
             wait_time(4)
+            self.use_bags()
             self.click_pos(TT_MATCH)
             wait_time(10 * 60)
             self.close_hd()
@@ -166,40 +167,34 @@ class DailyActivities(Base):
             wait_time(15 * 60)
             self.click_callback()
     
-    def xianmo_start(self, team):
+    def xianmo_start(self, team):        
+        while self.is_exists_image("add_role.png"):
+            wait_time(5)
         team.quick_match()
-        self.log_img()
-        wait_time(15)
-        self.log_img()
-        team.quick_match()
-        self.log_img()
 
     def xianmo(self):
         if is_between((20,1), (20,8)):            
             print('xian mo')
             self.start_hd(False)
-            if self.is_exists_image("xianmo.png") == False:
-                self.log_img()
+            if self.is_exists_image("xianmo.png") == False:               
                 self.click_pos(HD_POS_MINI)
-                self.log_img()
                 wait_time(2)
+            self.use_bags()
             self.click_pos(XIANMO)
-            self.log_img()
             team = Teams(self.driver)
             team.create_team()
             team.auto_match()
-            self.log_img()
             # team.auto_go()
             times = 0
             self.xianmo_start(team)            
             while times < 9:
-                self.log_img()
+                wait_time(30)
                 if self.is_exists_image("team.png") == False:
                     wait_time(30)
                 else:
                     self.xianmo_start(team)
                     times = times + 1
-            
+            self.log_img()
             Teams(self.driver).quit_team_status()
             self.log_img()
             self.use_bags()

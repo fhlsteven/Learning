@@ -5,7 +5,7 @@ import time
 from testSel import get_driver, login
 import socket
 
-from housejobs import HouseJob
+from housejobs import HouseJob, get_date_minutes
 from bosses import Boss
 from instancezones import InstanceZone
 from topprocess import TopProcess
@@ -16,6 +16,7 @@ from roles import Roles
 
 from monitor import Monitors
 from configs import configs
+from datetime import datetime
 
 LOG_LINE_NUM = 0
 
@@ -193,6 +194,11 @@ class MHApplication(object):
         self.btn_monitor_three_real.grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
+        cur_column = 0
+        self.btn_monitor_three_and_pets = Button(self.main_win, text='monitor three and pets', command=self.monitor_three_and_pets_click, width=20)
+        self.btn_monitor_three_and_pets.grid(row=row_start, column=cur_column)
+
+        row_start = row_start + 1
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
@@ -201,6 +207,32 @@ class MHApplication(object):
         self.log_show("pets_travels_all_click")
         HouseJob(self.driver).process_pets_travels()
         send_msg()
+
+    def monitor_three_and_pets_click(self):
+        times=0
+        c_times = 0
+        pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
+        r_pre_time = pre_time 
+        while is_exists_image(self.driver, "chat_box.png") == False:  
+            try: 
+                if get_date_minutes(pre_time, datetime.now()) > 5 and times < 12: 
+                    HouseJob(self.driver).house_to_pettravel(times%5==0)
+                    pre_time = datetime.now()
+                    times = times +1  
+                
+                if get_date_minutes(r_pre_time, datetime.now()) > 20:
+                    Boss(self.driver).rong_lian()
+                    r_pre_time = datetime.now()
+                
+                if c_times < 5:
+                    c_times = c_times + Boss(self.driver).process_three_realms()
+
+                if datetime.now().hour>=18:
+                    Boss(self.driver).rong_lian()
+                    Monitors(self.driver).monitor_hd()
+            except Exception as ex:
+                print(ex)
+            wait_time(3)
 
     def go_youm_click(self):
         InstanceZone(self.driver).go_you_ming()
@@ -307,7 +339,7 @@ class MHApplication(object):
     def pets_travel(self):
         self.log_show('pets_travel ...')
         try:
-            HouseJob(self.driver).house_to_pettravel()
+            HouseJob(self.driver).house_to_pettravel(True)
         except Exception as e:
             self.log_show(e)
         send_msg()

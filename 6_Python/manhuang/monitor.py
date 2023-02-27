@@ -108,17 +108,6 @@ class Monitors(BaseOCR):
     def monitor_three_boss(self):
         c_times = 0
         while self.is_exit(False) and c_times < 5:            
-            cur_time =  datetime.now()
-            try:
-                if cur_time.hour == 23:
-                    nxt = cur_time + timedelta(days=1)
-                    next_time = datetime(nxt.year, nxt.month, nxt.day,0,0,10)
-                else:
-                    next_time = datetime(cur_time.year, cur_time.month, cur_time.day, cur_time.hour + 1, 0, 10)
-                wait_secs = (next_time - cur_time).seconds                
-                wait_time(wait_secs)
-                Boss(self.driver).main_to_three_realms()                
-            except Exception as e:
-                print(e)
+            Boss(self.driver).process_three_realms()
             c_times = c_times + 1
            
