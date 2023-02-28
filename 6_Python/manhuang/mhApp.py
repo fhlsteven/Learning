@@ -11,7 +11,7 @@ from instancezones import InstanceZone
 from topprocess import TopProcess
 from teams import Teams
 from DailyActivities import DailyActivities
-from common import clear_kill_go,is_exists_image
+from common import clear_kill_go,is_exists_image, wait_time
 from roles import Roles
 
 from monitor import Monitors
@@ -272,7 +272,7 @@ class MHApplication(object):
         boss.main_to_single_boss()
         # pets_travel
         self.log_show("house_to_pettravel")
-        HouseJob(self.driver).house_to_pettravel()
+        HouseJob(self.driver).house_to_pettravel(True)
         # fb
         self.log_show("main_to_everyday_fb")
         InstanceZone(self.driver).main_to_everyday_fb()

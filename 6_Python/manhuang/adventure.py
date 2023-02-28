@@ -10,4 +10,6 @@ class Adventure(Base):
         super(Adventure, self).__init__(driver)
 
     def main_to_adventure(self):
-        self.click_pos(pos)    
+        self.click_pos(ADVENTRUE_POS)
+
+        
