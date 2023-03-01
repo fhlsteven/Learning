@@ -6,6 +6,7 @@ from datetime import datetime
 from housejobs import HouseJob
 from bosses import Boss
 from instancezones import InstanceZone
+from adventure import Adventure
 
 from datetime import datetime, timedelta
 
@@ -108,6 +109,5 @@ class Monitors(BaseOCR):
     def monitor_three_boss(self):
         c_times = 0
         while self.is_exit(False) and c_times < 5:            
-            Boss(self.driver).process_three_realms()
-            c_times = c_times + 1
+            c_times = c_times + Boss(self.driver).process_three_realms()
            

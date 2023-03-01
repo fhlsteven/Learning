@@ -113,15 +113,16 @@ class ImageApplication(object):
 
     def select_folder_path(self):
         get_path = askdirectory() #使用askdirectory()方法返回文件夹的路径        
-        if get_path == "":
+        if get_path == "":            
             pass#self.cur_path.get() # #当打开文件路径选择框后点击"取消" 输入框会清空路径，所以使用get()方法再获取一次路径
         else:
             get_path = get_path.replace("/","\\") # 实际在代码中执行的路径为“\“ 所以替换一下            
             self.cur_path.set(get_path)
-            self.read_all_images_name()
+        self.read_all_images_name()
 
     def read_all_images_name(self):
-        self.image_names.clear()       
+        self.image_names.clear()
+        self.lb_image_names.delete(0,END)
         for file_name in os.listdir(self.cur_path.get()):
             file_exten = os.path.splitext(file_name)[-1]
             if  file_exten != '' and file_exten in ".png,.jpg,.gif":

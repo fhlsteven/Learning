@@ -13,7 +13,7 @@ from teams import Teams
 from DailyActivities import DailyActivities
 from common import clear_kill_go,is_exists_image, wait_time
 from roles import Roles
-
+from adventure import Adventure
 from monitor import Monitors
 from configs import configs
 from datetime import datetime
@@ -123,8 +123,10 @@ class MHApplication(object):
         cur_column =cur_column + 1
         self.btn_clear_kill_go = Button(self.main_win, text='clear kill go', command=self.clear_kill_go_click, width=20)
         self.btn_clear_kill_go.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text="adventrure", command=self.process_adventure_click, width=20).grid(row=row_start, column=cur_column)
+        
         row_start = row_start + 1
-
         cur_column = 0        
         self.lb_house_tools = Label(self.main_win, text="house tools", fg='green', font=('宋体',16))
         self.lb_house_tools.grid(row=row_start, column=cur_column) 
@@ -202,6 +204,10 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def process_adventure_click(self):
+        Adventure(self.driver).process_adventure_events()
+        send_msg()
 
     def pets_travels_all_click(self):
         self.log_show("pets_travels_all_click")
@@ -368,7 +374,7 @@ class MHApplication(object):
 
     def login(self):
         self.log_show('login')
-        login(self.driver)
+        login(self.driver, False)
 
     def rechallenge(self):
         self.log_show('rechallenge loop')

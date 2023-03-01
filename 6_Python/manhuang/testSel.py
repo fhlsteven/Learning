@@ -43,7 +43,7 @@ def get_driver(url="https://baidu.com"):
     driver.get(url)
     return driver
 
-def login(driver):
+def login(driver, is_auto= True):
     wait_time(2)
     acct_text = driver.find_element(by=By.NAME, value=ACCOUNT_KEY)
     acct_text.send_keys(configs.login.user_name)
@@ -63,8 +63,9 @@ def login(driver):
    
     switch_frame(driver)
     select_server(driver)
-    wait_time(20) # wait loading
-    to_main(driver)  # clcik black
+    if is_auto:
+        wait_time(20)    # wait loading
+        to_main(driver)  # clcik black
 
 def select_server(driver):
     # check term    

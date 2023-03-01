@@ -38,6 +38,11 @@ QUIT_OK =(331, 605)
 def quit_scene(dr, is_need_ok):
     if is_exists_image(dr, 'quit_left.png'):
         click_pos_locxy(dr, QUIT_CLICK)
+
+    pos = match_img_pos(dr, "quit_left.png")
+    if pos[0]>0:
+        click_pos_locxy(dr, pos)
+    
     if is_need_ok:
         click_pos_locxy(dr, QUIT_OK)
 

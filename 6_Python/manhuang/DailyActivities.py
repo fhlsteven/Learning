@@ -206,10 +206,15 @@ class DailyActivities(Base):
             self.start_hd(False)
             if self.is_exists_image("jiutian.png") == False:
                 Teams(self.driver).quit_team_status() 
-                self.click_pos(HD_POS_MINI)                
-                wait_time(3)
-                      
+                self.click_pos(HD_POS_MINI)
+            wait_time(3)
+
             self.click_pos(XUANHUO_GO)
+            wait_time(3)
+            pos = self.get_pos_byimg("quit_team_ok.png")
+            if pos[0]>0:
+                self.click_pos(pos)
+           
             wait_time(18 * 60)
             self.use_bags()
             self.click_callback()
