@@ -5,6 +5,7 @@ from tkinter.filedialog import askdirectory
 import os
 import cv2
 import numpy as np
+from PIL import Image,ImageTk
 
 class Rectangle(object):
     def __init__(self, start_x, start_y):
@@ -35,8 +36,8 @@ class Rectangle(object):
 
     def __str__(self):
         if self.min_x==0 and self.min_y ==0 and self.max_x==0 and self.max_y==0:
-            return f'({self.start_x},{self.start_y})'
-        return f'({self.min_x},{self.min_y},{self.max_x},{self.max_y});({self.width()},{self.height()});center:{self.center()}'
+            return f'pos({self.start_x},{self.start_y})'
+        return f'({self.min_x},{self.min_y},{self.max_x},{self.max_y});w:h({self.width()},{self.height()});center:{self.center()}'
 
     __repr__ = __str__
 
@@ -51,10 +52,11 @@ class ImageApplication(object):
         self.g_start_point = [] 
         self.cur_rectangle = None
         self.cur_img_path=''
+        self.cur_img = None
     
     def window_boxes(self):
         self.main_win.title("Images")
-        self.main_win.geometry("700x590+550+150")
+        self.main_win.geometry("780x590+550+150")
 
         Label(self.main_win, text="目标路径:").grid(row=0,column=0)
         Entry(self.main_win, textvariable= self.cur_path, state="readonly").grid(row=0,column=1,ipadx=100)
@@ -64,7 +66,7 @@ class ImageApplication(object):
         self.lb_image_names.bind("<<ListboxSelect>>",self.show_msg)
         self.lb_image_names.grid(row=1,column=0,columnspan=2)
         
-        self.txt_result = Text(self.main_win, height=38, width=55)
+        self.txt_result = Text(self.main_win, height=38, width=53)
         self.txt_result.grid(row=1, column=2)
 
         Label(self.main_win, text='按 ESC 退出图像画框模式').grid(row=2,column=0,columnspan=2)
@@ -80,24 +82,31 @@ class ImageApplication(object):
     def process_img_file(self, index=0):
         if len(self.image_names)<=0:
             return
-        self.g_rectrangles.clear()
-        self.txt_result.delete('1.0','end')
+               
         img_path = os.path.join(self.cur_path.get(), self.image_names[index])
-        cur_img = self.read_img(img_path)
-        if cur_img is not None:
+        if self.cur_img_path != img_path:
+            self.cur_img = None
+            self.g_rectrangles.clear()
+            self.txt_result.delete('1.0','end') 
+            
+        self.cur_img = self.read_img(img_path)     
+        if self.cur_img is not None:
             self.cur_img_path = img_path
             cv2.namedWindow(img_path, 0)
-            cv2.resizeWindow(img_path, cur_img.shape[1], cur_img.shape[0])  # 设置长和宽
+            cv2.resizeWindow(img_path, self.cur_img.shape[1], self.cur_img.shape[0])  # 设置长和宽
             cv2.setMouseCallback(img_path, self.on_mouse)
             self.show_img(img_path)
 
     def show_img(self, path):
-        frame = self.read_img(path)
-        while cv2.waitKey(30) != 27:            
+        while cv2.waitKey(30) != 27:  
+            img_4_show = self.cur_img.copy()          
             if len(self.g_rectrangles)>0:
                 for rect in self.g_rectrangles:
-                    rect.draw(frame)
-            cv2.imshow(path, frame)
+                    rect.draw(img_4_show)
+            if self.cur_rectangle is not None:
+                self.cur_rectangle.draw(img_4_show)
+            cv2.imshow(path, img_4_show)
+        
         cv2.destroyWindow(path) 
         self.show_result()       
 
@@ -141,12 +150,24 @@ class ImageApplication(object):
             return
         for rect in self.g_rectrangles:
             self.txt_result.insert(END, str(rect)+'\n')
+        '''
+        # 测试显示截图图片
+        rect = self.g_rectrangles[0]
 
+        cur_image = Image.open(self.cur_img_path)
+        crop = cur_image.crop((rect.min_x,rect.min_y, rect.max_x, rect.max_y))
+
+        first_img = ImageTk.PhotoImage(crop)
+        curimg_lb=Label(self.main_win, image=first_img)
+        curimg_lb.image = first_img
+        curimg_lb.grid(row=3,column=0,columnspan=3)
+        '''
     def show_msg(self, *args):
         indexs = self.lb_image_names.curselection()
-        index = int(indexs[0])
-        self.process_img_file(index)
-    
+        if len(indexs) > 0:
+            index = int(indexs[0])
+            self.process_img_file(index)
+        
 def image_exe():
     # 调用Tk()创建主窗口
     window = Tk()
