@@ -61,13 +61,14 @@ class ImageApplication(object):
         Label(self.main_win, text="目标路径:").grid(row=0,column=0)
         Entry(self.main_win, textvariable= self.cur_path, state="readonly").grid(row=0,column=1,ipadx=100)
         Button(self.main_win, text="选择路径", command=self.select_folder_path).grid(row=0,column=2)
+        Button(self.main_win, text="全部保存", command=self.save_all_rect_img).grid(row=0,column=3)
 
         self.lb_image_names = Listbox(self.main_win, height=30, width=50)
         self.lb_image_names.bind("<<ListboxSelect>>",self.show_msg)
         self.lb_image_names.grid(row=1,column=0,columnspan=2)
         
         self.txt_result = Text(self.main_win, height=38, width=53)
-        self.txt_result.grid(row=1, column=2)
+        self.txt_result.grid(row=1, column=2,columnspan=2)
 
         Label(self.main_win, text='按 ESC 退出图像画框模式').grid(row=2,column=0,columnspan=2)
 
@@ -162,6 +163,14 @@ class ImageApplication(object):
         curimg_lb.image = first_img
         curimg_lb.grid(row=3,column=0,columnspan=3)
         '''
+    def save_all_rect_img(self):
+        if len(self.g_rectrangles)<=0:
+            return        
+        cur_image = Image.open(self.cur_img_path)
+        for i,rect in enumerate(self.g_rectrangles):
+            crop = cur_image.crop((rect.min_x,rect.min_y, rect.max_x, rect.max_y))
+            crop.save(str(i)+".png")
+    
     def show_msg(self, *args):
         indexs = self.lb_image_names.curselection()
         if len(indexs) > 0:
