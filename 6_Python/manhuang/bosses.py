@@ -2,6 +2,7 @@
 
 from common import wait_time, Base, BLACK_X
 from configs import configs
+from datetime import datetime
 
 MAIN_BOSS_POS =(476, 652)
 

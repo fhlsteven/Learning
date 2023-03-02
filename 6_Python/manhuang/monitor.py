@@ -2,7 +2,6 @@
 from common import BaseOCR, wait_time, IMG_PREFIX
 from socket import socket
 from DailyActivities import DailyActivities, is_between
-from datetime import datetime
 from housejobs import HouseJob
 from bosses import Boss
 from instancezones import InstanceZone
@@ -102,6 +101,8 @@ class Monitors(BaseOCR):
         # single_boss
         print("main_to_single_boss")
         boss.main_to_single_boss()
+
+        Adventure(self.driver).process_adventure_events()
 
         self.monitor_three_boss()
 

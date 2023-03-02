@@ -10,8 +10,8 @@ from bosses import Boss
 from instancezones import InstanceZone
 from topprocess import TopProcess
 from teams import Teams
-from DailyActivities import DailyActivities
-from common import clear_kill_go,is_exists_image, wait_time
+from DailyActivities import DailyActivities,is_between
+from common import clear_kill_go,is_exists_image, wait_time,callback_click
 from roles import Roles
 from adventure import Adventure
 from monitor import Monitors
@@ -233,9 +233,12 @@ class MHApplication(object):
                 if c_times < 5:
                     c_times = c_times + Boss(self.driver).process_three_realms()
 
-                if datetime.now().hour>=18:
+                if datetime.now().hour>=18 and datetime.now().hour<22:
                     Boss(self.driver).rong_lian()
                     Monitors(self.driver).monitor_hd()
+
+                if is_between((5,1), (9,1)):
+                    Monitors(self.driver).quick_mode()
             except Exception as ex:
                 print(ex)
             wait_time(3)

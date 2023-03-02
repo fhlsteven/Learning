@@ -46,4 +46,7 @@ if __name__ == "__main__":
         im.show()
         print(img['rectangle'][0])
 
+    pos = match_img_pos(imgname)
+    print(f'pos:{pos}')
+
 
