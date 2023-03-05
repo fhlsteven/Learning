@@ -79,6 +79,10 @@ class Boss(Base):
         self.click_pos(SINGLE_BOSS)
         self.single_boss()
 
+    def main_to_shen_dian(self):
+        self.main_to_boss()
+        
+
     def process_three_realms(self):        
         cur_time =  datetime.now()
         try:

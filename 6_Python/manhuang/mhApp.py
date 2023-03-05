@@ -176,8 +176,15 @@ class MHApplication(object):
         self.btn_eat_elixir.grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
-        self.lb_monitor = Label(self.main_win, text="monitor", fg='green', font=('宋体',16))
-        self.lb_monitor.grid(row=row_start, column=0) 
+        Label(self.main_win, text="monitor", fg='green', font=('宋体',16)).grid(row=row_start, column=0)
+        
+        self.txt_three_times = Text(self.main_win, width=10, height=1)
+        self.txt_three_times.insert('0.0', '5')
+        self.txt_three_times.grid(row=row_start,column=1) 
+
+        self.txt_pets_times = Text(self.main_win, width=10, height=1)
+        self.txt_pets_times.insert('0.0', '12')
+        self.txt_pets_times.grid(row=row_start,column=2) 
 
         row_start = row_start + 1
         cur_column = 0
@@ -213,13 +220,15 @@ class MHApplication(object):
         send_msg()
 
     def monitor_three_and_pets_click(self):
-        times=0
+        pets_times = int(self.txt_pets_times .get("1.0","end"))
+        three_times = int(self.txt_three_times .get("1.0","end"))
+        times = 0
         c_times = 0
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
         r_pre_time = pre_time 
         while is_exists_image(self.driver, "chat_box.png") == False:  
             try: 
-                if get_date_minutes(pre_time, datetime.now()) > 5 and times < 12: 
+                if get_date_minutes(pre_time, datetime.now()) > 5 and times < pets_times: 
                     HouseJob(self.driver).house_to_pettravel(times%5==0)
                     pre_time = datetime.now()
                     times = times +1  
@@ -228,7 +237,7 @@ class MHApplication(object):
                     Boss(self.driver).rong_lian()
                     r_pre_time = datetime.now()
                 
-                if c_times < 5:
+                if c_times < three_times:
                     c_times = c_times + Boss(self.driver).process_three_realms()
 
                 if datetime.now().hour>=18 and datetime.now().hour<22:
