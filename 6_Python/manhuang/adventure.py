@@ -35,7 +35,7 @@ class Adventure(Base):
 
     def process_kill_go(self):
         while True:
-            pos = self.get_pos_byimg("adv_kill.png")
+            pos = self.get_pos_byimg("adv_kill.png",confidence=0.8)
             if pos[0]> 0:
                 self.go_kill(pos)
             else:
@@ -59,7 +59,7 @@ class Adventure(Base):
 
     def process_explore(self):
         while True:
-            pos = self.get_pos_byimg("adv_explore.png")
+            pos = self.get_pos_byimg("adv_explore.png", confidence=0.8)
             if pos[0]>0:
                 self.click_pos(pos)
                 wait_time(35)
@@ -79,7 +79,7 @@ class Adventure(Base):
     def go_kill(self, pos):
         self.click_pos(pos)
         wait_time(5)
-        while self.is_adventure()== False:
+        while self.is_adventure() == False:
             wait_time(5)
     
     def is_adventure(self):

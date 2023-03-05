@@ -44,8 +44,7 @@ class MHApplication(object):
         self.main_win.geometry("605x590+550+150")
 
         cur_column = 0
-        self.lb_common_tools = Label(self.main_win, text="common tools", fg='green', font=('宋体',16))
-        self.lb_common_tools.grid(row=row_start,column=cur_column) 
+        Label(self.main_win, text="common tools", fg='green', font=('宋体',16)).grid(row=row_start,column=cur_column) 
         cur_column =cur_column + 1
         self.lb_one_long = Label(self.main_win, text="one long time(hour)", fg='red')
         self.lb_one_long.grid(row=row_start,column=cur_column)
@@ -70,8 +69,7 @@ class MHApplication(object):
 
         row_start = row_start + 1
         cur_column = 0        
-        self.lb_tools = Label(self.main_win, text="tools", fg='green', font=('宋体',16))
-        self.lb_tools.grid(row=row_start, column=cur_column) 
+        Label(self.main_win, text="tools", fg='green', font=('宋体',16)).grid(row=row_start, column=cur_column) 
 
         row_start = row_start + 1
         cur_column = 0
@@ -239,6 +237,7 @@ class MHApplication(object):
 
                 if is_between((5,1), (9,1)):
                     Monitors(self.driver).quick_mode()
+                    Teams(self.driver).auto_receive()
             except Exception as ex:
                 print(ex)
             wait_time(3)
