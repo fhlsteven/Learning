@@ -35,7 +35,7 @@ class Adventure(Base):
 
     def process_kill_go(self):
         while True:
-            pos = self.get_pos_byimg("adv_kill.png",confidence=0.8)
+            pos = self.get_pos_byimg("adv_kill.png",confidence=0.7)
             if pos[0]> 0:
                 self.go_kill(pos)
             else:

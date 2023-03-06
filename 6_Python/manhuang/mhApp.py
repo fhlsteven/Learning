@@ -17,6 +17,7 @@ from adventure import Adventure
 from monitor import Monitors
 from configs import configs
 from datetime import datetime
+from esports import ESports
 
 LOG_LINE_NUM = 0
 
@@ -123,6 +124,8 @@ class MHApplication(object):
         self.btn_clear_kill_go.grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text="adventrure", command=self.process_adventure_click, width=20).grid(row=row_start, column=cur_column)
+        cur_column = cur_column+1
+        Button(self.main_win, text="esports kill", command=self.esports_kill_click,width=20).grid(row=row_start, column=cur_column)
         
         row_start = row_start + 1
         cur_column = 0        
@@ -209,6 +212,9 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def esports_kill_click(self):
+        ESports(self.driver).kill_single()
 
     def process_adventure_click(self):
         Adventure(self.driver).process_adventure_events()

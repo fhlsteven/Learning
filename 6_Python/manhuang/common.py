@@ -207,7 +207,6 @@ class BaseOCR(object):
 
     def recognize(self, img):
         img = img.convert('L')
-        img.save(IMG_PREFIX+'chat_detail.png')
         return get_ocr_txt(img)
 
     def is_exists_image(self, img_name, confidence = 0.8):

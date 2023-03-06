@@ -20,7 +20,8 @@ YUN_MEN_POS =(373,683 + BLACK_X)
 KUA_FU_BOSS = (150, 892)
 THREE_REALM_BOSS = (93, 809)
 KILL_THREE_REALM = (257, 719)
-
+SHEN_DIAN_BOSS = (182,679+BLACK_X)
+KILL_SHEN_DIAN =(396, 126+BLACK_X)
 #kua qu
 KUA_QU_BOSS = (213, 766+BLACK_X)
 
@@ -61,13 +62,8 @@ class Boss(Base):
         self.click_pos(THREE_REALM_BOSS)
         self.click_pos(KILL_THREE_REALM)
 
-        times = 0
-        while self.is_exists_image("three_boss.png") == False:
-            wait_time(60)
-            times = times + 60
-            if times > 60 * 20:
-                break
-        
+        self.check_is_kill("three_boss.png")
+
         wait_time(2)
         self.use_bags()
         self.click_callback()
@@ -81,7 +77,22 @@ class Boss(Base):
 
     def main_to_shen_dian(self):
         self.main_to_boss()
-        
+        self.click_pos(KUA_FU_BOSS)
+
+    def shen_dian_boss(self):
+        self.click_pos(SHEN_DIAN_BOSS)
+        self.click_pos(KILL_SHEN_DIAN)
+        self.check_is_kill("shen_dian.png")
+        self.use_bags()
+        self.click_callback()
+
+    def check_is_kill(self, img_tag, duration=20):        
+        times = 0
+        while self.is_exists_image(img_tag) == False:
+            wait_time(60)
+            times = times + 60
+            if times > 60 * duration:
+                break
 
     def process_three_realms(self):        
         cur_time =  datetime.now()

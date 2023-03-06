@@ -6,6 +6,7 @@ from housejobs import HouseJob
 from bosses import Boss
 from instancezones import InstanceZone
 from adventure import Adventure
+from roles import Roles
 
 from datetime import datetime, timedelta
 
@@ -84,27 +85,30 @@ class Monitors(BaseOCR):
 
     def quick_mode(self):
         boss = Boss(self.driver)
-        # single_boss
+    
         print("main_to_single_boss")
         boss.main_to_single_boss()
-        # pets_travel
+       
         print("house_to_pettravel")
         HouseJob(self.driver).house_to_pettravel()
-        # fb
+ 
         print("main_to_everyday_fb")
         InstanceZone(self.driver).main_to_everyday_fb()
-        # island
+     
         print("main_to_shenbeast_island")
         InstanceZone(self.driver).main_to_shenbeast_island()
-        # eat        
-        self.eat_elixir_click()
-        # single_boss
+
         print("main_to_single_boss")
         boss.main_to_single_boss()
 
+        print("adventure")
         Adventure(self.driver).process_adventure_events()
 
-        self.monitor_three_boss()
+        print("shen dian boss")
+        boss.main_to_shen_dian()
+
+        print("eat elixir")
+        Roles(self.driver).main_to_eat_Elixir()
 
         # three boos
     def monitor_three_boss(self):
