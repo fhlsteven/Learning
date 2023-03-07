@@ -35,7 +35,8 @@ default_configs = {
     'start_button':'#serverCon>img:nth-child(3)',
     'reincarnation': 4,
     'svip_level':0,
-    'runtime':'debug'
+    'runtime':'debug',
+    'wait_min_morning':5
 }
 
 configs = to_dict(default_configs)

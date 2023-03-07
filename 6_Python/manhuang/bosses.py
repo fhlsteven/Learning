@@ -78,6 +78,7 @@ class Boss(Base):
     def main_to_shen_dian(self):
         self.main_to_boss()
         self.click_pos(KUA_FU_BOSS)
+        self.shen_dian_boss()
 
     def shen_dian_boss(self):
         self.click_pos(SHEN_DIAN_BOSS)

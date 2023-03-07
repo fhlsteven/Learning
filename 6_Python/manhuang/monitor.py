@@ -110,6 +110,9 @@ class Monitors(BaseOCR):
         print("eat elixir")
         Roles(self.driver).main_to_eat_Elixir()
 
+        print("xian yuan")
+        Roles(self.driver).main_to_xianyuan_fb()
+
         # three boos
     def monitor_three_boss(self):
         c_times = 0

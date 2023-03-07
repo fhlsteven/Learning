@@ -23,8 +23,10 @@ def click_locxy(dr, x, y, left_click=True):
         ActionChains(dr).move_by_offset(x, y).context_click().perform()
     ActionChains(dr).move_by_offset(-x, -y).perform()  # 将鼠标位置恢复到移动前
 
-def click_pos_locxy(dr, pos, isleft=True):
+def click_pos_locxy(dr, pos, is_check=False,isleft=True):
     click_locxy(dr, pos[0], pos[1], isleft)
+    if is_check:
+        wait_time(2)
 
 def click_black(dr, times=2):
     c_time = 0 
@@ -36,9 +38,7 @@ def click_black(dr, times=2):
 QUIT_CLICK = (42, 765)
 QUIT_OK =(331, 605)
 def quit_scene(dr, is_need_ok):
-    if is_exists_image(dr, 'quit_left.png'):
-        click_pos_locxy(dr, QUIT_CLICK)
-
+    click_pos_locxy(dr, QUIT_CLICK)
     pos = match_img_pos(dr, "quit_left.png")
     if pos[0]>0:
         click_pos_locxy(dr, pos)
@@ -154,8 +154,8 @@ class Base(object):
     def __init__(self, driver):
         self.driver = driver
 
-    def click_pos(self, pos):
-        click_pos_locxy(self.driver, pos)
+    def click_pos(self, pos, is_check=False):
+        click_pos_locxy(self.driver, pos, is_check)
 
     def get_pos_byimg(self, img_name, defalut_pos=(0,0), confidence=0.9):
         pos = match_img_pos(self.driver, img_name, confidencevalue=confidence)

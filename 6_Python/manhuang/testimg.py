@@ -1,7 +1,6 @@
 import aircv as ac
 from PIL import Image
 import sys
-
 # https://www.iloveimg.com/zh-cn/crop-image
 
 ALL_IMAGE = 'mh_all.png'
@@ -27,7 +26,6 @@ def match_img_pos(imgobj, confidencevalue=0.9):
 if __name__ == "__main__":
     imgname = "welfare.png"
     confidence_val=0.8
-
     argv = sys.argv[1:]
     if argv:
         imgname = argv[0]
@@ -48,5 +46,6 @@ if __name__ == "__main__":
 
     pos = match_img_pos(imgname)
     print(f'pos:{pos}')
+    
 
 

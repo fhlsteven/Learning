@@ -150,6 +150,7 @@ class ImageApplication(object):
     def show_result(self):
         if len(self.g_rectrangles)<=0:
             return
+        self.txt_result.delete('1.0','end') # 先清空结果
         for rect in self.g_rectrangles:
             self.txt_result.insert(END, str(rect)+'\n')
         '''

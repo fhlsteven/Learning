@@ -126,7 +126,14 @@ class MHApplication(object):
         Button(self.main_win, text="adventrure", command=self.process_adventure_click, width=20).grid(row=row_start, column=cur_column)
         cur_column = cur_column+1
         Button(self.main_win, text="esports kill", command=self.esports_kill_click,width=20).grid(row=row_start, column=cur_column)
-        
+
+        row_start = row_start + 1
+        cur_column = 0 
+        Button(self.main_win, text="shen dian boss", command=self.shen_dian_boss_click,width=20).grid(row=row_start, column=cur_column)
+        cur_column = cur_column+1
+        Button(self.main_win, text="xian yuan fb", command=self.xina_yuan_fb_click,width=20).grid(row=row_start, column=cur_column)
+        cur_column = cur_column+1
+        Button(self.main_win, text="hd mid", command=self.m_id_hd_click,width=20).grid(row=row_start, column=cur_column)
         row_start = row_start + 1
         cur_column = 0        
         self.lb_house_tools = Label(self.main_win, text="house tools", fg='green', font=('宋体',16))
@@ -213,6 +220,18 @@ class MHApplication(object):
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
 
+    def m_id_hd_click(self):
+        DailyActivities(self.driver).monitor_mid()
+        send_msg()
+
+    def shen_dian_boss_click(self):
+        Boss(self.driver).main_to_shen_dian()
+        send_msg()
+
+    def xina_yuan_fb_click(self):
+        Roles(self.driver).main_to_xianyuan_fb()
+        send_msg()
+
     def esports_kill_click(self):
         ESports(self.driver).kill_single()
 
@@ -246,11 +265,18 @@ class MHApplication(object):
                 if c_times < three_times:
                     c_times = c_times + Boss(self.driver).process_three_realms()
 
-                if datetime.now().hour>=18 and datetime.now().hour<22:
+                _now = datetime().now()
+                if _now.day in(5,6) and _now.hour == 11:
+                    DailyActivities(self.driver).monitor_mid()
+                
+                _now = datetime.now()
+                if _now.hour>=18 and _now.hour<22:
                     Boss(self.driver).rong_lian()
                     Monitors(self.driver).monitor_hd()
 
                 if is_between((5,1), (9,1)):
+                    wait_time(configs.wait_min_morning * 60)
+                    Roles(self.driver).check_login()
                     Monitors(self.driver).quick_mode()
                     Teams(self.driver).auto_receive()
             except Exception as ex:
@@ -287,31 +313,7 @@ class MHApplication(object):
         Teams(self.driver).kick_out()
 
     def one_long_service(self):
-        duration = int(self.txt_one_long.get("1.0","end"))
-
-        boss = Boss(self.driver)
-        # single_boss
-        self.log_show("main_to_single_boss")
-        boss.main_to_single_boss()
-        # pets_travel
-        self.log_show("house_to_pettravel")
-        HouseJob(self.driver).house_to_pettravel(True)
-        # fb
-        self.log_show("main_to_everyday_fb")
-        InstanceZone(self.driver).main_to_everyday_fb()
-        # island
-        self.log_show("main_to_shenbeast_island")
-        InstanceZone(self.driver).main_to_shenbeast_island()
-        # eat  
-        self.log_show("eat_elixir_click")      
-        self.eat_elixir_click()
-
-        # single_boss
-        self.log_show("main_to_single_boss")
-        boss.main_to_single_boss()
-
-        self.log_show(duration)
-
+        Monitors(self.driver).quick_mode()
         send_msg()
     
     def clear_kill_go_click(self):

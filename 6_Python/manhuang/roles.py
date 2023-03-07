@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import Base, BLACK_X, wait_time
+from common import Base, BLACK_X, wait_time, click_black
 
 ROLE_POS = (126, 769 + BLACK_X) # 126 769 + 124
 
@@ -16,6 +16,14 @@ ELIXIR_Y = 75
 # last: 379 213
 
 BLACK_POS = (250, 59+BLACK_X)
+
+MORE_POS = (454,666+BLACK_X)
+XINA_YUAN = (278, 603+BLACK_X)
+YI_JIE = (141, 770+BLACK_X)
+XY_FB = (416, 350 +BLACK_X)
+XY_FB_START = (250,628 +BLACK_X)
+
+# login
 
 class Roles(Base):
     def __init__(self, driver):
@@ -40,6 +48,39 @@ class Roles(Base):
             self.click_pos(EAT_ELIXIR)
             self.click_pos(BLACK_POS)
             times = times + 1
-        wait_time(2)       
+        wait_time(2)
+
+    def main_to_xianyuan(self):
+        self.click_pos(MORE_POS)
+        self.click_pos(XINA_YUAN)
+
+    def main_to_xianyuan_fb(self):
+        self.main_to_xianyuan()
+        self.xianyuan_fb()
+
+    def xianyuan_fb(self):
+        self.click_pos(YI_JIE)
+        times = 0
+        while times < 2:  
+            times = times + 1           
+            self.click_pos(XY_FB)
+            wait_time(2)
+            self.click_pos(XY_FB_START)
+            wait_time(30 + 5)
+        self.use_bags()
+        self.click_callback()
+
+    def check_login(self):
+        pos = self.get_pos_byimg("ok.png")
+        if pos[0]>0:
+            self.click_pos(pos)
+            wait_time()
+            while self.is_exists_image("login_bg.png"):
+                wait_time()
+            click_black(self.driver, 5)
+            
+
+
+        
     
     

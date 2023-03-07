@@ -54,6 +54,8 @@ XIANMEN_TEAM = (451, 500+BLACK_X)
 # shenmo : 2 20:40-21:10
 # fengyunleitai : 7 20:40-21:05
 
+XIAN_MEN_GO = (310, 612+BLACK_X)
+
 def is_between(start_at, end_at):
     now_time = datetime.now()
     if start_at[0] <= now_time.hour <= end_at[0]:
@@ -73,6 +75,21 @@ class DailyActivities(Base):
             if datetime.now().hour == 21:
                 break
 
+    def monitor_mid(self, is_ignore_time=True):
+        d_now = datetime.now()
+        loop_flag = True
+        if is_ignore_time:            
+            loop_flag = d_now.hour == 11 and d_now.minute > 20
+        while loop_flag:
+            wait_time()            
+            try:
+                self.protect()
+                self.boss()
+            except Exception as e:
+                print(f'{d_now} monitor_mid:{e}')
+            if d_now.hour == 12 and d_now.minute > 45:
+                break
+
     def hd_process(self):
         d_now = datetime.now()
         d_wkday = d_now.weekday()
@@ -88,6 +105,8 @@ class DailyActivities(Base):
             self.jiutian()
             if d_wkday == 1:
                 self.shen_mo_battlefield()
+            if d_wkday in(4,5):
+                self.xian_men_jifen()
         except Exception as e:
             print(f'exception:{e},{d_now}')        
     # down 
@@ -223,10 +242,19 @@ class DailyActivities(Base):
     def shen_mo_battlefield(self):
         if is_between((20,40), (21,10)):
             print("shen mo battlefiled")
+            self.start_hd(False)
             self.click_pos(XUANHUO_GO)
             wait_time(25*60)
             self.use_bags()
             self.click_callback()
+
+    def xian_men_jifen(self):
+        if is_between((20,40), (21,10)):
+            print("xian men ji fen start")
+            self.start_hd(False)
+            self.click_pos(XIAN_MEN_GO, True)
+            wait_time(20 * 60)
+            print("xian men ji fen start")
 
     def start_hd(self, need_start=True):   
         self.click_pos(HD_POS)
