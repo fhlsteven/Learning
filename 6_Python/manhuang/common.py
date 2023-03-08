@@ -77,8 +77,9 @@ def match_img(imgsrc, imgobj, confidencevalue=0.9):  # imgsrc=原始图像，img
 '''
 根据图像匹配坐标，获取第一个
 '''
-def match_img_pos(driver, imgobj, confidencevalue=0.9):
-    save_all_img(driver)
+def match_img_pos(driver, imgobj, confidencevalue=0.9, is_save=True):
+    if is_save:
+        save_all_img(driver)
     xyt = match_img(ALL_IMAGE, imgobj, confidencevalue)    
     if xyt != None and len(xyt) > 0:
         x = xyt[0]['result'][0]
@@ -157,8 +158,8 @@ class Base(object):
     def click_pos(self, pos, is_check=False):
         click_pos_locxy(self.driver, pos, is_check)
 
-    def get_pos_byimg(self, img_name, defalut_pos=(0,0), confidence=0.9):
-        pos = match_img_pos(self.driver, img_name, confidencevalue=confidence)
+    def get_pos_byimg(self, img_name, defalut_pos=(0,0), confidence=0.9, screen_shot =True):
+        pos = match_img_pos(self.driver, img_name, confidencevalue=confidence, is_save=screen_shot)
         if pos[0] != 0 and pos[1] != 0:
             return pos            
         return defalut_pos

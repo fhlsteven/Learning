@@ -7,6 +7,7 @@ from bosses import Boss
 from instancezones import InstanceZone
 from adventure import Adventure
 from roles import Roles
+from esports import ESports
 
 from datetime import datetime, timedelta
 
@@ -115,6 +116,9 @@ class Monitors(BaseOCR):
 
         print("adventure")
         Adventure(self.driver).process_adventure_events()
+
+        print("xy esports")
+        ESports(self.driver).main_to_xy()
 
         # three boos
     def monitor_three_boss(self):

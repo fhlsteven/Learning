@@ -41,7 +41,7 @@ class MHApplication(object):
         column_num = 6
         row_start = 0 
         # 标题 和 标签
-        self.main_win.title("man")
+        self.main_win.title("man:"+configs.login.user_name)
         self.main_win.geometry("605x590+550+150")
 
         cur_column = 0
@@ -135,6 +135,8 @@ class MHApplication(object):
         cur_column = cur_column+1
         Button(self.main_win, text="hd mid", command=self.m_id_hd_click,width=20).grid(row=row_start, column=cur_column)
         row_start = row_start + 1
+        Button(self.main_win, text="xian yuan esport", command=self.xy_esports_click,width=20).grid(row=row_start, column=cur_column)
+
         cur_column = 0        
         self.lb_house_tools = Label(self.main_win, text="house tools", fg='green', font=('宋体',16))
         self.lb_house_tools.grid(row=row_start, column=cur_column) 
@@ -219,6 +221,10 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def xy_esports_click(self):
+        ESports(self.driver).main_to_xy()
+        send_msg()
 
     def m_id_hd_click(self):
         DailyActivities(self.driver).monitor_mid()
