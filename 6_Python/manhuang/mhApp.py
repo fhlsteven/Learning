@@ -271,7 +271,7 @@ class MHApplication(object):
                 if c_times < three_times:
                     c_times = c_times + Boss(self.driver).process_three_realms()
 
-                _now = datetime().now()
+                _now = datetime.now()
                 if _now.day in(5,6) and _now.hour == 11:
                     DailyActivities(self.driver).monitor_mid()
                 
