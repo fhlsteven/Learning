@@ -25,7 +25,7 @@ class Adventure(Base):
 
     def process_open(self):
         while True:
-            pos = self.get_pos_byimg("adv_open.png")
+            pos = self.get_pos_byimg("adv_open.png", confidence=0.7)
             if pos[0]>0:
                 self.click_pos(pos)
                 wait_time(2*60+3)
@@ -59,7 +59,7 @@ class Adventure(Base):
 
     def process_explore(self):
         while True:
-            pos = self.get_pos_byimg("adv_explore.png", confidence=0.8)
+            pos = self.get_pos_byimg("adv_explore.png", confidence=0.7)
             if pos[0]>0:
                 self.click_pos(pos)
                 wait_time(35)

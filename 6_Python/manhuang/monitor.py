@@ -113,6 +113,9 @@ class Monitors(BaseOCR):
         print("xian yuan")
         Roles(self.driver).main_to_xianyuan_fb()
 
+        print("adventure")
+        Adventure(self.driver).process_adventure_events()
+
         # three boos
     def monitor_three_boss(self):
         c_times = 0

@@ -64,9 +64,10 @@ class Roles(Base):
         while times < 2:  
             times = times + 1           
             self.click_pos(XY_FB)
-            wait_time(2)
             self.click_pos(XY_FB_START)
-            wait_time(30 + 5)
+            wait_time(3*60)
+            while is_exists_image("xy_fb.png") == False:
+                wait_time(5)
         self.use_bags()
         self.click_callback()
 

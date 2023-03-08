@@ -47,7 +47,7 @@ class InstanceZone(Base):
 
     def single_fb_kill(self):
         self.click_pos(FB_START_POS)
-        wait_time(8)
+        wait_time(7)
         self.click_pos(OK_POS)
         wait_time(2)
 
