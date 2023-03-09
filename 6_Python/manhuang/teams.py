@@ -21,6 +21,10 @@ QUIT_OK = (325, 480+BLACK_X)
 
 QUICK_MATCH = (251, 615 + BLACK_X)
 
+SELF_REGION = (194,375,305,395)
+LEFT_REGION = (73,473,201,490)
+RIGHT_REGION = (316,473,423,490)
+
 class Teams(Base):
     def __init__(self, driver):
         super(Teams, self).__init__(driver)
@@ -67,4 +71,7 @@ class Teams(Base):
 
     def quick_match(self):
         self.click_pos(QUICK_MATCH)
+
+    def ocr_num(self):
+        return 'self:;left:;right:;'
 

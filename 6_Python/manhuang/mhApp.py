@@ -134,9 +134,10 @@ class MHApplication(object):
         Button(self.main_win, text="xian yuan fb", command=self.xina_yuan_fb_click,width=20).grid(row=row_start, column=cur_column)
         cur_column = cur_column+1
         Button(self.main_win, text="hd mid", command=self.m_id_hd_click,width=20).grid(row=row_start, column=cur_column)
-        row_start = row_start + 1
+        cur_column = cur_column+1
         Button(self.main_win, text="xian yuan esport", command=self.xy_esports_click,width=20).grid(row=row_start, column=cur_column)
-
+        
+        row_start = row_start + 1
         cur_column = 0        
         self.lb_house_tools = Label(self.main_win, text="house tools", fg='green', font=('宋体',16))
         self.lb_house_tools.grid(row=row_start, column=cur_column) 
@@ -277,6 +278,7 @@ class MHApplication(object):
                 
                 _now = datetime.now()
                 if _now.hour>=18 and _now.hour<22:
+                    print('monitor_hd')
                     Boss(self.driver).rong_lian()
                     Monitors(self.driver).monitor_hd()
 
