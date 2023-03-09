@@ -66,7 +66,7 @@ class Roles(Base):
             self.click_pos(XY_FB)
             self.click_pos(XY_FB_START)
             wait_time(3*60)
-            while is_exists_image("xy_fb.png") == False:
+            while self.is_exists_image("xy_fb.png") == False:
                 wait_time(5)
         self.use_bags()
         self.click_callback()
