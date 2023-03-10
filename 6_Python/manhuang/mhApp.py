@@ -293,6 +293,8 @@ class MHApplication(object):
                     Monitors(self.driver).monitor_hd()
 
                 if is_between((5,1), (9,1)):
+                    times = 13
+                    c_times = 5
                     wait_time(configs.wait_min_morning * 60)
                     Roles(self.driver).check_login()
                     Monitors(self.driver).quick_mode()
