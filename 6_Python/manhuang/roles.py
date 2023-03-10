@@ -22,7 +22,6 @@ XINA_YUAN = (278, 603+BLACK_X)
 YI_JIE = (141, 770+BLACK_X)
 XY_FB = (416, 350 +BLACK_X)
 XY_FB_START = (250,628 +BLACK_X)
-
 # login
 
 class Roles(Base):
@@ -65,7 +64,8 @@ class Roles(Base):
             times = times + 1           
             self.click_pos(XY_FB)
             self.click_pos(XY_FB_START)
-            wait_time(3*60)
+            wait_time(3*60+2)            
+            click_black(self.driver, times=1)
             while self.is_exists_image("xy_fb.png") == False:
                 wait_time(5)
         self.use_bags()

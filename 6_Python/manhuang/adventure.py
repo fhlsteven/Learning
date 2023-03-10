@@ -27,50 +27,60 @@ class Adventure(Base):
         self.click_callback()
     
     def process_kill_go(self):
-        while True:
+        times = 0 
+        while times<4:
             pos = self.get_pos_byimg("adv_kill.png",confidence=0.7)
             if pos[0]> 0:
                 self.go_kill(pos)
+                times = times + 1
             else:
                 break
 
     def process_open(self, is_save_all):
-        while True:
+        times =0
+        while times<4:
             pos = self.get_pos_byimg("adv_open.png", confidence=0.7, screen_shot=is_save_all)
             if pos[0]>0:
                 self.click_pos(pos)
                 wait_time(2*60+3)
                 self.click_pos(pos)
                 is_save_all = True
+                times = times + 1
             else:
                 break
 
     def process_small_gamble(self, is_save_all):
-        while True:
+        times= 0
+        while times<4:
             pos = self.get_pos_byimg("adv_gamble.png", screen_shot=is_save_all)
             if pos[0]>0:
                 self.small_gamble(pos)
                 is_save_all =True
+                times = times + 1
             else:
                 break
 
     def process_fariy(self, is_save_all):
-        while True:
+        times= 0
+        while times < 4:
             pos = self.get_pos_byimg("adv_recv.png", screen_shot=is_save_all)
             if pos[0]>0:
-                self.receive_fariy(pos)
+                #self.receive_fariy(pos) # 
                 is_save_all=True
+                times = times + 1
             else:
                 break
 
     def process_explore(self, is_save_all):
-        while True:
+        times = 0
+        while times<4:
             pos = self.get_pos_byimg("adv_explore.png", confidence=0.7, screen_shot=is_save_all)
             if pos[0]>0:
                 self.click_pos(pos)
                 wait_time(35)
                 self.click_pos(EX_OK_POS)
                 is_save_all = True
+                times = times + 1
             else:
                 break
     

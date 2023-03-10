@@ -136,6 +136,10 @@ class MHApplication(object):
         Button(self.main_win, text="hd mid", command=self.m_id_hd_click,width=20).grid(row=row_start, column=cur_column)
         cur_column = cur_column+1
         Button(self.main_win, text="xian yuan esport", command=self.xy_esports_click,width=20).grid(row=row_start, column=cur_column)
+
+        row_start =row_start+1
+        cur_column = 0
+        Button(self.main_win, text="protect", command=self.xv_protect_click).grid(row=row_start, column=cur_column)
         
         row_start = row_start + 1
         cur_column = 0        
@@ -222,6 +226,10 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+    
+    def xv_protect_click(self):
+        DailyActivities(self.driver).protect(True)
+        send_msg()
 
     def xy_esports_click(self):
         ESports(self.driver).main_to_xy()
@@ -275,6 +283,8 @@ class MHApplication(object):
                 _now = datetime.now()
                 if _now.day in(5,6) and _now.hour == 11:
                     DailyActivities(self.driver).monitor_mid()
+                elif _now.hour == 16:
+                    DailyActivities(self.driver).protect()
                 
                 _now = datetime.now()
                 if _now.hour>=18 and _now.hour<22:

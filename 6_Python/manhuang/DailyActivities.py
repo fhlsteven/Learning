@@ -160,14 +160,19 @@ class DailyActivities(Base):
             self.rong_lian()  # smelt
             print("tian ti end")
     
-    def protect(self):
-        if is_between((16,1),(16,50)):
+    def protect(self, ignore_time = False):
+        if is_between((16,1),(16,15)) or ignore_time:
             self.start_hd(False)
             times = 0
-            while times< 3:
+            while times < 3:
                 self.click_pos(XIAN_NV)
                 self.click_pos(XIAN_NV)
-                wait_time(15 * 60)
+                while self.is_exists_image("protecting.png"):
+                    wait_time(60)
+                    click_black(self.driver)
+                    _now = datetime.now()
+                    if _now.hour>=17 and _now.minute>30:
+                        break
                 self.click_pos(XIAN_NV)
                 times = times + 1
             self.click_callback()
