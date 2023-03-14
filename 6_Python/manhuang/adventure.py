@@ -52,7 +52,7 @@ class Adventure(Base):
     def process_small_gamble(self, is_save_all):
         times= 0
         while times<4:
-            pos = self.get_pos_byimg("adv_gamble.png", screen_shot=is_save_all)
+            pos = self.get_pos_byimg("adv_gamble.png", confidence=0.7, screen_shot=is_save_all)
             if pos[0]>0:
                 self.small_gamble(pos)
                 is_save_all =True

@@ -36,6 +36,7 @@ class MHApplication(object):
         self.main_win = window
         self.driver = driver
         self.msg_sock = None
+        self.is_done_quick_mode = False
     
     def window_box(self):
         column_num = 6
@@ -221,12 +222,23 @@ class MHApplication(object):
         cur_column = 0
         self.btn_monitor_three_and_pets = Button(self.main_win, text='monitor three and pets', command=self.monitor_three_and_pets_click, width=20)
         self.btn_monitor_three_and_pets.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text="monitor end", command=self.monitor_end_click).grid(row=row_start,column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text="monitor cqzh boss", command=self.monitor_cqzh_boss_click).grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
     
+    def monitor_cqzh_boss_click(self):
+        Monitors(self.driver).monitor_chuan_qi_boss()
+
+    def monitor_end_click(self):
+        Monitors(self.dirver).monitor_end()
+        send_msg()
+
     def xv_protect_click(self):
         DailyActivities(self.driver).protect(True)
         send_msg()
@@ -291,14 +303,18 @@ class MHApplication(object):
                     print('monitor_hd')
                     Boss(self.driver).rong_lian()
                     Monitors(self.driver).monitor_hd()
+                
+                if _now.hour == 4:
+                    self.is_done_quick_mode = False
 
-                if is_between((5,1), (9,1)):
+                if is_between((5,1), (9,1)) and self.is_done_quick_mode == False:
                     times = 13
                     c_times = 5
                     wait_time(configs.wait_min_morning * 60)
                     Roles(self.driver).check_login()
                     Monitors(self.driver).quick_mode()
                     Teams(self.driver).auto_receive()
+                    self.is_done_quick_mode = True
             except Exception as ex:
                 print(ex)
             wait_time(3)

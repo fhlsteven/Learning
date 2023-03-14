@@ -121,6 +121,15 @@ SMELT_POS=(150, 895)
 def open_bag(dr):    
     click_pos_locxy(dr, BAG_POS)
 
+def check_login(dr, screen_shot = True):
+    pos = match_img_pos(dr, "ok.png", is_save=screen_shot)
+    if pos[0]>0:
+        self.click_pos(pos)
+        wait_time()
+        while is_exists_image(dr,"login_bg.png"):
+            wait_time()
+        click_black(dr, 5)
+
 ONEKEY_SMELT_POS = (256,824)
 def rong_lian(dr):
     wait_time(1)
@@ -129,9 +138,14 @@ def rong_lian(dr):
             open_bag(dr)
             click_pos_locxy(dr, SMELT_POS)
             click_pos_locxy(dr, ONEKEY_SMELT_POS)
+            c_times = 0
             while is_exists_image(dr, "smelt_ok.png") == False:
                 wait_time(6)
+                c_times = c_times + 1
                 if is_exists_image(dr, "smelt_up.png"):
+                    break
+                if c_times>11:
+                    check_login(dr)
                     break
         click_multi(dr, BLACK_POS, 3)
         wait_time(2)
@@ -150,6 +164,17 @@ def click_multi(dr,pos,times=1):
         click_locxy(dr, pos[0], pos[1])
         wait_time(1)
         c_times = c_times + 1
+
+class Languages(object):
+    CHS = 'chi_sim'
+    ENG = 'eng'
+
+def get_ocr_txt(image, lang=Languages.CHS):
+    result = ''
+    content = ocr_act.image_to_string(image, lang)
+    for x in content:
+        result += x.strip(' ')
+    return result
 
 class Base(object):
     def __init__(self, driver):
@@ -191,27 +216,9 @@ class Base(object):
     def is_exit_loop(self, status = False):
         return is_exists_image(self.driver, "chat_box.png") == status
 
-class Languages(object):
-    CHS = 'chi_sim'
-    ENG = 'eng'
-
-def get_ocr_txt(image, lang=Languages.CHS):
-    result = ''
-    content = ocr_act.image_to_string(image, lang)
-    for x in content:
-        result += x.strip(' ')
-    return result
-
-class BaseOCR(object):
-    def __init__(self, driver):
-        self.driver = driver
-
     def recognize(self, img):
         img = img.convert('L')
         return get_ocr_txt(img)
-
-    def is_exists_image(self, img_name, confidence = 0.8):
-        return is_exists_image(self.driver, img_name, confidence)
 
     def crop_by_region(self, imgsrc, region):
         try:            
@@ -220,3 +227,6 @@ class BaseOCR(object):
         except Exception as e:
             print(e)
             return None
+
+
+    

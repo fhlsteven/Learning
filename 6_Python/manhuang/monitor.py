@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from common import BaseOCR, wait_time, IMG_PREFIX
+from common import Base, wait_time, IMG_PREFIX,BLACK_X
 from socket import socket
 from DailyActivities import DailyActivities, is_between
 from housejobs import HouseJob
@@ -19,7 +19,11 @@ OTHER_FB = [b'\xe5\xb9\xbd\xe5\x86\xa5', b'\xe6\x88\x98\xe9\xad\x82', b'\xe8\x99
 
 ONE_ALL = b'\xe7\x83\x81\xe9\x87\x91\xe7\x8e\x84\xe8\x8b\x8d\xe5\xb9\xbb\xe6\xb5\xb7\xe7\x82\xbd\xe5\xa4\xa9\xe6\x98\x86\xe5\xa2\x9f\xe7\x8e\x84\xe9\xbe\x9f\xe6\x83\x8a\xe9\x9b\xb7\xe7\x99\xbd\xe6\xb3\xbd\xe7\x82\x8e\xe5\x87\xb0\xe8\x8b\x8d\xe9\xbe\x99\xe4\xbb\x99\xe5\x99\xa8\xe7\x81\xb5\xe5\xae\xa0\xe7\xa5\x9e\xe5\x88\x83\xe4\xbb\x99\xe7\xbe\xbd\xe8\xa3\x85\xe8\xa2\x8d\xe7\x8f\xa0\xe7\xba\xb9\xe5\xb9\xbd\xe5\x86\xa5\xe8\x99\x9a\xe6\x97\xa0\xe6\x88\x98\xe9\xad\x82'
 
-class Monitors(BaseOCR):
+CQ_POS = (324, 287+BLACK_X)
+CQ_REFRESH = (250,652+BLACK_X)
+CQ_KILL = (385,233+BLACK_X)
+
+class Monitors(Base):
     def __init__(self, driver):
         super(Monitors, self).__init__(driver)
         self.driver = driver
@@ -125,4 +129,31 @@ class Monitors(BaseOCR):
         c_times = 0
         while self.is_exit(False) and c_times < 5:            
             c_times = c_times + Boss(self.driver).process_three_realms()
+
+    def monitor_chuan_qi_boss(self):
+        while self.is_exit(False):
+            self.click_pos(CQ_POS)
+            while self.is_exists_image("boos_zh.png") == False:
+                self.click_pos(CQ_REFRESH)
+                wait_time(5)
+
+            self.click_pos(CQ_KILL)
+            
+            c_times = 0 
+            while self.is_exists_image("quit_left.png"):
+                wait_time(30)
+                c_times= c_times +1
+                if c_times>5:
+                    break
+            pos = self.get_pos_byimg("ok.png", screen_shot=False)
+            if pos[0]>0:
+                self.click_pos(pos)
+    
+    def monitor_end(self):
+        while self.is_exit(False) or self.is_exists_image("quit_left.png"):
+            wait_time(30)
+            
+            
+
+
            
