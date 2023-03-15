@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from common import wait_time, Base, click_black
+from common import wait_time, Base, click_black, BLACK_X
+from configs import configs
 
 WELFARE_POS=(65, 261)
 WELFARE_IMG = "welfare.png"
@@ -38,16 +39,29 @@ YB_IMG = 'yb.png'
 YB_GET_POS = (372, 480)
 YB_QUIT = (446, 413) #289 +124
 
+#SVIP
+SVIP_POS = (235, 56+BLACK_X)
+SVIP_GIFT=(414, 205+BLACK_X)
+SVIP_GET =(250,482+BLACK_X)
+
+#shop free
+SHOP_POS =(0,0)
+SHOP_FREE = (0,0)
+
 class TopProcess(Base):
     def __init__(self, driver):
         super(TopProcess, self).__init__(driver)
     
-    def process_top(self):        
+    def process_top(self):  
+        self.to_main()      
         self.get_welfare()
         self.get_rank()
         self.find_treasure()
         self.xd_rank()
         self.get_yb()
+        self.free_shop()
+        if configs.svip_level > 0:
+            self.get_svip()
 
     def get_welfare(self):
         welfare_pos = self.get_pos_byimg(WELFARE_IMG, WELFARE_POS, 0.8)
@@ -83,8 +97,9 @@ class TopProcess(Base):
         wait_time(2)
         times = 0
         while times < 5:
-            self.click_pos((ZB_POS[0] + times * X_STEP, ZB_POS[1]))
+            self.click_pos((ZB_POS[0] + times * X_STEP, ZB_POS[1]))            
             self.click_pos(FREE_FIND_POS)
+            click_black(self.driver)
             times = times + 1
             wait_time(1)
         
@@ -92,6 +107,7 @@ class TopProcess(Base):
         while times < 3:
             self.click_pos((ZB_POS[0] + times * X_STEP, ZB_POS[1] +Y_STEP))
             self.click_pos(FREE_FIND_POS)
+            click_black(self.driver)
             times = times + 1
             wait_time(1)
 
@@ -118,4 +134,18 @@ class TopProcess(Base):
             self.click_pos(YB_GET_POS)
             wait_time(1)
             self.click_pos(YB_QUIT)
+
+    def get_svip(self):
+        self.click_pos(SVIP_POS)
+        self.click_pos(SVIP_GIFT)
+        self.click_pos(SVIP_GET)
+        click_black(self.driver,times=1)
+        self.click_callback()
+
+    def free_shop(self):
+        self.click_pos(SHOP_POS)
+        self.click_pos(SHOP_FREE)
+        self.use_bags()
+        self.click_callback()
+
 

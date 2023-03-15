@@ -262,7 +262,7 @@ class DailyActivities(Base):
             print("xian men ji fen start")
 
     def start_hd(self, need_start=True):   
-        self.click_pos(HD_POS)
+        self.click_pos(HD_POS, is_check=True)
         wait_time(2)               
         clear_kill_go(self.driver)
         if need_start:

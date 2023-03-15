@@ -72,6 +72,8 @@ class Roles(Base):
         self.click_callback()
 
     def check_login(self):
+        self.use_bags()
+        click_black(self.driver)
         pos = self.get_pos_byimg("ok.png")
         if pos[0]>0:
             self.click_pos(pos)

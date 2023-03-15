@@ -48,8 +48,7 @@ class MHApplication(object):
         cur_column = 0
         Label(self.main_win, text="common tools", fg='green', font=('宋体',16)).grid(row=row_start,column=cur_column) 
         cur_column =cur_column + 1
-        self.lb_one_long = Label(self.main_win, text="one long time(hour)", fg='red')
-        self.lb_one_long.grid(row=row_start,column=cur_column)
+        Label(self.main_win, text="one long time(hour)", fg='red').grid(row=row_start,column=cur_column)
         cur_column =cur_column + 1
         self.txt_one_long = Text(self.main_win, width=10, height=1)
         self.txt_one_long.insert('0.0', '1')
@@ -57,17 +56,13 @@ class MHApplication(object):
 
         row_start = row_start + 1
         cur_column = 0
-        self.btn_rechallenge_pets = Button(self.main_win, text='rechange pets', command=self.rechallenge_pets, width=20)
-        self.btn_rechallenge_pets.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='rechange pets', command=self.rechallenge_pets, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_hd_monitor = Button(self.main_win, text='one long server', command=self.one_long_service, width=20)
-        self.btn_hd_monitor.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='one long server', command=self.one_long_service, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_screen_img = Button(self.main_win, text='screen img', command=self.screen_img, width=20)
-        self.btn_screen_img.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='screen img', command=self.screen_img, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_smelt_bag = Button(self.main_win, text='smelt bag', command=self.smelt_bag, width=20)
-        self.btn_smelt_bag.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='smelt bag', command=self.smelt_bag, width=20).grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         cur_column = 0        
@@ -75,17 +70,13 @@ class MHApplication(object):
 
         row_start = row_start + 1
         cur_column = 0
-        self.btn_login = Button(self.main_win, text='login', command=self.login, width=20)
-        self.btn_login.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='login', command=self.login, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_rechallenge = Button(self.main_win, text='rechange loop', command=self.rechallenge, width=20)
-        self.btn_rechallenge.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='rechange loop', command=self.rechallenge, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_single_boss = Button(self.main_win, text='single boss', command=self.single_boss, width=20)
-        self.btn_single_boss.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='single boss', command=self.single_boss, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_instance_zone = Button(self.main_win, text='instance zone(fb)', command=self.instance_zone_fb, width=20)
-        self.btn_instance_zone.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='instance zone(fb)', command=self.instance_zone_fb, width=20).grid(row=row_start, column=cur_column)
         
         row_start = row_start + 1
         cur_column = 0 
@@ -118,11 +109,9 @@ class MHApplication(object):
 
         row_start = row_start + 1
         cur_column = 0 
-        self.btn_day_boss_kill = Button(self.main_win, text='daily boss kill', command=self.day_boss_kills, width=20)
-        self.btn_day_boss_kill.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='daily boss kill', command=self.day_boss_kills, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_clear_kill_go = Button(self.main_win, text='clear kill go', command=self.clear_kill_go_click, width=20)
-        self.btn_clear_kill_go.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='clear kill go', command=self.clear_kill_go_click, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text="adventrure", command=self.process_adventure_click, width=20).grid(row=row_start, column=cur_column)
         cur_column = cur_column+1
@@ -201,7 +190,7 @@ class MHApplication(object):
         self.txt_three_times.grid(row=row_start,column=1) 
 
         self.txt_pets_times = Text(self.main_win, width=10, height=1)
-        self.txt_pets_times.insert('0.0', '12')
+        self.txt_pets_times.insert('0.0', '13')
         self.txt_pets_times.grid(row=row_start,column=2) 
 
         row_start = row_start + 1
@@ -300,11 +289,12 @@ class MHApplication(object):
                 
                 _now = datetime.now()
                 if _now.hour>=18 and _now.hour<22:
+                    Roles(self.driver).check_login()
                     print('monitor_hd')
                     Boss(self.driver).rong_lian()
                     Monitors(self.driver).monitor_hd()
                 
-                if _now.hour == 4:
+                if _now.hour == 4 and self.is_done_quick_mode:
                     self.is_done_quick_mode = False
 
                 if is_between((5,1), (9,1)) and self.is_done_quick_mode == False:
@@ -312,7 +302,7 @@ class MHApplication(object):
                     c_times = 5
                     wait_time(configs.wait_min_morning * 60)
                     Roles(self.driver).check_login()
-                    Monitors(self.driver).quick_mode()
+                    Monitors(self.driver).quick_mode()                    
                     Teams(self.driver).auto_receive()
                     self.is_done_quick_mode = True
             except Exception as ex:

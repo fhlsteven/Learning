@@ -27,6 +27,9 @@ def click_pos_locxy(dr, pos, is_check=False,isleft=True):
     click_locxy(dr, pos[0], pos[1], isleft)
     if is_check:
         wait_time(2)
+        pos_ok = match_img_pos(dr, "ok_sec.png")
+        if pos_ok[0]>0:
+            click_locxy(dr, pos_ok[0],pos_ok[1], isleft)
 
 def click_black(dr, times=2):
     c_time = 0 
@@ -227,6 +230,13 @@ class Base(object):
         except Exception as e:
             print(e)
             return None
+    
+    def to_main(self):
+        if is_exists_image(self.driver, "day.png") == False:
+            click_black(self.driver)
+            self.click_quit()
+            self.click_callback()
+            
 
 
     

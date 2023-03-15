@@ -31,10 +31,10 @@ class Adventure(Base):
         while times<4:
             pos = self.get_pos_byimg("adv_kill.png",confidence=0.7)
             if pos[0]> 0:
-                self.go_kill(pos)
-                times = times + 1
+                self.go_kill(pos)                
             else:
                 break
+            times = times + 1
 
     def process_open(self, is_save_all):
         times =0
@@ -44,10 +44,10 @@ class Adventure(Base):
                 self.click_pos(pos)
                 wait_time(2*60+3)
                 self.click_pos(pos)
-                is_save_all = True
-                times = times + 1
+                is_save_all = True                
             else:
                 break
+            times = times + 1
 
     def process_small_gamble(self, is_save_all):
         times= 0
@@ -56,9 +56,9 @@ class Adventure(Base):
             if pos[0]>0:
                 self.small_gamble(pos)
                 is_save_all =True
-                times = times + 1
             else:
-                break
+                break                
+            times = times + 1
 
     def process_fariy(self, is_save_all):
         times= 0
@@ -66,10 +66,10 @@ class Adventure(Base):
             pos = self.get_pos_byimg("adv_recv.png", screen_shot=is_save_all)
             if pos[0]>0:
                 #self.receive_fariy(pos) # 
-                is_save_all=True
-                times = times + 1
+                is_save_all=True                
             else:
                 break
+            times = times + 1
 
     def process_explore(self, is_save_all):
         times = 0
@@ -79,10 +79,10 @@ class Adventure(Base):
                 self.click_pos(pos)
                 wait_time(35)
                 self.click_pos(EX_OK_POS)
-                is_save_all = True
-                times = times + 1
+                is_save_all = True                
             else:
                 break
+            times = times + 1
     
     def receive_fariy(self, pos):
         self.click_pos(pos) # todo:

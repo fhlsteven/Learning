@@ -8,7 +8,7 @@ from instancezones import InstanceZone
 from adventure import Adventure
 from roles import Roles
 from esports import ESports
-
+from topprocess import TopProcess
 from datetime import datetime, timedelta
 
 YUAN_SHEN = [b'\xe7\x83\x81\xe9\x87\x91', b'\xe7\x8e\x84\xe8\x8b\x8d', b'\xe5\xb9\xbb\xe6\xb5\xb7', b'\xe7\x82\xbd\xe5\xa4\xa9', b'\xe6\x98\x86\xe5\xa2\x9f']
@@ -123,6 +123,13 @@ class Monitors(Base):
 
         print("xy esports")
         ESports(self.driver).main_to_xy()
+
+        print("top process")
+        TopProcess(self.driver).process_top()
+
+        print("adventrue")
+        Adventure(self.driver).process_adventure_events()
+
 
         # three boos
     def monitor_three_boss(self):
