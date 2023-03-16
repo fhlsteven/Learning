@@ -4,6 +4,7 @@ from tkinter import *
 import time
 from testSel import get_driver, login
 import socket
+import traceback
 
 from housejobs import HouseJob, get_date_minutes
 from bosses import Boss
@@ -225,7 +226,7 @@ class MHApplication(object):
         Monitors(self.driver).monitor_chuan_qi_boss()
 
     def monitor_end_click(self):
-        Monitors(self.dirver).monitor_end()
+        Monitors(self.driver).monitor_end()
         send_msg()
 
     def xv_protect_click(self):
@@ -300,13 +301,15 @@ class MHApplication(object):
                 if is_between((5,1), (9,1)) and self.is_done_quick_mode == False:
                     times = 13
                     c_times = 5
-                    wait_time(configs.wait_min_morning * 60)
                     Roles(self.driver).check_login()
+                    wait_time(configs.wait_min_morning * 60)                   
                     Monitors(self.driver).quick_mode()                    
                     Teams(self.driver).auto_receive()
                     self.is_done_quick_mode = True
             except Exception as ex:
-                print(ex)
+                print(datetime.now(),ex)
+                traceback.print_exc()
+                wait_time()
             wait_time(3)
 
     def go_youm_click(self):

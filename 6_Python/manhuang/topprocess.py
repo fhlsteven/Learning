@@ -45,8 +45,8 @@ SVIP_GIFT=(414, 205+BLACK_X)
 SVIP_GET =(250,482+BLACK_X)
 
 #shop free
-SHOP_POS =(0,0)
-SHOP_FREE = (0,0)
+SHOP_POS =(459,716+BLACK_X)
+SHOP_FREE = (174,152+BLACK_X)
 
 class TopProcess(Base):
     def __init__(self, driver):

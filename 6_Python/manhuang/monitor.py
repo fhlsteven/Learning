@@ -138,11 +138,17 @@ class Monitors(Base):
             c_times = c_times + Boss(self.driver).process_three_realms()
 
     def monitor_chuan_qi_boss(self):
-        while self.is_exit(False):
+        while self.is_exit(False):            
+            while self.is_exists_image("yi_yu_boss.png")== False:
+                wait_time(3)
             self.click_pos(CQ_POS)
-            while self.is_exists_image("boos_zh.png") == False:
+            c_times = 0 
+            while self.is_exists_image("boss_zh.png") == False:
                 self.click_pos(CQ_REFRESH)
                 wait_time(5)
+                c_times = c_times+1
+                if self.is_exit(False) or c_times==12:
+                    break
 
             self.click_pos(CQ_KILL)
             
@@ -157,8 +163,10 @@ class Monitors(Base):
                 self.click_pos(pos)
     
     def monitor_end(self):
-        while self.is_exit(False) or self.is_exists_image("quit_left.png"):
+        while self.is_exit(False):            
             wait_time(30)
+            if self.is_exists_image("team.png"):
+                break
             
             
 
