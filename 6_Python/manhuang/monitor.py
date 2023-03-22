@@ -95,7 +95,7 @@ class Monitors(Base):
         boss.main_to_single_boss()
        
         print("house_to_pettravel")
-        HouseJob(self.driver).house_to_pettravel()
+        HouseJob(self.driver).house_to_pettravel(True)
  
         print("main_to_everyday_fb")
         InstanceZone(self.driver).main_to_everyday_fb()
@@ -149,6 +149,8 @@ class Monitors(Base):
                 c_times = c_times+1
                 if self.is_exit(False) or c_times==12:
                     break
+            if c_times== 12:
+                break
 
             self.click_pos(CQ_KILL)
             

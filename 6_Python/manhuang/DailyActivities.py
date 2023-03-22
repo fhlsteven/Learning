@@ -136,8 +136,10 @@ class DailyActivities(Base):
             self.start_hd()
             wait_time(3)
             self.click_pos(BOSS_POS)
-
-            wait_time(482 + 25)
+            cur_time = datetime.now()
+            next_time = datetime(cur_time.year, cur_time.month, cur_time.day, cur_time.hour, 38, 3)
+            wait_secs = (next_time - cur_time).seconds  
+            wait_time(wait_secs+25)
             for x in range(1, 4):                
                 self.click_pos((FIRST_BOSS[0], FIRST_BOSS[1] + x*20))
                 wait_time(25)

@@ -15,6 +15,8 @@ from common import *
 from configs import configs
 from monitor import Monitors
 from datetime import datetime
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
 # html node name
 ACCOUNT_KEY = "account"
 PWD_KEY = "password"
@@ -33,11 +35,16 @@ def get_driver(url="https://baidu.com"):
         c_op = webdriver.ChromeOptions()
         c_op.add_argument("--mute-audio")
         driver = webdriver.Chrome(chrome_options=c_op)
-    else:
+    elif configs.browser_type == "edge":
         e_op = webdriver.EdgeOptions()
         e_op.add_argument("--mute-audio")
         e_op.add_argument("--disable-features=msHubApps")
         driver = webdriver.Edge(options=e_op)
+    else:
+        f_binary = FirefoxBinary("C:\Program Files\Mozilla Firefox\\firefox.exe")
+        f_op = webdriver.FirefoxOptions()
+        f_op.add_argument("--mute-audio")
+        driver = webdriver.Firefox(firefox_binary=f_binary,options=f_op)
 
     driver.set_window_size(500,950)
     driver.set_window_position(BROWSER_POS[0], BROWSER_POS[1])

@@ -303,8 +303,9 @@ class MHApplication(object):
                     c_times = 5
                     Roles(self.driver).check_login()
                     wait_time(configs.wait_min_morning * 60)                   
-                    Monitors(self.driver).quick_mode()                    
-                    Teams(self.driver).auto_receive()
+                    Monitors(self.driver).quick_mode()
+                    if _now.day in(5,6):                        
+                        Teams(self.driver).auto_receive()
                     self.is_done_quick_mode = True
             except Exception as ex:
                 print(datetime.now(),ex)

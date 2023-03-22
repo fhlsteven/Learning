@@ -127,7 +127,7 @@ def open_bag(dr):
 def check_login(dr, screen_shot = True):
     pos = match_img_pos(dr, "ok.png", is_save=screen_shot)
     if pos[0]>0:
-        self.click_pos(pos)
+        click_pos_locxy(dr, pos)
         wait_time()
         while is_exists_image(dr,"login_bg.png"):
             wait_time()
