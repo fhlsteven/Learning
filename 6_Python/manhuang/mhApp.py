@@ -303,6 +303,8 @@ class MHApplication(object):
                     self.is_done_quick_mode = False
                     Roles(self.dirver).check_login()
                     Monitors(self.driver).quick_daylies_more_times(False)
+                    Boss(self.driver).rong_lian()
+                    Teams(self.driver).get_email()
 
                 if is_between((5,1), (9,1)) and self.is_done_quick_mode == False:
                     times = 13
