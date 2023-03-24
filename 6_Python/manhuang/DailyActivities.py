@@ -105,8 +105,14 @@ class DailyActivities(Base):
             self.jiutian()
             if d_wkday == 1:
                 self.shen_mo_battlefield()
+            if d_wkday == 2:
+                self.zhandui()
+            if d_wkday == 3:
+                self.xiandaohui()
             if d_wkday in(4,5):
                 self.xian_men_jifen()
+            if d_wkday == 6:
+                self.fengyunleitai()
         except Exception as e:
             print(f'exception:{e},{d_now}')        
     # down 
@@ -220,9 +226,7 @@ class DailyActivities(Base):
                 else:
                     self.xianmo_start(team)
                     times = times + 1
-            self.log_img()
             Teams(self.driver).quit_team_status()
-            self.log_img()
             self.use_bags()
             self.click_callback()
 
@@ -254,6 +258,35 @@ class DailyActivities(Base):
             wait_time(25*60)
             self.use_bags()
             self.click_callback()
+
+    def zhandui(self):
+        if is_between((20,40), (21,10)):
+            print("zhandui")
+            self.start_hd(False)
+            self.log_unknow()
+            self.use_bags()
+            self.click_callback()
+    
+    def xiandaohui(self):
+        if is_between((20,40), (21,10)):
+            print("xiandaohui")
+            self.start_hd(False)
+            self.log_unknow()
+            self.use_bags()
+            self.click_callback()
+
+    def fengyunleitai(self):
+        if is_between((20,40), (21,5)):
+            print("fengyunleitai")
+            self.start_hd(False)
+            self.log_unknow()
+            self.use_bags()
+            self.click_callback()
+
+    def log_unknow(self):
+        self.log_img()
+        wait_time(5 * 60)
+        self.log_img()
 
     def xian_men_jifen(self):
         if is_between((20,40), (21,10)):

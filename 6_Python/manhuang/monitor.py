@@ -10,6 +10,7 @@ from roles import Roles
 from esports import ESports
 from topprocess import TopProcess
 from datetime import datetime, timedelta
+from teams import Teams
 
 YUAN_SHEN = [b'\xe7\x83\x81\xe9\x87\x91', b'\xe7\x8e\x84\xe8\x8b\x8d', b'\xe5\xb9\xbb\xe6\xb5\xb7', b'\xe7\x82\xbd\xe5\xa4\xa9', b'\xe6\x98\x86\xe5\xa2\x9f']
 BA_GUA = [b'\xe7\x8e\x84\xe9\xbe\x9f', b'\xe6\x83\x8a\xe9\x9b\xb7', b'\xe7\x99\xbd\xe6\xb3\xbd', b'\xe7\x82\x8e\xe5\x87\xb0', b'\xe8\x8b\x8d\xe9\xbe\x99']
@@ -20,6 +21,7 @@ OTHER_FB = [b'\xe5\xb9\xbd\xe5\x86\xa5', b'\xe6\x88\x98\xe9\xad\x82', b'\xe8\x99
 ONE_ALL = b'\xe7\x83\x81\xe9\x87\x91\xe7\x8e\x84\xe8\x8b\x8d\xe5\xb9\xbb\xe6\xb5\xb7\xe7\x82\xbd\xe5\xa4\xa9\xe6\x98\x86\xe5\xa2\x9f\xe7\x8e\x84\xe9\xbe\x9f\xe6\x83\x8a\xe9\x9b\xb7\xe7\x99\xbd\xe6\xb3\xbd\xe7\x82\x8e\xe5\x87\xb0\xe8\x8b\x8d\xe9\xbe\x99\xe4\xbb\x99\xe5\x99\xa8\xe7\x81\xb5\xe5\xae\xa0\xe7\xa5\x9e\xe5\x88\x83\xe4\xbb\x99\xe7\xbe\xbd\xe8\xa3\x85\xe8\xa2\x8d\xe7\x8f\xa0\xe7\xba\xb9\xe5\xb9\xbd\xe5\x86\xa5\xe8\x99\x9a\xe6\x97\xa0\xe6\x88\x98\xe9\xad\x82'
 
 CQ_POS = (324, 287+BLACK_X)
+PT_POS= (176,286+BLACK_X)
 CQ_REFRESH = (250,652+BLACK_X)
 CQ_KILL = (385,233+BLACK_X)
 
@@ -91,7 +93,7 @@ class Monitors(Base):
     def quick_mode(self):
         boss = Boss(self.driver)
     
-        print("main_to_single_boss")
+        print(f"main_to_single_boss:{datetime.now()}")
         boss.main_to_single_boss()
        
         print("house_to_pettravel")
@@ -122,14 +124,24 @@ class Monitors(Base):
         Adventure(self.driver).process_adventure_events()
 
         print("xy esports")
-        ESports(self.driver).main_to_xy()
-
-        print("top process")
-        TopProcess(self.driver).process_top()
+        ESports(self.driver).main_to_xy()        
 
         print("adventrue")
         Adventure(self.driver).process_adventure_events()
 
+        print("get email")
+        Teams(self.driver).get_email()
+
+        print("top process")
+        TopProcess(self.driver).process_top()
+
+    def quick_daylies_more_times(self, is_adventure=False):
+        Roles(self.driver).check_login()
+        self.to_main()
+        if is_adventure:
+            Adventure(self.driver).process_adventure_events()
+        ESports(self.driver).main_to_xy()
+        InstanceZone(self.driver).main_to_shenbeast_island()
 
         # three boos
     def monitor_three_boss(self):
@@ -137,17 +149,21 @@ class Monitors(Base):
         while self.is_exit(False) and c_times < 5:            
             c_times = c_times + Boss(self.driver).process_three_realms()
 
-    def monitor_chuan_qi_boss(self):
+    def monitor_yiyu_boss(self, is_chuan_qi=True):
         while self.is_exit(False):            
-            while self.is_exists_image("yi_yu_boss.png")== False:
+            while self.is_exists_image("yi_yu_boss.png") == False:
                 wait_time(3)
-            self.click_pos(CQ_POS)
+            if is_chuan_qi:
+                self.click_pos(CQ_POS)
+            else:
+                self.click_pos(PT_POS)
+            
             c_times = 0 
             while self.is_exists_image("boss_zh.png") == False:
                 self.click_pos(CQ_REFRESH)
                 wait_time(5)
                 c_times = c_times+1
-                if self.is_exit(False) or c_times==12:
+                if self.is_exists_image("chat_box.png", is_save_img=False) or c_times==12:
                     break
             if c_times== 12:
                 break
@@ -158,7 +174,7 @@ class Monitors(Base):
             while self.is_exists_image("quit_left.png"):
                 wait_time(30)
                 c_times= c_times +1
-                if c_times>5:
+                if c_times>5 or self.is_exists_image("chat_box.png", is_save_img=False):
                     break
             pos = self.get_pos_byimg("ok.png", screen_shot=False)
             if pos[0]>0:

@@ -91,14 +91,16 @@ class InstanceZone(Base):
         self.click_callback()
 
     def main_to_fb(self):
+        self.use_bags()
         self.click_pos(MAIN_FB_POS)
 
-    def main_to_shenbeast_island(self):
+    def main_to_shenbeast_island(self, is_feng=True):
         self.main_to_fb()
         self.shenbeast_island_infinite()
         wait_time(3)
-        self.shenbesat_island_feng()
-        wait_time(3)
+        if is_feng:
+            self.shenbesat_island_feng()
+            wait_time(3)
         self.click_callback()
 
     def shenbeast_island_infinite(self):

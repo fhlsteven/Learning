@@ -15,7 +15,6 @@ def wait_time(secs=10):
 # BLACK_POS = (324, 184)
 BLACK_X = 124
 def click_locxy(dr, x, y, left_click=True):
-    wait_time(1)
     y = y - BLACK_X
     if left_click:
         ActionChains(dr).move_by_offset(x, y).click().perform()
@@ -99,8 +98,9 @@ def match_img_pos_all(driver, img_obj, confidence=0.9):
         res.append(xy)
     return res
 
-def is_exists_image(driver, imgobj, confidencevalue=0.8):
-    save_all_img(driver)
+def is_exists_image(driver, imgobj, confidencevalue=0.8, is_save=True):
+    if is_save:
+        save_all_img(driver)
     result = match_img(ALL_IMAGE, imgobj, confidencevalue)
     if result != None and len(result)>0:
         return True
@@ -210,8 +210,8 @@ class Base(object):
     def click_quit(self, is_need_ok=True):
         quit_scene(self.driver, is_need_ok)
 
-    def is_exists_image(self, img_name, confidence = 0.8):
-        return is_exists_image(self.driver, img_name, confidence)
+    def is_exists_image(self, img_name, confidence = 0.8, is_save_img=True):
+        return is_exists_image(self.driver, img_name, confidence, is_save=is_save_img)
     
     def click_callback(self):
         callback_click(self.driver)

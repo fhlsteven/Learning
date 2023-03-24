@@ -53,6 +53,7 @@ class Boss(Base):
 
     def main_to_boss(self):
         self.rong_lian()
+        self.use_bags()
         self.click_pos(MAIN_BOSS_POS)
         wait_time(2)
     

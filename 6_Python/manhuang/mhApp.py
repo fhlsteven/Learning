@@ -216,14 +216,18 @@ class MHApplication(object):
         Button(self.main_win, text="monitor end", command=self.monitor_end_click).grid(row=row_start,column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text="monitor cqzh boss", command=self.monitor_cqzh_boss_click).grid(row=row_start, column=cur_column)
-
+        cur_column =cur_column + 1
+        Button(self.main_win, text="monitor ptzh boss", command=self.monitor_ptzh_boss_click).grid(row=row_start, column=cur_column)
         row_start = row_start + 1
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def monitor_ptzh_boss_click(self):
+        Monitors(self.driver).monitor_yiyu_boss(False)
     
     def monitor_cqzh_boss_click(self):
-        Monitors(self.driver).monitor_chuan_qi_boss()
+        Monitors(self.driver).monitor_yiyu_boss()
 
     def monitor_end_click(self):
         Monitors(self.driver).monitor_end()
@@ -291,12 +295,14 @@ class MHApplication(object):
                 _now = datetime.now()
                 if _now.hour>=18 and _now.hour<22:
                     Roles(self.driver).check_login()
-                    print('monitor_hd')
+                    print(f'monitor_hd:{_now}')
                     Boss(self.driver).rong_lian()
                     Monitors(self.driver).monitor_hd()
                 
-                if _now.hour == 4 and self.is_done_quick_mode:
+                if _now.hour == 2 and self.is_done_quick_mode:
                     self.is_done_quick_mode = False
+                    Roles(self.dirver).check_login()
+                    Monitors(self.driver).quick_daylies_more_times(False)
 
                 if is_between((5,1), (9,1)) and self.is_done_quick_mode == False:
                     times = 13
@@ -307,6 +313,7 @@ class MHApplication(object):
                     if _now.day in(5,6):                        
                         Teams(self.driver).auto_receive()
                     self.is_done_quick_mode = True
+
             except Exception as ex:
                 print(datetime.now(),ex)
                 traceback.print_exc()

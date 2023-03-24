@@ -28,6 +28,7 @@ class ESports(Base):
         self.click_pos(QUICK_MODE)
 
     def main_to_sport(self):
+        self.use_bags()
         self.click_pos(SPORT)        
 
     def kill_single(self):
@@ -48,7 +49,7 @@ class ESports(Base):
     def xy_kill(self, pos):
         self.click_pos(pos)
         wait_time(5)
-        self.click_pos(XY_OK)
+        #self.click_pos(XY_OK)
         while self.is_exists_image("xy_esport.png")==False:
             wait_time(5)
 

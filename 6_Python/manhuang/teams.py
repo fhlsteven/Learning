@@ -25,6 +25,8 @@ SELF_REGION = (194,375,305,395)
 LEFT_REGION = (73,473,201,490)
 RIGHT_REGION = (316,473,423,490)
 
+MY_TEAM =(250, 700+BLACK_X)
+
 class Teams(Base):
     def __init__(self, driver):
         super(Teams, self).__init__(driver)
@@ -64,6 +66,7 @@ class Teams(Base):
         self.click_pos(KICK_OUT_OK)
 
     def quit_team_status(self, is_need_cb=True):
+        self.click_pos(MY_TEAM)
         self.click_pos(QUIT)
         self.click_pos(QUIT_OK)
         if is_need_cb:
