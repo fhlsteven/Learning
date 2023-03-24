@@ -150,14 +150,20 @@ class Monitors(Base):
             c_times = c_times + Boss(self.driver).process_three_realms()
 
     def monitor_yiyu_boss(self, is_chuan_qi=True):
-        while self.is_exit(False):            
+        pt_times = 0
+        while self.is_exit(False):          
+            if pt_times >= 9:
+                break  
+
             while self.is_exists_image("yi_yu_boss.png") == False:
-                wait_time(3)
+                wait_time(15)
+
             if is_chuan_qi:
                 self.click_pos(CQ_POS)
             else:
                 self.click_pos(PT_POS)
-            
+                pt_times = pt_times + 1            
+                        
             c_times = 0 
             while self.is_exists_image("boss_zh.png") == False:
                 self.click_pos(CQ_REFRESH)
