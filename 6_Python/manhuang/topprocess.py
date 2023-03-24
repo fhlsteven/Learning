@@ -47,6 +47,9 @@ SVIP_GET =(250,482+BLACK_X)
 #shop free
 SHOP_POS =(459,716+BLACK_X)
 SHOP_FREE = (174,152+BLACK_X)
+SEC_SHOP = (145,772+BLACK_X)
+XF_SHOP = (83,712+BLACK_X)
+BUY_OK = (250, 480 +BLACK_X)
 
 class TopProcess(Base):
     def __init__(self, driver):
@@ -147,5 +150,39 @@ class TopProcess(Base):
         self.click_pos(SHOP_FREE)
         self.use_bags()
         self.click_callback()
+
+    def main_to_xf_shop(self):
+        self.click_pos(SHOP_POS)
+        wait_time(5)
+        self.click_pos(SEC_SHOP)
+        self.click_pos(XF_SHOP)
+        wait_time(3)
+        self.xf_shop()
+        self.click_callback()
+
+    def xf_shop(self):
+        c_times = 0
+        while True:
+            pos = self.get_pos_byimg("xf_shop.png")
+            if pos[0]>0:
+                buy_pos = (pos[0]+23, pos[1]+33)                
+                self.click_pos(buy_pos)
+                self.click_pos(BUY_OK)
+                wait_time(3)  
+            c_times = c_times+1
+            if c_times >6:
+                break
+        c_times = 0
+        while True:
+            pos = self.get_pos_byimg("xf_yb.png", confidence=0.98)
+            if pos[0]>0:
+                buy_pos = (pos[0], pos[1]+11)
+                self.click_pos(buy_pos)
+                self.click_pos(BUY_OK)
+                wait_time(3)            
+            c_times = c_times+1
+            if c_times >3:
+                break
+
 
 

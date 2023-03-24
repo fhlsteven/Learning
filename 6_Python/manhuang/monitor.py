@@ -135,6 +135,9 @@ class Monitors(Base):
         print("top process")
         TopProcess(self.driver).process_top()
 
+        print("xianfu-shop")
+        TopProcess(self.driver).main_to_xf_shop()
+
     def quick_daylies_more_times(self, is_adventure=False):
         Roles(self.driver).check_login()
         self.to_main()
@@ -142,7 +145,7 @@ class Monitors(Base):
             Adventure(self.driver).process_adventure_events()
         ESports(self.driver).main_to_xy()
         InstanceZone(self.driver).main_to_shenbeast_island()
-
+        TopProcess(self.driver).main_to_xf_shop()
         # three boos
     def monitor_three_boss(self):
         c_times = 0

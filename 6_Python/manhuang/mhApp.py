@@ -173,6 +173,8 @@ class MHApplication(object):
         cur_column =cur_column + 1
         self.btn_get_yb = Button(self.main_win, text='get yuanbao', command=self.get_yuanbao, width=20)
         self.btn_get_yb.grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text="xf shop", command=self.xf_shop_click).grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         self.lb_role = Label(self.main_win, text="role", fg='green', font=('宋体',16))
@@ -223,8 +225,13 @@ class MHApplication(object):
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
 
+    def xf_shop_click(self):
+        TopProcess(self.driver).main_to_xf_shop()
+        send_msg()
+
     def monitor_ptzh_boss_click(self):
         Monitors(self.driver).monitor_yiyu_boss(False)
+        send_msg()
     
     def monitor_cqzh_boss_click(self):
         Monitors(self.driver).monitor_yiyu_boss()

@@ -40,7 +40,10 @@ if __name__ == "__main__":
         start = rect[0]
         end = rect[3]
         print(f'start:{start},end:{end}')
-        im = all_img.crop((start[0], start[1], end[0], end[1]))
+        #im = all_img.crop((start[0], start[1], end[0], end[1]))
+        dot = img['result']
+        
+        im =all_img.crop((dot[0], dot[1], dot[0]+10, dot[1]+13))
         im.show()
         print(img['rectangle'][0])
 
