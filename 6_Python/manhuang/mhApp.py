@@ -43,7 +43,7 @@ class MHApplication(object):
         column_num = 6
         row_start = 0 
         # 标题 和 标签
-        self.main_win.title("man:"+configs.login.user_name)
+        self.main_win.title("man:"+configs.login.cur_index)
         self.main_win.geometry("605x590+550+150")
 
         cur_column = 0

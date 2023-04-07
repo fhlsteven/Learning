@@ -26,7 +26,7 @@ FIRST_FRAME="game-iframe"
 SECOND_FRAME="gameFrame"
 
 # Position
-BROWSER_POS=(0,0)
+BROWSER_POS=(configs.browser_pos.x, configs.browser_pos.y)
 
 # 放到根目录（MicrosoftWebDriver.exe）
 # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
@@ -140,6 +140,22 @@ def main_loop():
 
 if __name__ == "__main__":
     try:
-        test_eight_components()
+        url="https://www.baidu.com"
+        #test_eight_components()
+        c_op = webdriver.ChromeOptions()
+        c_op.add_argument("--mute-audio")
+        chromedriver = webdriver.Chrome(chrome_options=c_op)
+        chromedriver.set_window_size(500,950)
+        chromedriver.set_window_position(BROWSER_POS[0], BROWSER_POS[1])
+        chromedriver.get(url)
+
+        e_op = webdriver.EdgeOptions()
+        e_op.add_argument("--mute-audio")
+        e_op.add_argument("--disable-features=msHubApps")
+        driver = webdriver.Edge(options=e_op)
+        driver.set_window_size(500,950)
+        driver.set_window_position(510,0)
+        driver.get(url)
+        wait_time(1000)
     except Exception as e:
         print(f'ex:{e}')

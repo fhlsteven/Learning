@@ -29,7 +29,12 @@ default_configs = {
     'login':{
         'url':'https://h5game.gowan8.com/?yisdk_param=mZpuX9Lm2M_S&ext_param=ZJ1raKOp',
         'user_name':'fhl1993',
-        'pwd':'fhl19930321'
+        'pwd':'fhl19930321',
+        'cur_index':'1'
+    },
+    'browser_pos':{
+        'x':0,
+        'y':0
     },
     'check_term':'#serverCon>img:nth-child(7)',
     'start_button':'#serverCon>img:nth-child(3)',
