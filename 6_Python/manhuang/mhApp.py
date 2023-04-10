@@ -303,13 +303,14 @@ class MHApplication(object):
                 if _now.hour>=18 and _now.hour<22:
                     Roles(self.driver).check_login()
                     print(f'monitor_hd:{_now}')
-                    Boss(self.driver).rong_lian()
+                    if get_date_minutes(r_pre_time, datetime.now()) > 20:
+                        Boss(self.driver).rong_lian()
                     Monitors(self.driver).monitor_hd()
                 
                 if _now.hour == 2 and self.is_done_quick_mode:
                     self.is_done_quick_mode = False
                     Roles(self.dirver).check_login()
-                    Monitors(self.driver).quick_daylies_more_times(False)
+                    Monitors(self.driver).quick_daylies_more_times(False)                   
                     Boss(self.driver).rong_lian()
                     Teams(self.driver).get_email()
 

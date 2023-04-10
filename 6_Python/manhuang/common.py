@@ -5,6 +5,7 @@ import aircv as ac
 import pytesseract as ocr_act
 from PIL import Image
 from configs import configs
+from datetime import datetime
 
 BLACK_POS = (324, 184)
 ALL_IMAGE = 'mh_all.png'
@@ -16,6 +17,9 @@ def wait_time(secs=10):
 BLACK_X = 124
 def click_locxy(dr, x, y, left_click=True):
     y = y - BLACK_X
+    if datetime.now().weekday() in(5,6):
+        wait_time(2)
+    
     if left_click:
         ActionChains(dr).move_by_offset(x, y).click().perform()
     else:
