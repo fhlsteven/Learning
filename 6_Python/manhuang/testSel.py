@@ -39,6 +39,7 @@ def get_driver(url="https://baidu.com"):
         e_op = webdriver.EdgeOptions()
         e_op.add_argument("--mute-audio")
         e_op.add_argument("--disable-features=msHubApps")
+        e_op.add_argument("--remote-allow-origins=*")
         driver = webdriver.Edge(options=e_op)
     else:
         f_binary = FirefoxBinary("C:\Program Files\Mozilla Firefox\\firefox.exe")
