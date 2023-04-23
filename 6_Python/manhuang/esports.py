@@ -18,14 +18,14 @@ XY_OK = (250,721+BLACK_X)
 XY_TOP = (410,273 +BLACK_X)
 
 class ESports(Base):
-    def __init__(self, driver):
-        super(ESports, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(ESports, self).__init__(driver, waits=waits)
 
     def single_sport(self):
         self.main_to_sport()
         self.click_pos(SINGLE_SPORT)
         self.click_pos(QUN_XIAN)
-        self.click_pos(QUICK_MODE)
+        #self.click_pos(QUICK_MODE)
 
     def main_to_sport(self):
         self.use_bags()
@@ -52,5 +52,14 @@ class ESports(Base):
         #self.click_pos(XY_OK)
         while self.is_exists_image("xy_esport.png")==False:
             wait_time(5)
+
+    def main_to_single_all(self):
+        self.single_sport()
+        times = 0
+        while times<10:
+            self.kill_single()
+            times = times+1
+
+
 
 

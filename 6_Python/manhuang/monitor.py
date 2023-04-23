@@ -26,8 +26,8 @@ CQ_REFRESH = (250,652+BLACK_X)
 CQ_KILL = (385,233+BLACK_X)
 
 class Monitors(Base):
-    def __init__(self, driver):
-        super(Monitors, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(Monitors, self).__init__(driver, waits=waits)
         self.driver = driver
         self.pre_msg = ""
         self.socket = None
@@ -93,50 +93,53 @@ class Monitors(Base):
     def quick_mode(self):
         boss = Boss(self.driver)
     
-        print(f"main_to_single_boss:{datetime.now()}")
+        print(f"--main_to_single_boss:{datetime.now()}")
         boss.main_to_single_boss()
        
-        print("house_to_pettravel")
+        print("--house_to_pettravel")
         HouseJob(self.driver).house_to_pettravel(True)
  
-        print("main_to_everyday_fb")
+        print("--main_to_everyday_fb")
         InstanceZone(self.driver).main_to_everyday_fb()
      
-        print("main_to_shenbeast_island")
+        print("--main_to_shenbeast_island")
         InstanceZone(self.driver).main_to_shenbeast_island()
 
-        print("main_to_single_boss")
+        print("--main_to_single_boss")
         boss.main_to_single_boss()
 
-        print("adventure")
+        print("--adventure")
         Adventure(self.driver).process_adventure_events()
 
-        print("shen dian boss")
+        print("--shen dian boss")
         boss.main_to_shen_dian()
 
-        print("eat elixir")
+        print("--eat elixir")
         Roles(self.driver).main_to_eat_Elixir()
 
-        print("xian yuan")
+        print("--xian yuan")
         Roles(self.driver).main_to_xianyuan_fb()
 
-        print("adventure")
+        print("--adventure")
         Adventure(self.driver).process_adventure_events()
 
-        print("xy esports")
+        print("--xy esports")
         ESports(self.driver).main_to_xy()        
 
-        print("adventrue")
+        print("--adventrue")
         Adventure(self.driver).process_adventure_events()
 
-        print("get email")
+        print("--get email")
         Teams(self.driver).get_email()
 
-        print("top process")
+        print("--top process")
         TopProcess(self.driver).process_top()
 
-        print("xianfu-shop")
+        print("--xianfu-shop")
         TopProcess(self.driver).main_to_xf_shop()
+
+        print("--esports kill 10")
+        ESports(self.driver).main_to_single_all()
 
     def quick_daylies_more_times(self, is_adventure=False):
         Roles(self.driver).check_login()

@@ -28,8 +28,8 @@ RIGHT_REGION = (316,473,423,490)
 MY_TEAM =(250, 700+BLACK_X)
 
 class Teams(Base):
-    def __init__(self, driver):
-        super(Teams, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(Teams, self).__init__(driver, waits=waits)
 
     def create_team(self):
         self.click_pos(CREATE_TEAM)

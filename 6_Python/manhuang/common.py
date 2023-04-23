@@ -15,24 +15,23 @@ def wait_time(secs=10):
 
 # BLACK_POS = (324, 184)
 BLACK_X = 124
-def click_locxy(dr, x, y, left_click=True):
-    y = y - BLACK_X
-    if datetime.now().weekday() in(5,6):
-        wait_time(2)
-    
+def click_locxy(dr, x, y, left_click=True, waits=1):
+    y = y - BLACK_X  
+    if waits>0:
+        wait_time(waits)    
     if left_click:
         ActionChains(dr).move_by_offset(x, y).click().perform()
     else:
         ActionChains(dr).move_by_offset(x, y).context_click().perform()
     ActionChains(dr).move_by_offset(-x, -y).perform()  # 将鼠标位置恢复到移动前
 
-def click_pos_locxy(dr, pos, is_check=False,isleft=True):
-    click_locxy(dr, pos[0], pos[1], isleft)
+def click_pos_locxy(dr, pos, is_check=False,isleft=True, waits=1):
+    click_locxy(dr, pos[0], pos[1], isleft, waits=waits)
     if is_check:
         wait_time(2)
         pos_ok = match_img_pos(dr, "ok_sec.png")
         if pos_ok[0]>0:
-            click_locxy(dr, pos_ok[0],pos_ok[1], isleft)
+            click_locxy(dr, pos_ok[0],pos_ok[1], isleft,waits=0)
 
 def click_black(dr, times=2):
     c_time = 0 
@@ -47,7 +46,7 @@ def quit_scene(dr, is_need_ok):
     click_pos_locxy(dr, QUIT_CLICK)
     pos = match_img_pos(dr, "quit_left.png")
     if pos[0]>0:
-        click_pos_locxy(dr, pos)
+        click_pos_locxy(dr, pos, waits=0)
     
     if is_need_ok:
         click_pos_locxy(dr, QUIT_OK)
@@ -56,13 +55,13 @@ BAG_USE = (375, 781)
 def get_goods(dr):
     while is_exists_image(dr, 'use_btn.png'):
         wait_time(2)
-        click_pos_locxy(dr, BAG_USE)
+        click_pos_locxy(dr, BAG_USE, waits=0)
     click_black(dr, times=1)
 
 CALLBACK_POS=(450, 916)
 def callback_click(dr):
     while is_exists_image(dr, "callback.png"):
-        click_pos_locxy(dr, CALLBACK_POS)
+        click_pos_locxy(dr, CALLBACK_POS, waits=0)
 
 IMG_PREFIX = 'imgs/'
 def match_img(imgsrc, imgobj, confidencevalue=0.9):  # imgsrc=原始图像，imgobj=待查找的图片   
@@ -115,7 +114,7 @@ CLOSE_KILL_GO = (476, 650)
 def clear_kill_go(driver):
     c_times = 0
     while is_exists_image(driver, "kill_go.png", confidencevalue=0.8) and c_times < 6:
-        click_pos_locxy(driver, CLOSE_KILL_GO)
+        click_pos_locxy(driver, CLOSE_KILL_GO, waits=0)
         c_times= c_times + 1
 
 def save_all_img(driver):
@@ -129,9 +128,10 @@ def open_bag(dr):
     click_pos_locxy(dr, BAG_POS)
 
 def check_login(dr, screen_shot = True):
+    click_black(dr)
     pos = match_img_pos(dr, "ok.png", is_save=screen_shot)
     if pos[0]>0:
-        click_pos_locxy(dr, pos)
+        click_pos_locxy(dr, pos, waits=0)
         wait_time()
         while is_exists_image(dr,"login_bg.png"):
             wait_time()
@@ -184,11 +184,12 @@ def get_ocr_txt(image, lang=Languages.CHS):
     return result
 
 class Base(object):
-    def __init__(self, driver):
+    def __init__(self, driver, waits=1):
         self.driver = driver
+        self.waits = waits
 
     def click_pos(self, pos, is_check=False):
-        click_pos_locxy(self.driver, pos, is_check)
+        click_pos_locxy(self.driver, pos, is_check, waits=self.waits)
 
     def get_pos_byimg(self, img_name, defalut_pos=(0,0), confidence=0.9, screen_shot =True):
         pos = match_img_pos(self.driver, img_name, confidencevalue=confidence, is_save=screen_shot)

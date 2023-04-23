@@ -9,8 +9,8 @@ CLOSE_GAMBLE = (440, 260+BLACK_X)
 EX_OK_POS = (247,667 +BLACK_X)
 
 class Adventure(Base):
-    def __init__(self, driver):
-        super(Adventure, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(Adventure, self).__init__(driver, waits=waits)
 
     def main_to_adventure(self):
         self.click_pos(ADVENTRUE_POS)

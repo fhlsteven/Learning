@@ -226,50 +226,54 @@ class MHApplication(object):
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
 
     def xf_shop_click(self):
-        TopProcess(self.driver).main_to_xf_shop()
+        TopProcess(self.driver, 0).main_to_xf_shop()
         send_msg()
 
     def monitor_ptzh_boss_click(self):
-        Monitors(self.driver).monitor_yiyu_boss(False)
+        Monitors(self.driver, 0).monitor_yiyu_boss(False)
         send_msg()
     
     def monitor_cqzh_boss_click(self):
-        Monitors(self.driver).monitor_yiyu_boss()
+        Monitors(self.driver, 0).monitor_yiyu_boss()
 
     def monitor_end_click(self):
         Monitors(self.driver).monitor_end()
         send_msg()
 
     def xv_protect_click(self):
-        DailyActivities(self.driver).protect(True)
+        DailyActivities(self.driver, 0).protect(True)
         send_msg()
 
     def xy_esports_click(self):
-        ESports(self.driver).main_to_xy()
+        ESports(self.driver, 0).main_to_xy()
         send_msg()
 
     def m_id_hd_click(self):
-        DailyActivities(self.driver).monitor_mid()
+        DailyActivities(self.driver, 0).monitor_mid()
         send_msg()
 
     def shen_dian_boss_click(self):
-        Boss(self.driver).main_to_shen_dian()
+        Boss(self.driver, 0).main_to_shen_dian()
         send_msg()
 
     def xina_yuan_fb_click(self):
-        Roles(self.driver).main_to_xianyuan_fb()
+        Roles(self.driver, 0).main_to_xianyuan_fb()
         send_msg()
 
     def esports_kill_click(self):
-        ESports(self.driver).kill_single()
+        es_kill = ESports(self.driver, waits=0)
+        e_times = 0
+        while e_times <10:
+            es_kill.kill_single()
+            e_times = e_times+1
 
     def process_adventure_click(self):
-        Adventure(self.driver).process_adventure_events()
+        Adventure(self.driver, 0).process_adventure_events()
         send_msg()
 
     def pets_travels_all_click(self):
         self.log_show("pets_travels_all_click")
-        HouseJob(self.driver).process_pets_travels()
+        HouseJob(self.driver, 0).process_pets_travels()
         send_msg()
 
     def monitor_three_and_pets_click(self):
@@ -342,22 +346,22 @@ class MHApplication(object):
         Monitors(self.driver).monitor_hd()
 
     def eat_elixir_click(self):
-        Roles(self.driver).main_to_eat_Elixir()
+        Roles(self.driver, 0).main_to_eat_Elixir()
     
     def monitor_fb_click(self):
-        Monitors(self.driver).monitor_fb()
+        Monitors(self.driver, 0).monitor_fb()
 
     def monitor_msg_click(self):
         Monitors(self.driver).monitor_msg()
 
     def island_kill_click(self):
-        InstanceZone(self.driver).main_to_shenbeast_island()
+        InstanceZone(self.driver, 0).main_to_shenbeast_island()
 
     def hd_process_click(self):
         DailyActivities(self.driver).hd_process()
 
     def kick_out_team(self):
-        Teams(self.driver).kick_out()
+        Teams(self.driver, 0).kick_out()
 
     def one_long_service(self):
         Monitors(self.driver).quick_mode()
@@ -367,35 +371,35 @@ class MHApplication(object):
         clear_kill_go(self.driver)
 
     def day_boss_kills(self):
-        DailyActivities(self.driver).main_to_daily_boss_gets()
+        DailyActivities(self.driver, 0).main_to_daily_boss_gets()
         send_msg()
 
     def get_email(self):
-        Teams(self.driver).get_email()
+        Teams(self.driver, 0).get_email()
 
     def get_yuanbao(self):
-        TopProcess(self.driver).get_yb()
+        TopProcess(self.driver, 0).get_yb()
 
     def xd_rank(self):
-        TopProcess(self.driver).xd_rank()
+        TopProcess(self.driver, 0).xd_rank()
 
     def house_event_p(self):
         HouseJob(self.driver).house_random_event()
         send_msg()
 
     def boss_three_realm(self):
-        Boss(self.driver).main_to_three_realms()
+        Boss(self.driver, 0).main_to_three_realms()
         send_msg()
 
     def top_all(self):
-        TopProcess(self.driver).process_top()
+        TopProcess(self.driver, 0).process_top()
         send_msg()
 
     def find_god(self):
-        TopProcess(self.driver).find_treasure()
+        TopProcess(self.driver, 0).find_treasure()
 
     def use_bags(self):
-        Boss(self.driver).use_bags()
+        Boss(self.driver, 0).use_bags()
 
     def boss_and_fb(self):
         Boss(self.driver).main_to_single_boss()
@@ -403,15 +407,15 @@ class MHApplication(object):
         send_msg()
 
     def rank_clcik(self):
-        TopProcess(self.driver).get_rank()
+        TopProcess(self.driver, 0).get_rank()
 
     def welfare_click(self):
-        TopProcess(self.driver).get_welfare()
+        TopProcess(self.driver, 0).get_welfare()
 
     def pets_travel(self):
         self.log_show('pets_travel ...')
         try:
-            HouseJob(self.driver).house_to_pettravel(True)
+            HouseJob(self.driver, 0).house_to_pettravel(True)
         except Exception as e:
             self.log_show(e)
         send_msg()
@@ -421,12 +425,12 @@ class MHApplication(object):
         self.driver.save_screenshot(f_name)
 
     def smelt_bag(self):
-        Boss(self.driver).rong_lian()
-        Boss(self.driver).use_bags()
+        Boss(self.driver, 0).rong_lian()
+        Boss(self.driver, 0).use_bags()
 
     def rechallenge_pets(self):
         self.log_show('rechallenge_pets')
-        HouseJob(self.driver).rechallenge_pets()       
+        HouseJob(self.driver, 0).rechallenge_pets()       
 
     def single_boss(self):
         self.log_show('single_boss ...')
@@ -444,7 +448,7 @@ class MHApplication(object):
 
     def rechallenge(self):
         self.log_show('rechallenge loop')
-        HouseJob(self.driver).rechallenge_loop()
+        HouseJob(self.driver, 0).rechallenge_loop()
 
     def get_time(self):
         current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))

@@ -25,8 +25,8 @@ def get_date_minutes(start, end):
     return int((end-start).seconds /60) 
 
 class HouseJob(Base):
-    def __init__(self, dr):
-        super(HouseJob, self).__init__(dr)
+    def __init__(self, dr, waits=1):
+        super(HouseJob, self).__init__(dr, waits=waits)
 
     def get_money_reiki(self):
         self.click_pos(MONEY_POS)

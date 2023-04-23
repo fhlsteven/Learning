@@ -52,8 +52,8 @@ XF_SHOP = (83,712+BLACK_X)
 BUY_OK = (250, 480 +BLACK_X)
 
 class TopProcess(Base):
-    def __init__(self, driver):
-        super(TopProcess, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(TopProcess, self).__init__(driver, waits=waits)
     
     def process_top(self):  
         self.to_main()      

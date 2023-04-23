@@ -36,8 +36,8 @@ ISLAND_SEC_LONG = (254, 484) # 254 360
 QUICK_MATCH = (251, 615 + BLACK_X)
 
 class InstanceZone(Base):
-    def __init__(self, driver):
-        super(InstanceZone, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(InstanceZone, self).__init__(driver, waits=waits)
 
     def single_fb_time_kill(self):
         self.click_pos(FB_FIRST_POS)

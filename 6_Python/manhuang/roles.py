@@ -73,7 +73,7 @@ class Roles(Base):
 
     def check_login(self):
         self.use_bags()
-        click_black(self.driver)
+        click_black(self.driver, times=5)
         pos = self.get_pos_byimg("ok.png")
         if pos[0]>0:
             self.click_pos(pos)

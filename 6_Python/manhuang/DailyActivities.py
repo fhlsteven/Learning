@@ -64,8 +64,8 @@ def is_between(start_at, end_at):
     return False
 
 class DailyActivities(Base):
-    def __init__(self, driver):
-        super(DailyActivities, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(DailyActivities, self).__init__(driver, waits=waits)
         self.hd_in_progress = False
 
     def monitor(self):

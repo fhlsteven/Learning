@@ -31,8 +31,8 @@ HUANJING_BOSS = (287,766+BLACK_X)
 
 
 class Boss(Base):
-    def __init__(self, driver):
-        super(Boss, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(Boss, self).__init__(driver, waits=waits)
     
     def single_boss(self):
         times=0
