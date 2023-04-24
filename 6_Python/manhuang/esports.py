@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import Base, wait_time, BLACK_X
+from common import Base, wait_time, BLACK_X, click_black
 
 SPORT = (467, 568+ BLACK_X)
 SINGLE_SPORT = (69, 762 + BLACK_X) # 69 762
@@ -56,9 +56,16 @@ class ESports(Base):
     def main_to_single_all(self):
         self.single_sport()
         times = 0
+        while self.is_exists_image("quick_mod.png") == False:
+            self.click_pos(QUICK_MODE)
+            click_black(self.driver)
+        
         while times<10:
             self.kill_single()
+            wait_time(2)
             times = times+1
+        wait_time()
+        self.click_callback()
 
 
 

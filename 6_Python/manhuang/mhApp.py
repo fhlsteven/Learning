@@ -131,6 +131,8 @@ class MHApplication(object):
         row_start =row_start+1
         cur_column = 0
         Button(self.main_win, text="protect", command=self.xv_protect_click).grid(row=row_start, column=cur_column)
+        cur_column = cur_column + 1
+        Button(self.main_win, text="relogin", command=self.relogin_click).grid(row=row_start, column=cur_column)
         
         row_start = row_start + 1
         cur_column = 0        
@@ -224,6 +226,9 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def relogin_click(self):
+        Roles(self.driver).relogin()
 
     def xf_shop_click(self):
         TopProcess(self.driver, 0).main_to_xf_shop()

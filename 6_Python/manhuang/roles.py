@@ -25,8 +25,8 @@ XY_FB_START = (250,628 +BLACK_X)
 # login
 
 class Roles(Base):
-    def __init__(self, driver):
-        super(Roles, self).__init__(driver)
+    def __init__(self, driver, waits=1):
+        super(Roles, self).__init__(driver, waits=waits)
 
     def main_to_role(self):
         self.click_pos(ROLE_POS)
@@ -81,6 +81,20 @@ class Roles(Base):
             while self.is_exists_image("login_bg.png"):
                 wait_time()
             click_black(self.driver, 5)
+
+    def relogin(self):
+        self.driver.refresh()
+        while True:
+            wait_time()
+            if self.is_exists_image("login.png"):
+                break            
+        pos = self.get_pos_byimg("login.png", False)
+        if pos[0]>0:
+            self.click_pos(pos)
+            while self.is_exists_image("login_bg.png"):
+                wait_time()
+            click_black(self.driver, 5)
+        
             
 
 
