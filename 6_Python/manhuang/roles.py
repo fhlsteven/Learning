@@ -78,7 +78,7 @@ class Roles(Base):
         if pos[0]>0:
             self.click_pos(pos)
             wait_time()
-            while self.is_exists_image("login_bg.png"):
+            while self.is_exists_image("login_bg.png") == False:
                 wait_time()
             click_black(self.driver, 5)
 
@@ -91,7 +91,7 @@ class Roles(Base):
         pos = self.get_pos_byimg("login.png", False)
         if pos[0]>0:
             self.click_pos(pos)
-            while self.is_exists_image("login_bg.png"):
+            while self.is_exists_image("login_bg.png") == False:
                 wait_time()
             click_black(self.driver, 5)
         
