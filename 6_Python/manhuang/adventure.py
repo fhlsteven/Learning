@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import Base, wait_time, BLACK_X
+from common import Base, wait_time, BLACK_X, CLOSE_KILL_GO
 
 
 ADVENTRUE_POS = (472, 446+BLACK_X)
@@ -17,6 +17,7 @@ class Adventure(Base):
 
     def process_adventure_events(self):
         self.main_to_adventure()
+        self.waits = 0 # 都是不需要等待的状态
         if self.is_exists_image("adv_black.png") == False:
             self.process_kill_go()
             self.process_small_gamble(False)
@@ -28,6 +29,7 @@ class Adventure(Base):
     
     def process_kill_go(self):
         times = 0 
+        self.clear_right_tips()
         while times<4:
             pos = self.get_pos_byimg("adv_kill.png",confidence=0.7)
             if pos[0]> 0:
@@ -103,5 +105,11 @@ class Adventure(Base):
     
     def is_adventure(self):
         return self.is_exists_image("adv_event.png")
+
+    def clear_right_tips(self):
+        times = 0
+        while times < 5:
+            self.click_pos(CLOSE_KILL_GO)
+
 
         

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import Base, wait_time, BLACK_X, click_black
+from common import Base, wait_time, BLACK_X
 
 SPORT = (467, 568+ BLACK_X)
 SINGLE_SPORT = (69, 762 + BLACK_X) # 69 762
@@ -16,6 +16,8 @@ XY_FIRST = (413, 506+BLACK_X)
 XY_REFRESH =(346, 600 + BLACK_X)
 XY_OK = (250,721+BLACK_X)
 XY_TOP = (410,273 +BLACK_X)
+
+EBLACK_POS=(250, 73+BLACK_X)
 
 class ESports(Base):
     def __init__(self, driver, waits=1):
@@ -57,8 +59,9 @@ class ESports(Base):
         self.single_sport()
         times = 0
         while self.is_exists_image("quick_mod.png") == False:
+            self.click_pos(EBLACK_POS)
             self.click_pos(QUICK_MODE)
-            click_black(self.driver)
+            self.click_pos(EBLACK_POS)
         
         while times<10:
             self.kill_single()

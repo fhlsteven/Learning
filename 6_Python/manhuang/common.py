@@ -197,6 +197,24 @@ class Base(object):
             return pos            
         return defalut_pos
 
+    def get_pos_byimg_region(self, img_name, region,defalut_pos=(0,0), confidence=0.9, screen_shot=True):
+        try:
+            if screen_shot:
+                save_all_img(driver)
+            
+            region_im = self.crop_by_region(IMG_PREFIX+ALL_IMAGE, region)
+
+            if region_im != None:
+                region_im.save(IMG_PREFIX+ALL_IMAGE)
+                xyt = match_img(ALL_IMAGE, img_name, confidence)    
+                if xyt != None and len(xyt) > 0:
+                    x = xyt[0]['result'][0]
+                    y = xyt[0]['result'][1]
+                    return (int(x), int(y) + BLACK_X) # 因为后面点击的方法会减去这个值，所以这里的加一下
+        except Exception as e:
+            print(e)
+        return defalut_pos
+
     def use_bags(self):
         clear_kill_go(self.driver)
         get_goods(self.driver)

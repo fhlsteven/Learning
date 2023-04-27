@@ -72,6 +72,8 @@ class TopProcess(Base):
         wait_time(2)
         self.click_pos(LOGIN_GIGT)
         self.click_pos(LOGIN_GIGT_GET)
+        if configs.svip_level>0:
+            self.click_pos(LOGIN_GIGT_GET)            
         wait_time(2)
         self.click_pos(DAY_SIGN_IN)
         wait_time(1)
@@ -100,6 +102,8 @@ class TopProcess(Base):
         wait_time(2)
         times = 0
         while times < 5:
+            if times>=3:
+                self.use_bags()
             self.click_pos((ZB_POS[0] + times * X_STEP, ZB_POS[1]))            
             self.click_pos(FREE_FIND_POS)
             click_black(self.driver)
