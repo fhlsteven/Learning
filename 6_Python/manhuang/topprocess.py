@@ -2,6 +2,7 @@
 
 from common import wait_time, Base, click_black, BLACK_X
 from configs import configs
+from roles import Roles
 
 WELFARE_POS=(65, 261)
 WELFARE_IMG = "welfare.png"
@@ -51,40 +52,70 @@ SEC_SHOP = (145,772+BLACK_X)
 XF_SHOP = (83,712+BLACK_X)
 BUY_OK = (250, 480 +BLACK_X)
 
+# hd
+HD_FIRST = (70,768 +BLACK_X)
+HD_LOGIN = (345, 779+BLACK_X)
+HD_YB = (402,243+BLACK_X)
+
 class TopProcess(Base):
     def __init__(self, driver, waits=1):
         super(TopProcess, self).__init__(driver, waits=waits)
     
     def process_top(self):  
-        self.to_main()      
+        self.to_main()  
         self.get_welfare()
         self.get_rank()
-        self.find_treasure()
-        self.xd_rank()
-        self.get_yb()
-        self.free_shop()
+        self.find_treasure()        
+        self.free_shop()        
         if configs.svip_level > 0:
             self.get_svip()
+        self.hd_yb()
+        self.xd_rank()
+        self.get_yb()
 
     def get_welfare(self):
         welfare_pos = self.get_pos_byimg(WELFARE_IMG, WELFARE_POS, 0.8)
         self.click_pos(welfare_pos)
         wait_time(2)
-        self.click_pos(LOGIN_GIGT)
-        self.click_pos(LOGIN_GIGT_GET)
-        if configs.svip_level>0:
-            self.click_pos(LOGIN_GIGT_GET)            
-        wait_time(2)
-        self.click_pos(DAY_SIGN_IN)
-        wait_time(1)
-        self.click_pos(SIGN_IN)        
-        self.click_pos(ONLINE_BAGS)
-        wait_time(2)
-        self.click_pos(ONLINE_GET)
+
+        if self.is_exists_image("check_welfare.png"):
+            self.welfare_double()
+        else:
+            self.click_pos(LOGIN_GIGT)
+            self.click_pos(LOGIN_GIGT_GET)
+            if configs.svip_level>0:
+                self.click_pos(LOGIN_GIGT_GET)                    
+            wait_time(2)
+            self.click_pos(DAY_SIGN_IN)
+            wait_time(1)
+            self.click_pos(SIGN_IN)        
+            self.click_pos(ONLINE_BAGS)
+            wait_time(2)
+            self.click_pos(ONLINE_GET)
+        
         self.use_bags()
         wait_time(2)
         click_black(self.driver)
         self.click_callback()
+
+    def welfare_double(self):
+        self.click_pos(LOGIN_GIGT)
+        self.click_pos(LOGIN_GIGT_GET)
+        if configs.svip_level>0:
+            self.click_pos(LOGIN_GIGT_GET)
+        wait_time(2)
+        self.click_pos((140, LOGIN_GIGT[1]))
+        self.click_pos(LOGIN_GIGT_GET)
+        if configs.svip_level>0:
+            self.click_pos(LOGIN_GIGT_GET)
+        wait_time(2)
+
+        self.click_pos((210, LOGIN_GIGT[1]))
+        wait_time(2)
+        self.click_pos(SIGN_IN)
+        self.click_pos((280,LOGIN_GIGT[1]))
+        wait_time(2)
+        self.click_pos(ONLINE_GET)         
     
     def get_rank(self):
         rank_pos = self.get_pos_byimg(RANK_IMG, RANK_POS, 0.8)
@@ -102,6 +133,7 @@ class TopProcess(Base):
         wait_time(2)
         times = 0
         while times < 5:
+            Roles(self.driver).check_login(False)
             if times>=3:
                 self.use_bags()
             self.click_pos((ZB_POS[0] + times * X_STEP, ZB_POS[1]))            
@@ -121,7 +153,7 @@ class TopProcess(Base):
         self.click_callback()
     
     def xd_rank(self):
-        xd_rank_pos = self.get_pos_byimg(XD_RANK_IMG, confidence=0.5)
+        xd_rank_pos = self.try_get_imgpos(XD_RANK_IMG, confid=0.5)
         if xd_rank_pos[0]>0:
             self.click_pos(xd_rank_pos)
             wait_time(2)
@@ -134,13 +166,33 @@ class TopProcess(Base):
             self.click_pos(XD_QUIT)
 
     def get_yb(self):
-        yb_pos = self.get_pos_byimg(YB_IMG, confidence=0.5)
+        yb_pos = self.try_get_imgpos(YB_IMG, confid=0.5)
         if yb_pos[0] > 0:
             self.click_pos(yb_pos)
             wait_time(2)
             self.click_pos(YB_GET_POS)
             wait_time(1)
             self.click_pos(YB_QUIT)
+
+    def hd_yb(self):
+        pos = self.try_get_imgpos("top_hd.png", 0.7)
+        if pos[0]>0:
+            self.click_pos(pos)
+            wait_time(2)
+            self.click_pos(HD_FIRST)
+            hd_login = self.try_get_imgpos("top_hd_l.png", 0.8)
+            if hd_login[0]>0:
+                self.click_pos(hd_login)
+            else:
+                self.click_pos(HD_LOGIN)            
+            wait_time(2)
+            self.click_pos(HD_YB)
+            wait_time(2)
+            if configs.svip_level>0:
+                self.click_pos(HD_YB)
+                wait_time(1)
+                self.click_pos(HD_YB)
+            self.click_callback()
 
     def get_svip(self):
         self.click_pos(SVIP_POS)
@@ -174,7 +226,7 @@ class TopProcess(Base):
                 self.click_pos(BUY_OK)
                 wait_time(3)  
             c_times = c_times+1
-            if c_times >6:
+            if c_times > 6:
                 break
         c_times = 0
         while True:
@@ -185,8 +237,16 @@ class TopProcess(Base):
                 self.click_pos(BUY_OK)
                 wait_time(3)            
             c_times = c_times+1
-            if c_times >3:
+            if c_times > 3:
                 break
+
+    def try_get_imgpos(self, img_name, confid):
+        times = 0
+        pos = self.get_pos_byimg(img_name, confidence=confid)
+        while pos[0]<1 and times < 5:
+            pos = self.get_pos_byimg(img_name, confidence=confid)
+            times = times + 1
+        return pos
 
 
 

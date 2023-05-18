@@ -177,6 +177,8 @@ class MHApplication(object):
         self.btn_get_yb.grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text="xf shop", command=self.xf_shop_click).grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text="hd yuanb", command=self.hd_yuanb_click).grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         self.lb_role = Label(self.main_win, text="role", fg='green', font=('宋体',16))
@@ -227,6 +229,9 @@ class MHApplication(object):
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
 
+    def hd_yuanb_click(self):
+        TopProcess(self.driver).hd_yb()
+
     def relogin_click(self):
         Roles(self.driver).relogin()
 
@@ -254,7 +259,7 @@ class MHApplication(object):
         send_msg()
 
     def m_id_hd_click(self):
-        DailyActivities(self.driver, 0).monitor_mid()
+        DailyActivities(self.driver, 0).monitor_mid(is_ignore_time=False)
         send_msg()
 
     def shen_dian_boss_click(self):

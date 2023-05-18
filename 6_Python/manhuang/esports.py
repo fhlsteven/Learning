@@ -39,6 +39,7 @@ class ESports(Base):
 
     def main_to_xy(self):
         self.main_to_sport()
+        self.click_pos(EBLACK_POS)
         self.click_pos(XY_POS)
         self.xy_kill(XY_SEC)
         self.xy_kill(XY_FIRST)

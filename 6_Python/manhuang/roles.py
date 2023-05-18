@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from common import Base, BLACK_X, wait_time, click_black
+from datetime import datetime
 
 ROLE_POS = (126, 769 + BLACK_X) # 126 769 + 124
 
@@ -71,9 +72,11 @@ class Roles(Base):
         self.use_bags()
         self.click_callback()
 
-    def check_login(self):
-        self.use_bags()
-        click_black(self.driver, times=5)
+    def check_login(self, check_more=True):
+        if check_more:
+            self.use_bags()
+            click_black(self.driver, times=5)
+            self.log_by_img()
         pos = self.get_pos_byimg("ok.png")
         if pos[0]>0:
             self.click_pos(pos)
@@ -81,6 +84,11 @@ class Roles(Base):
             while self.is_exists_image("login_bg.png"):
                 wait_time()
             click_black(self.driver, 5)
+        if check_more:
+            self.log_by_img()
+        pos = self.get_pos_byimg("ok_sec.png")
+        if pos[0]>0:
+            self.relogin() 
 
     def relogin(self):
         self.driver.refresh()
@@ -96,6 +104,8 @@ class Roles(Base):
                 wait_time()
             click_black(self.driver, 5)
         
+    def log_by_img(self):
+        self.driver.save_screenshot("temp/clog_"+ str(datetime.now()).replace(':','_')+'.png')
             
 
 

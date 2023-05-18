@@ -31,9 +31,10 @@ class Adventure(Base):
         times = 0 
         self.clear_right_tips()
         while times<4:
-            pos = self.get_pos_byimg("adv_kill.png",confidence=0.7)
+            pos = self.get_pos_byimg("adv_kill.png",confidence=0.8)
             if pos[0]> 0:
-                self.go_kill(pos)                
+                self.go_kill(pos)   
+                self.clear_right_tips()       
             else:
                 break
             times = times + 1
@@ -110,6 +111,7 @@ class Adventure(Base):
         times = 0
         while times < 5:
             self.click_pos(CLOSE_KILL_GO)
+            times = times+1
 
 
         

@@ -158,7 +158,7 @@ class Monitors(Base):
     def monitor_yiyu_boss(self, is_chuan_qi=True):
         pt_times = 0
         while self.is_exit(False):          
-            if pt_times >= 9:
+            if pt_times > 9:
                 break  
 
             while self.is_exists_image("yi_yu_boss.png") == False:

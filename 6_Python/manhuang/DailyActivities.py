@@ -56,6 +56,8 @@ XIANMEN_TEAM = (451, 500+BLACK_X)
 
 XIAN_MEN_GO = (310, 612+BLACK_X)
 
+YUN_MEN_BOSS = (250,590+BLACK_X)
+
 def is_between(start_at, end_at):
     now_time = datetime.now()
     if start_at[0] <= now_time.hour <= end_at[0]:
@@ -82,12 +84,15 @@ class DailyActivities(Base):
             loop_flag = d_now.hour == 11 and d_now.minute > 20
         while loop_flag:
             wait_time()            
-            try:
-                self.protect()
+            try:                
+                self.god_treasure()
+                self.yun_men_boss()
                 self.boss()
             except Exception as e:
                 print(f'{d_now} monitor_mid:{e}')
+            d_now = datetime.now()
             if d_now.hour == 12 and d_now.minute > 45:
+                loop_flag = False
                 break
 
     def hd_process(self):
@@ -126,6 +131,19 @@ class DailyActivities(Base):
             self.close_hd()
             self.use_bags()
 
+    def yun_men_boss(self):
+        if is_between((12,00),(12,7)):
+            print("yun_men_boss start")
+            self.start_hd(False)
+            wait_time(3)
+            if self.is_exists_image("day.png"):
+                self.click_pos(HD_POS_MINI)
+            self.click_pos(YUN_MEN_BOSS)
+            wait_time(15*60)
+            self.click_quit()
+            self.use_bags()
+            self.click_callback()
+
     # bath
     def bath(self):
         if is_between((19,1), (19,16)):
@@ -137,18 +155,21 @@ class DailyActivities(Base):
             self.use_bags()
 
     def boss(self):
-        if is_between((12,30), (12,42)):
+        if is_between((12,30), (12,38)):
             print("boss start")
-            self.start_hd()
+            self.start_hd(False)
             wait_time(3)
+            if self.is_exists_image("day.png"):
+                self.click_pos(HD_POS_MINI)
+            
             self.click_pos(BOSS_POS)
             cur_time = datetime.now()
             next_time = datetime(cur_time.year, cur_time.month, cur_time.day, cur_time.hour, 38, 3)
             wait_secs = (next_time - cur_time).seconds  
-            wait_time(wait_secs+25)
+            wait_time(wait_secs+24)
             for x in range(1, 4):                
                 self.click_pos((FIRST_BOSS[0], FIRST_BOSS[1] + x*20))
-                wait_time(25)
+                wait_time(24)
 
             wait_time(4*60)
             self.close_hd()

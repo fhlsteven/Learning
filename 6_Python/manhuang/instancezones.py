@@ -53,6 +53,7 @@ class InstanceZone(Base):
 
     def signle_everyday_fb(self):
         c_times=0
+        
         while 7 > c_times:            
             self.single_fb_kill()
             c_times = c_times + 1 
