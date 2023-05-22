@@ -293,8 +293,15 @@ class MHApplication(object):
         c_times = 0
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
         r_pre_time = pre_time 
+        check_login_time = datetime.now()
         while is_exists_image(self.driver, "chat_box.png") == False:  
             try: 
+
+                _now = datetime.now()
+                if get_date_minutes(check_login_time, _now) > 60:
+                    Roles(self.driver).check_login()
+                    check_login_time = _now
+
                 if get_date_minutes(pre_time, datetime.now()) > 5 and times < pets_times: 
                     HouseJob(self.driver).house_to_pettravel(times%5==0)
                     pre_time = datetime.now()
@@ -308,7 +315,7 @@ class MHApplication(object):
                     c_times = c_times + Boss(self.driver).process_three_realms()
 
                 _now = datetime.now()
-                if _now.day in(5,6) and _now.hour == 11:
+                if _now.hour == 11:
                     DailyActivities(self.driver).monitor_mid()
                 elif _now.hour == 16:
                     DailyActivities(self.driver).protect()
