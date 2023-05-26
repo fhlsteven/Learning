@@ -3,6 +3,7 @@
 from common import wait_time, Base, click_black, BLACK_X
 from configs import configs
 from roles import Roles
+from datetime import datetime
 
 WELFARE_POS=(65, 261)
 WELFARE_IMG = "welfare.png"
@@ -57,6 +58,24 @@ HD_FIRST = (70,768 +BLACK_X)
 HD_LOGIN = (345, 779+BLACK_X)
 HD_YB = (402,243+BLACK_X)
 
+#jx
+JX_RENWU = (261, 699+BLACK_X)
+JX_GET = (395, 113+BLACK_X)
+JX_SAIJI = (382, 628+BLACK_X)
+
+# every day Competition
+COMPE_POS = (450, 164 +BLACK_X)
+FS_BUY = (213,670+BLACK_X)
+FS_BUY_POS =(260, 783+BLACK_X)
+FSQ_BUY = (169,768 +BLACK_X)
+FS_UP = (80,770+BLACK_X)
+FS_UPJX=(333,663+BLACK_X)
+FS_UP_POS = (210, 650+BLACK_X)
+FS_XF = (360,253 + BLACK_X)
+FS_WHTB = (100, 388 + BLACK_X)
+FS_WHTB_UP = (200, 608+BLACK_X)
+FS_WHTB_CLOSE = (444, 191+BLACK_X)
+
 class TopProcess(Base):
     def __init__(self, driver, waits=1):
         super(TopProcess, self).__init__(driver, waits=waits)
@@ -72,6 +91,7 @@ class TopProcess(Base):
         self.hd_yb()
         self.xd_rank()
         self.get_yb()
+        self.jiuxiao_get()
 
     def get_welfare(self):
         welfare_pos = self.get_pos_byimg(WELFARE_IMG, WELFARE_POS, 0.8)
@@ -194,6 +214,23 @@ class TopProcess(Base):
                 self.click_pos(HD_YB)
             self.click_callback()
 
+    def jiuxiao_get(self):
+        pos = self.try_get_imgpos("jiuxiao.png", 0.8)
+        if pos[0]>0:
+            self.click_pos(pos)
+            wait_time(4)
+            self.click_pos(JX_RENWU)
+            wait_time(3)
+            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.5) == False:
+                self.click_pos(JX_GET)
+                wait_time(5)
+            self.click_pos(JX_SAIJI)
+            wait_time(4)
+            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.5) == False:
+                self.click_pos(JX_GET)
+                wait_time(3)
+            self.click_callback()         
+
     def get_svip(self):
         self.click_pos(SVIP_POS)
         self.click_pos(SVIP_GIFT)
@@ -248,5 +285,87 @@ class TopProcess(Base):
             times = times + 1
         return pos
 
+    def day_competition(self):
+        self.click_pos(COMPE_POS)
+        wait_time(3)
+        if self.is_exists_image('fs_xf.png'):
+            self.fs_xf()
+            self.click_callback()
+            return
+        
+        if self.is_exists_image('fs_buy.png'):
+            self.click_pos(FS_BUY)            
+        else:
+            self.click_pos(FS_BUY_POS)
+            wait_time(3)
+            self.click_pos(FS_BUY)
+
+        wait_time(3)
+        self.click_pos(FSQ_BUY)
+        wait_time(3)
+        self.click_pos(FS_UP)
+        wait_time(3)
+        if datetime.now().weekday() != 5:
+            self.click_pos(FS_UPJX)
+            wait_time(3)
+            self.click_pos(FS_UP_POS)
+            c_times = 0
+            while self.is_exists_image("cl_out.png") == False:
+                self.click_pos(FS_UP_POS)
+                wait_time(3)
+                c_times = c_times+1
+                if c_times > 20:
+                    break
+            wait_time(2)
+            click_black(self.driver)
+            self.fs_up_after()
+        else:
+            self.click_pos(FS_UPJX)
+            wait_time(3)
+            self.fs_wutb()
+            self.fs_up_after()
+
+    def fs_up_after(self):
+        self.click_callback(1)
+        wait_time(3)
+        c_times=0
+        while c_times < 10:
+            c_times = c_times + 1
+            self.click_pos(FS_UPJX)
+            wait_time(2)
+        self.click_callback()
+        wait_time(2)
+        self.click_pos(COMPE_POS)
+        if self.is_exists_image('fs_xf.png'):
+            self.fs_xf()
+        self.click_callback()
+
+    def fs_wutb(self):
+        c_times = 0
+        while c_times < 12:
+            self.click_pos(FS_WHTB)
+            u_all_times = 8
+            if c_times > 5:
+                u_all_times = 4
+            
+            u_times = 0
+            while u_times < u_all_times:
+                self.click_pos(FS_WHTB_UP)
+                u_times = u_times + 1
+            self.click_pos(FS_WHTB_CLOSE)
+            wait_time(3)
+            c_times = c_times+1
+
+    def fs_xf(self):
+        self.click_pos(FS_XF)
+        wait_time(2)
+        c_times = 0 
+        while self.is_exists_image_by_region("fs_go.png",(338,218,448,286)) == False:
+            self.click_pos(FS_XF)
+            wait_time(2)
+            c_times = c_times+1
+            if c_times >= 15:
+                break
+            
 
 

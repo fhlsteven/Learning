@@ -132,14 +132,21 @@ class Monitors(Base):
         print("--get email")
         Teams(self.driver).get_email()
 
-        print("--top process")
-        TopProcess(self.driver).process_top()
-
         print("--xianfu-shop")
         TopProcess(self.driver).main_to_xf_shop()
 
+        print("--top process")
+        TopProcess(self.driver).process_top()        
+
         print("--esports kill 10")
         ESports(self.driver).main_to_single_all()
+
+        if datetime.now().weekday() != 3:
+            print("--esports main_to_mobai ")
+            ESports(self.driver).main_to_mobai()
+        
+        print("-- day_competition ")
+        TopProcess(self.driver).day_competition()
 
     def quick_daylies_more_times(self, is_adventure=False):
         Roles(self.driver).check_login()
@@ -149,6 +156,9 @@ class Monitors(Base):
         ESports(self.driver).main_to_xy()
         InstanceZone(self.driver).main_to_shenbeast_island()
         TopProcess(self.driver).main_to_xf_shop()
+        TopProcess(self.dirver).jiuxiao_get()
+        if datetime.now().weekday() == 3:
+            ESports(self.driver).main_to_mobai()
         # three boos
     def monitor_three_boss(self):
         c_times = 0

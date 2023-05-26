@@ -59,9 +59,16 @@ def get_goods(dr):
     click_black(dr, times=1)
 
 CALLBACK_POS=(450, 916)
-def callback_click(dr):
-    while is_exists_image(dr, "callback.png"):
-        click_pos_locxy(dr, CALLBACK_POS, waits=0)
+def callback_click(dr, times=0):
+    if times == 0:
+        while is_exists_image(dr, "callback.png"):
+            click_pos_locxy(dr, CALLBACK_POS, waits=0)
+    else:
+        c_times = 0 
+        while c_times < times:
+            c_times = c_times + 1
+            if is_exists_image(dr, "callback.png"):
+                click_pos_locxy(dr, CALLBACK_POS, waits=0)
 
 IMG_PREFIX = 'imgs/'
 def match_img(imgsrc, imgobj, confidencevalue=0.9):  # imgsrc=原始图像，imgobj=待查找的图片   
@@ -200,7 +207,7 @@ class Base(object):
     def get_pos_byimg_region(self, img_name, region,defalut_pos=(0,0), confidence=0.9, screen_shot=True):
         try:
             if screen_shot:
-                save_all_img(driver)
+                save_all_img(self.driver)
             
             region_im = self.crop_by_region(IMG_PREFIX+ALL_IMAGE, region)
 
@@ -233,11 +240,22 @@ class Base(object):
     def click_quit(self, is_need_ok=True):
         quit_scene(self.driver, is_need_ok)
 
+    def is_exists_image_by_region(self, img_name, region, confidence=0.8, is_save=True):
+        if is_save:
+            save_all_img(self.driver)
+            
+        region_im = self.crop_by_region(IMG_PREFIX+ALL_IMAGE, region, 2)
+        if region_im != None:
+            region_im.save(IMG_PREFIX+ALL_IMAGE)
+            xyt = match_img(ALL_IMAGE, img_name, confidence)    
+            return xyt != None and len(xyt) > 0
+        return False
+
     def is_exists_image(self, img_name, confidence = 0.8, is_save_img=True):
         return is_exists_image(self.driver, img_name, confidence, is_save=is_save_img)
     
-    def click_callback(self):
-        callback_click(self.driver)
+    def click_callback(self, c_times=0):
+        callback_click(self.driver, c_times)
 
     def is_exit_loop(self, status = False):
         return is_exists_image(self.driver, "chat_box.png") == status
@@ -246,10 +264,13 @@ class Base(object):
         img = img.convert('L')
         return get_ocr_txt(img)
 
-    def crop_by_region(self, imgsrc, region):
+    def crop_by_region(self, imgsrc, region, mode=1):
         try:            
             all_img = Image.open(imgsrc)
-            return all_img.crop((region[0], region[1], region[0]+region[2], region[1]+region[3]))            
+            if mode == 1:
+                return all_img.crop((region[0], region[1], region[0]+region[2], region[1]+region[3]))
+            else:
+                return all_img.crop((region[0], region[1], region[2], region[3]))
         except Exception as e:
             print(e)
             return None
