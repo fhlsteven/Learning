@@ -221,14 +221,14 @@ class TopProcess(Base):
             wait_time(4)
             self.click_pos(JX_RENWU)
             wait_time(3)
-            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.5) == False:
+            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.7) == False:
                 self.click_pos(JX_GET)
                 wait_time(5)
             self.click_pos(JX_SAIJI)
-            wait_time(4)
-            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.5) == False:
+            wait_time(5)
+            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.7) == False:
                 self.click_pos(JX_GET)
-                wait_time(3)
+                wait_time(5)
             self.click_callback()         
 
     def get_svip(self):
