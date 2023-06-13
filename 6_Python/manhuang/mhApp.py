@@ -182,9 +182,11 @@ class MHApplication(object):
 
         row_start = row_start + 1
         cur_column = 0
-        Button(self.main_win, text='jx get', command=self.jx_get_click, width=20).grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='jx get', command=self.jx_get_click).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text='fs competion', command=self.fs_competion_click, width=20).grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text='qmin kh', command=self.qmin_kh_click).grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         self.lb_role = Label(self.main_win, text="role", fg='green', font=('宋体',16))
@@ -235,6 +237,9 @@ class MHApplication(object):
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
 
+    def qmin_kh_click(self):
+        TopProcess(self.driver).qmkh()
+        send_msg()
 
     def fs_competion_click(self):
         TopProcess(self.driver).day_competition()

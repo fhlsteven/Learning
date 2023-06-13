@@ -76,6 +76,10 @@ FS_WHTB = (100, 388 + BLACK_X)
 FS_WHTB_UP = (200, 608+BLACK_X)
 FS_WHTB_CLOSE = (444, 191+BLACK_X)
 
+# QMKH
+QM_KH = (355,215 +BLACK_X)
+QM_GET = (74, 229 + BLACK_X)
+
 class TopProcess(Base):
     def __init__(self, driver, waits=1):
         super(TopProcess, self).__init__(driver, waits=waits)
@@ -220,16 +224,20 @@ class TopProcess(Base):
             self.click_pos(pos)
             wait_time(4)
             self.click_pos(JX_RENWU)
-            wait_time(3)
-            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.7) == False:
-                self.click_pos(JX_GET)
-                wait_time(5)
+            wait_time(3) # 325,111,456,139
+
+            self.jx_get()
             self.click_pos(JX_SAIJI)
             wait_time(5)
-            while self.is_exists_image_by_region("jx_get.png",(326,86,455,136), 0.7) == False:
-                self.click_pos(JX_GET)
-                wait_time(5)
-            self.click_callback()         
+            self.jx_get()
+            self.click_callback()  
+
+    def jx_get(self):
+        c_times = 0 
+        while self.is_exists_image_by_region("jx_get.png",(335,111,451,137), 0.7) == False and c_times<15:
+            self.click_pos(JX_GET)
+            wait_time(5)
+            c_times = c_times + 1
 
     def get_svip(self):
         self.click_pos(SVIP_POS)
@@ -302,6 +310,7 @@ class TopProcess(Base):
 
         wait_time(3)
         self.click_pos(FSQ_BUY)
+        self.use_bags()
         wait_time(3)
         self.click_pos(FS_UP)
         wait_time(3)
@@ -333,9 +342,20 @@ class TopProcess(Base):
             c_times = c_times + 1
             self.click_pos(FS_UPJX)
             wait_time(2)
+        
+        '''
         self.click_callback()
         wait_time(2)
         self.click_pos(COMPE_POS)
+        '''
+        # 378 800
+        find_pos = (378, 800+BLACK_X)
+        self.click_pos(find_pos)
+        f_times = 0
+        while self.is_exists_image('fs_xf.png') == False and f_times < 4:
+            self.click_pos(find_pos)
+            f_times = f_times + 1
+
         if self.is_exists_image('fs_xf.png'):
             self.fs_xf()
         self.click_callback()
@@ -367,5 +387,23 @@ class TopProcess(Base):
             if c_times >= 15:
                 break
             
+    def qmkh(self):
+        pos = self.try_get_imgpos("qmkh.png", 0.8)
+        if pos[0] == 0:
+            pos = self.try_get_imgpos('qmkh_2.png', 0.8)
+        if pos[0] > 0:
+            self.click_pos(pos)
+            wait_time(3)
+            c_times = 0
+            while self.is_exists_image_by_region('qm_go.png', (52,210,120,254)) == False and c_times < 25:
+                self.click_pos(QM_GET)
+                wait_time(3)
+                c_times = c_times + 1
+            g_times = 0
+            while g_times < 3:
+                self.click_pos(QM_KH)
+                g_times = g_times + 1
+            self.use_bags()
+            self.click_callback()
 
 

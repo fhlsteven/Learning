@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from common import Base, wait_time, BLACK_X
+from datetime import datetime
 
 SPORT = (467, 568+ BLACK_X)
 SINGLE_SPORT = (69, 762 + BLACK_X) # 69 762
@@ -70,6 +71,8 @@ class ESports(Base):
         self.click_pos(ZD_MB)
         wait_time(2)
         self.click_pos(ZD_MB_SEC)
+        if datetime.now().weekday() == 1:
+            wait_time(60 * 3)
         self.click_callback()
 
     def main_to_single_all(self):
