@@ -209,9 +209,9 @@ class Monitors(Base):
     
     def monitor_end(self):
         while self.is_exit(False):  
-            if configs.login.cur_index == 1:
+            if configs.login.cur_index == '1':
                 self.click_pos(THIRD_BOSS)
-            elif configs.login.cur_index == 2:
+            elif configs.login.cur_index == '2':
                 self.click_pos(FOURTH_BOSS)
             wait_time(30)
             if self.is_exists_image("team.png"):
