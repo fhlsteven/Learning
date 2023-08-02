@@ -120,6 +120,29 @@ module.exports = {
 }
 ```
 
+## 2.0中一个最简单的配置后来发现的
+
+在这个[Markdown增强](https://plugin-md-enhance.vuejs.press/zh/guide/#%E9%80%89%E9%A1%B9%E5%8D%A1)看到了，里面有很多插件，除了数学公式还有流程图等等一堆。我是在看流程图的时候发现的哦。来看怎么用。
+
+1. 安装插件包 `npm i -D vuepress-plugin-md-enhance`
+2. 按照以下代码修改`config.ts`，具体的可以看[文档说明](https://plugin-md-enhance.vuejs.press/zh/guide/tex.html)
+
+```ts
+// .vuepress/config.ts
+import { mdEnhancePlugin } from "vuepress-plugin-md-enhance";
+
+export default {
+  plugins: [
+    mdEnhancePlugin({
+      // 使用 KaTeX 启用 TeX 支持
+      katex: true,
+      // 使用 mathjax 启用 TeX 支持
+      mathjax: true,
+    }),
+  ],
+};
+```
+
 ## 总结
 
 通个这个的搞定，那么使用其他Markdown It 插件都可以去这个网站找[https://mdit-plugins.github.io/zh/](https://mdit-plugins.github.io/zh/)，然后自己改改就能轻松融入了！还是的多琢磨！
