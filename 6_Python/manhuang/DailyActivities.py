@@ -161,7 +161,7 @@ class DailyActivities(Base):
             wait_time(3)
             if self.is_exists_image("day.png"):
                 self.click_pos(HD_POS_MINI)
-            
+            wait_time(3)
             self.click_pos(BOSS_POS)
             cur_time = datetime.now()
             next_time = datetime(cur_time.year, cur_time.month, cur_time.day, cur_time.hour, 38, 3)
@@ -172,7 +172,6 @@ class DailyActivities(Base):
                 wait_time(24)
 
             wait_time(4*60)
-            self.close_hd()
             self.click_callback()
             print("boss end")
     
@@ -193,9 +192,11 @@ class DailyActivities(Base):
         if is_between((16,1),(16,15)) or ignore_time:
             self.start_hd(False)
             times = 0
-            while times < 3:
+            while times < 4:
                 self.click_pos(XIAN_NV)
                 self.click_pos(XIAN_NV)
+                wait_time(60*5+5)
+                click_black(self.driver)
                 while self.is_exists_image("protecting.png"):
                     wait_time(60)
                     click_black(self.driver)
@@ -347,4 +348,5 @@ class DailyActivities(Base):
         self.click_callback()  
     
     def log_img(self):
-        self.driver.save_screenshot("temp/hd_"+ str(datetime.now()).replace(':','_')+'.png')    
+        pass
+        #self.driver.save_screenshot("temp/hd_"+ str(datetime.now()).replace(':','_')+'.png')    

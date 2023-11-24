@@ -54,7 +54,7 @@ class InstanceZone(Base):
     def signle_everyday_fb(self):
         c_times=0
         
-        while 7 > c_times:            
+        while 7 >= c_times:            
             self.single_fb_kill()
             c_times = c_times + 1 
         
@@ -66,10 +66,10 @@ class InstanceZone(Base):
         self.single_fb_kill()
         self.single_fb_kill()
 
-        quick_times = 10
+        quick_times = 12
         c_times = 0
         if configs.svip_level > 0:
-            quick_times = 45
+            quick_times = quick_times * 6
         
         while c_times < quick_times:
             self.click_pos(FB_FIRST_POS)

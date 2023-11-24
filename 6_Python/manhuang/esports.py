@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from common import Base, wait_time, BLACK_X
+from datetime import datetime
 
 SPORT = (467, 568+ BLACK_X)
 SINGLE_SPORT = (69, 762 + BLACK_X) # 69 762
@@ -18,6 +19,12 @@ XY_OK = (250,721+BLACK_X)
 XY_TOP = (410,273 +BLACK_X)
 
 EBLACK_POS=(250, 73+BLACK_X)
+
+# zhan dui
+ZD_POS = (276, 790 + BLACK_X)
+ZD_ZL = (318,687 +BLACK_X)
+ZD_MB = (252, 580+BLACK_X)
+ZD_MB_SEC = (239, 672+BLACK_X)
 
 class ESports(Base):
     def __init__(self, driver, waits=1):
@@ -55,6 +62,18 @@ class ESports(Base):
         #self.click_pos(XY_OK)
         while self.is_exists_image("xy_esport.png")==False:
             wait_time(5)
+
+    def main_to_mobai(self):
+        self.main_to_sport()
+        wait_time(2)
+        self.click_pos(ZD_POS)
+        wait_time(2)
+        self.click_pos(ZD_MB)
+        wait_time(2)
+        self.click_pos(ZD_MB_SEC)
+        if datetime.now().weekday() == 1:
+            wait_time(60 * 3)
+        self.click_callback()
 
     def main_to_single_all(self):
         self.single_sport()

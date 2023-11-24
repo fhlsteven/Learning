@@ -133,6 +133,8 @@ class MHApplication(object):
         Button(self.main_win, text="protect", command=self.xv_protect_click).grid(row=row_start, column=cur_column)
         cur_column = cur_column + 1
         Button(self.main_win, text="relogin", command=self.relogin_click).grid(row=row_start, column=cur_column)
+        cur_column = cur_column + 1
+        Button(self.main_win, text="zd mb", command=self.zb_mb_click).grid(row=row_start, column=cur_column)
         
         row_start = row_start + 1
         cur_column = 0        
@@ -170,15 +172,21 @@ class MHApplication(object):
 
         row_start = row_start + 1
         cur_column = 0
-        self.btn_xd_rank = Button(self.main_win, text='xd rank', command=self.xd_rank, width=20)
-        self.btn_xd_rank.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='xd rank', command=self.xd_rank, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
-        self.btn_get_yb = Button(self.main_win, text='get yuanbao', command=self.get_yuanbao, width=20)
-        self.btn_get_yb.grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='get yuanbao', command=self.get_yuanbao, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text="xf shop", command=self.xf_shop_click).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text="hd yuanb", command=self.hd_yuanb_click).grid(row=row_start, column=cur_column)
+
+        row_start = row_start + 1
+        cur_column = 0
+        Button(self.main_win, text='jx get', command=self.jx_get_click).grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text='fs competion', command=self.fs_competion_click, width=20).grid(row=row_start, column=cur_column)
+        cur_column =cur_column + 1
+        Button(self.main_win, text='qmin kh', command=self.qmin_kh_click).grid(row=row_start, column=cur_column)
 
         row_start = row_start + 1
         self.lb_role = Label(self.main_win, text="role", fg='green', font=('宋体',16))
@@ -228,6 +236,20 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def qmin_kh_click(self):
+        TopProcess(self.driver).qmkh()
+        send_msg()
+
+    def fs_competion_click(self):
+        TopProcess(self.driver).day_competition()
+        send_msg()
+    
+    def zb_mb_click(self):
+        ESports(self.driver).main_to_mobai()
+
+    def jx_get_click(self):
+        TopProcess(self.driver).jiuxiao_get()
 
     def hd_yuanb_click(self):
         TopProcess(self.driver).hd_yb()
@@ -293,8 +315,15 @@ class MHApplication(object):
         c_times = 0
         pre_time = datetime(2015, 4, 7, 4, 30, 3, 628556) 
         r_pre_time = pre_time 
+        check_login_time = datetime.now()
         while is_exists_image(self.driver, "chat_box.png") == False:  
             try: 
+
+                _now = datetime.now()
+                if get_date_minutes(check_login_time, _now) > 60:
+                    Roles(self.driver).check_login()
+                    check_login_time = _now
+
                 if get_date_minutes(pre_time, datetime.now()) > 5 and times < pets_times: 
                     HouseJob(self.driver).house_to_pettravel(times%5==0)
                     pre_time = datetime.now()
@@ -308,7 +337,7 @@ class MHApplication(object):
                     c_times = c_times + Boss(self.driver).process_three_realms()
 
                 _now = datetime.now()
-                if _now.day in(5,6) and _now.hour == 11:
+                if _now.hour == 11:
                     DailyActivities(self.driver).monitor_mid()
                 elif _now.hour == 16:
                     DailyActivities(self.driver).protect()
@@ -328,7 +357,7 @@ class MHApplication(object):
                     Boss(self.driver).rong_lian()
                     Teams(self.driver).get_email()
 
-                if is_between((5,1), (9,1)) and self.is_done_quick_mode == False:
+                if is_between((5,1), (7,1)) and self.is_done_quick_mode == False:
                     times = 13
                     c_times = 5
                     Roles(self.driver).check_login()

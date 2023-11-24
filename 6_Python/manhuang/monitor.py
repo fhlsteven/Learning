@@ -11,6 +11,7 @@ from esports import ESports
 from topprocess import TopProcess
 from datetime import datetime, timedelta
 from teams import Teams
+from configs import configs
 
 YUAN_SHEN = [b'\xe7\x83\x81\xe9\x87\x91', b'\xe7\x8e\x84\xe8\x8b\x8d', b'\xe5\xb9\xbb\xe6\xb5\xb7', b'\xe7\x82\xbd\xe5\xa4\xa9', b'\xe6\x98\x86\xe5\xa2\x9f']
 BA_GUA = [b'\xe7\x8e\x84\xe9\xbe\x9f', b'\xe6\x83\x8a\xe9\x9b\xb7', b'\xe7\x99\xbd\xe6\xb3\xbd', b'\xe7\x82\x8e\xe5\x87\xb0', b'\xe8\x8b\x8d\xe9\xbe\x99']
@@ -24,6 +25,8 @@ CQ_POS = (324, 310+BLACK_X)
 PT_POS= (176,310+BLACK_X)
 CQ_REFRESH = (250,652+BLACK_X)
 CQ_KILL = (385,233+BLACK_X)
+THIRD_BOSS = (337, 599+BLACK_X)
+FOURTH_BOSS = (337,625+BLACK_X)
 
 class Monitors(Base):
     def __init__(self, driver, waits=1):
@@ -132,14 +135,21 @@ class Monitors(Base):
         print("--get email")
         Teams(self.driver).get_email()
 
-        print("--top process")
-        TopProcess(self.driver).process_top()
-
         print("--xianfu-shop")
         TopProcess(self.driver).main_to_xf_shop()
 
+        print("--top process")
+        TopProcess(self.driver).process_top()        
+
         print("--esports kill 10")
         ESports(self.driver).main_to_single_all()
+
+        if datetime.now().weekday() != 3:
+            print("--esports main_to_mobai ")
+            ESports(self.driver).main_to_mobai()
+        
+        print("-- day_competition ")
+        TopProcess(self.driver).day_competition()
 
     def quick_daylies_more_times(self, is_adventure=False):
         Roles(self.driver).check_login()
@@ -149,6 +159,10 @@ class Monitors(Base):
         ESports(self.driver).main_to_xy()
         InstanceZone(self.driver).main_to_shenbeast_island()
         TopProcess(self.driver).main_to_xf_shop()
+        TopProcess(self.dirver).jiuxiao_get()
+        TopProcess(self.driver).qmkh()
+        if datetime.now().weekday() == 3:
+            ESports(self.driver).main_to_mobai()
         # three boos
     def monitor_three_boss(self):
         c_times = 0
@@ -194,7 +208,11 @@ class Monitors(Base):
                 self.click_pos(pos)
     
     def monitor_end(self):
-        while self.is_exit(False):            
+        while self.is_exit(False):  
+            if configs.login.cur_index == '1':
+                self.click_pos(THIRD_BOSS)
+            elif configs.login.cur_index == '2':
+                self.click_pos(FOURTH_BOSS)
             wait_time(30)
             if self.is_exists_image("team.png"):
                 break

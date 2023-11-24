@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import wait_time, Base, BLACK_X
+from common import wait_time, Base, BLACK_X,click_black
 from configs import configs
 from datetime import datetime, timedelta
 
@@ -58,6 +58,8 @@ class Boss(Base):
         wait_time(2)
     
     def main_to_three_realms(self):
+        if datetime.now().hour == 23:
+            click_black(self.driver)
         self.main_to_boss()
         self.click_pos(KUA_FU_BOSS)
         self.click_pos(THREE_REALM_BOSS)
