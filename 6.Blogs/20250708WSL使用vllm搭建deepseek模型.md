@@ -74,6 +74,17 @@
 
     校验：
 
+    报错 Killed：
+    
+    ```bash
+    # 报Killed错误添加参数 --no-cache-dir
+    sudo pip install --no-cache-dir torch==2.1.2+cu118 torchvision==0.16.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118 
+    # 或着 下载到本地 
+    wget https://download.pytorch.org/whl/cu118/torch-2.1.2%2Bcu118-cp310-cp310-linux_x86_64.whl
+    wget https://download.pytorch.org/whl/cu118/torchvision-0.16.2%2Bcu118-cp310-cp310-linux_x86_64.whl
+    ```
+
+
     ```bash
     python3 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
     ```
