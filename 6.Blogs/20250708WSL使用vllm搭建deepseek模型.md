@@ -116,8 +116,8 @@
     ```bash
     pip install modelscope
 
-    modelscope download --model deepseek-ai/deepseek-coder-1.3b-instruct
-
+    modelscope download --model deepseek-ai/deepseek-coder-1.3b-instruct --local_dir ./   # 下载到当前文件夹 modelscope download --model TheBloke/deepseek-coder-6.7B-base-GPTQ --local_dir ./
+    # 废话一下后面这个是量化模型 使用GPU内存小
     ln -s /d/models/deepseek-coder-1.3b-instruct /d/models/deepseek  # 为了简化调用，建立软链接
     ```
 
