@@ -16,7 +16,9 @@ def wait_time(secs=10):
 # BLACK_POS = (324, 184)
 BLACK_X = 124
 def click_locxy(dr, x, y, left_click=True, waits=1):
-    y = y - BLACK_X  
+    y = y - BLACK_X
+    if configs.runtime == 'debug':
+        print(f'click_locxy:{x},{y}')
     if waits>0:
         wait_time(waits)    
     if left_click:

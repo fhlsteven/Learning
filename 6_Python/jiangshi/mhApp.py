@@ -19,6 +19,7 @@ from monitor import Monitors
 from configs import configs
 from datetime import datetime
 from esports import ESports
+from play_normal import PlayNormal
 
 LOG_LINE_NUM = 0
 
@@ -57,7 +58,7 @@ class MHApplication(object):
 
         row_start = row_start + 1
         cur_column = 0
-        Button(self.main_win, text='rechange pets', command=self.rechallenge_pets, width=20).grid(row=row_start, column=cur_column)
+        Button(self.main_win, text='paly normal', command=self.palynormal, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
         Button(self.main_win, text='one long server', command=self.one_long_service, width=20).grid(row=row_start, column=cur_column)
         cur_column =cur_column + 1
@@ -236,6 +237,11 @@ class MHApplication(object):
         cur_column =0
         self.txt_log = Text(self.main_win, height=10)
         self.txt_log.grid(row=row_start, column=cur_column, columnspan=column_num)
+
+    def palynormal(self):
+        while True:
+            PlayNormal(self.driver).playNormal()
+            wait_time(10)
 
     def qmin_kh_click(self):
         TopProcess(self.driver).qmkh()
@@ -506,6 +512,7 @@ class MHApplication(object):
 
 def mh_gui():
     # 调用Tk()创建主窗口
+    print(configs.login.url)
     window =  Tk()
     driver = get_driver(configs.login.url)   
     app = MHApplication(window, driver)

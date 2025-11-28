@@ -24,7 +24,7 @@ def match_img_pos(imgobj, confidencevalue=0.9):
     return (0,0)
 
 if __name__ == "__main__":
-    imgname = "welfare.png"
+    imgname = "select.png"
     confidence_val=0.8
     argv = sys.argv[1:]
     if argv:

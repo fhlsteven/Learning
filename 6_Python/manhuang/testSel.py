@@ -34,7 +34,7 @@ def get_driver(url="https://baidu.com"):
     if configs.browser_type == "chrome":
         c_op = webdriver.ChromeOptions()
         c_op.add_argument("--mute-audio")
-        driver = webdriver.Chrome(chrome_options=c_op)
+        driver = webdriver.Chrome(options=c_op)
     elif configs.browser_type == "edge":
         e_op = webdriver.EdgeOptions()
         e_op.add_argument("--mute-audio")
