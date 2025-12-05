@@ -339,7 +339,7 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-6_Python/manhuang/imgs/
+6_Python/jiangshi/imgs/
 */*/dist/*.tar.gz
 6_Python/manhuang/imgs/.DS_Store
 6_Python/manhuang/imgs/mh_all.png
