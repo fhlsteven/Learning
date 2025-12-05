@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import time
 from selenium.webdriver.common.action_chains import ActionChains
 import aircv as ac
@@ -6,6 +7,8 @@ import pytesseract as ocr_act
 from PIL import Image
 from configs import configs
 from datetime import datetime
+import cv2
+import numpy as np
 
 BLACK_POS = (324, 184)
 ALL_IMAGE = 'mh_all.png'
@@ -103,7 +106,10 @@ class Base(object):
         self.waits = waits
 
     def click_pos(self, pos, is_check=False):
-        click_locxy(self.driver, pos[0], pos[1])
+        try:
+            click_locxy(self.driver, pos[0], pos[1])
+        except Exception as e:
+            print(e)
 
     def click_by_js(self, x, y):
         try:
@@ -173,7 +179,65 @@ class Base(object):
         except Exception as e:
             print(e)
             return None
-            
-
-
     
+    def is_exists_image_CV2(self, img_name, confidence = 0.8, is_save_img=True):
+        if is_save_img:
+            save_all_img(self.driver)
+        result = self.match_img_CV2(ALL_IMAGE, img_name, confidence)
+        if result != None and len(result)>0:
+            return True
+        return False
+    
+    def match_img_CV2(self, imgsrc, imgobj, confidencevalue=0.9, is_return_pos= False):
+        img_src =  IMG_PREFIX+imgsrc
+        img_obj = IMG_PREFIX+imgobj
+        try:
+            imsrc = cv2.imread(img_src, 0)
+            imobj = cv2.imread(img_obj, 0)
+            w, h = imobj.shape[::-1]
+
+            res = cv2.matchTemplate(imsrc, imobj, cv2.TM_CCOEFF_NORMED)
+            loc = np.where(res >= confidencevalue)  # 匹配度阈值
+
+            match_result = []
+
+            for pt in zip(*loc[::-1]):  # (x,y)
+                x, y = pt
+                center_x = x + w / 2
+                center_y = y + h / 2
+
+                result = {
+                    "result": (center_x, center_y),
+                    "rectangle": (
+                        (x, y),
+                        (x, y + h),
+                        (x + w, y),
+                        (x + w, y + h)
+                    ),
+                    "confidence": float(res[y][x])
+                }
+
+                match_result.append(result)
+
+            if configs.runtime == 'debug':
+                print(f'img_src:{img_src},img_obj:{img_obj}.match_result:{len(match_result)},confdend:{confidencevalue}')  
+            #[{'result': (61.0, 135.5), 'rectangle': ((36, 110), (36, 161), (86, 110), (86, 161)), 'confidence': 1.0}]
+
+            if not match_result:
+                return None
+
+            # 是否只返回第一个坐标
+            if is_return_pos:
+                return match_result[0]["result"]
+
+            return match_result
+        except Exception as ex:
+                print(ex)
+        return None
+    
+    def clear_console():
+        try:
+            os.system('cls' if os.name == 'nt' else 'clear')
+        except Exception as e:
+            print(e)
+

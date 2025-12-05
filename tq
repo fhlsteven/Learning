@@ -1,0 +1,576 @@
+[33mcommit 26ef052ba1028fad548d797983e2ffae5c89780e[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: fhlsteven <1508727061@qq.com>
+Date:   Sat Nov 29 17:03:38 2025 +0800
+
+    only jiagnshi
+
+[33mcommit 739427a1a970226f22dcb58a07191dc900c127fa[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Nov 28 16:43:55 2025 +0800
+
+    tets
+
+[33mcommit dc36598d161ed2919aaf379ad6b62cb302014094[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Nov 27 21:37:52 2025 +0800
+
+    jiangshi
+
+[33mcommit de360e2db8026f8cba6c145ec79ca0da50ed4c23[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Jul 10 12:45:55 2025 +0800
+
+    完善
+
+[33mcommit 613944e11f20cb5f1075d59ba6b19dcd8a40ad4d[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Jul 10 10:43:28 2025 +0800
+
+    增加下载模型
+
+[33mcommit 325adacf757d598903b2b01920f376e190dc659c[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Jul 10 10:17:10 2025 +0800
+
+    补充
+
+[33mcommit 9be7732fa425c3f59b1660160daf700a2f416cc6[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Jul 8 18:02:34 2025 +0800
+
+    本地部署 vLLM + DeepSeek-Coder-1.3B 实践总结version1
+
+[33mcommit 0fc566577b9e1791db9b6fe0dbaa59843d3da600[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Jul 3 16:18:34 2025 +0800
+
+    done
+
+[33mcommit bfc26626b5d363fb263b9f4845403a898bca8064[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Jul 3 16:06:58 2025 +0800
+
+    jquery.tmpl.min.js 渲染模板 小于号(<) 变 `/&lt;` 处理
+
+[33mcommit 14bc73ff7370a100dc5d920cf1757fd7351fde21[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Jul 19 17:43:54 2024 +0800
+
+    fix before
+
+[33mcommit 8beca04cb33908d69554517874b1ed2cf9ab0c9d[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Jul 16 15:02:07 2024 +0800
+
+    docker WSL exception log
+
+[33mcommit 1d9bb053ed54df36df9447a4855c6672a94b4193[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Jun 24 14:49:12 2024 +0800
+
+    截取视频片头片尾
+    
+    截取视频片头片尾；用这种命令模式的比较好控制
+
+[33mcommit 8b633c35a9a786eca7ba420e0774f0a81a14fee1[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed May 29 17:42:52 2024 +0800
+
+    ColoredBox child 是 Scaffold 颜色失效
+    
+    ColoredBox child 是 Scaffold 颜色失效
+
+[33mcommit b47aa63c6c855ad5aa902d1a4ee06ad057c738fb[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu May 23 11:29:15 2024 +0800
+
+    netcore 插件
+
+[33mcommit e31c14465bfce3c01c5b24d55041e4e50136b93e[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed May 8 14:07:48 2024 +0800
+
+    # 服务器更换证书后jira无法访问Confluence处理
+
+[33mcommit 0e3dbff99c8e0d7bf01f141b07a4cb110dcec271[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Apr 24 17:39:10 2024 +0800
+
+    add tools
+
+[33mcommit 11ea395af31d9ffbb2bd0dbce89804f03a405a74[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Jan 30 15:57:39 2024 +0800
+
+    wps js 宏相关
+
+[33mcommit f906b1a868234dec58ca5b828720b11553b579a1[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Jan 5 11:22:49 2024 +0800
+
+    php start
+
+[33mcommit 07c30ff5700296e000877655ff330fcb8b48b0bd[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Jan 4 10:14:52 2024 +0800
+
+    cainiao
+
+[33mcommit 52a485473349da48f60892ae6e136731c1767db9[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Dec 20 16:30:47 2023 +0800
+
+    速度和记忆
+
+[33mcommit 8f4f1b93fcf71e033e71a799ad208c4a6d24d061[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Dec 15 18:02:15 2023 +0800
+
+    sudu
+
+[33mcommit ba1288c98b52e1c95d1f006b7df27e57b36603f8[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Dec 8 09:38:16 2023 +0800
+
+    fix
+
+[33mcommit f27ed9194b3ee3bca5c732fb54fc2eb3cf6fb778[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Dec 8 09:36:24 2023 +0800
+
+    fix
+
+[33mcommit 934b3e04b3990f84a8a8a783d9d1f7c2dc283598[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Dec 7 18:03:09 2023 +0800
+
+    ss
+    
+    ss
+
+[33mcommit e61c2f8ac6f19a7e71e0e637a76409e76da14f1e[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Dec 7 17:21:00 2023 +0800
+
+    math fix.
+
+[33mcommit 01059172fe9f24cfd212a32614c618c363cc2cab[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Dec 7 17:15:42 2023 +0800
+
+    fix math error 2022xcds
+
+[33mcommit e7093db2413f6515c936157055a2525c4e2f8cd8[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Dec 7 16:55:48 2023 +0800
+
+    2022done
+    
+    2022xcds
+
+[33mcommit e11487bf1ef5626f91969fade321a8fbc7efb80a[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Nov 30 17:56:24 2023 +0800
+
+    work 2022xcds 言语理解
+
+[33mcommit 13b9760104a5d4e214fe7f7b1e3a111527d4d7e4[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Nov 30 14:22:02 2023 +0800
+
+    ok
+
+[33mcommit 33d84acf592e5c716e715982ee1b86bd10091fac[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Nov 30 14:12:37 2023 +0800
+
+    modify style
+
+[33mcommit 1325106e2ffb437901fd36ee87d16ba927a535c4[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Nov 30 11:03:50 2023 +0800
+
+    交作业 2022XCDS 常识判断
+
+[33mcommit 38a79c860528b61167bd7e657e1653d47790ee42[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Nov 29 18:05:33 2023 +0800
+
+    2022
+
+[33mcommit 43028ba5e777f6bbc7129b123515e96d88bc01dc[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Nov 28 11:25:56 2023 +0800
+
+    modify markdown text
+
+[33mcommit 53ac27db33ff64eb0880312317965a43a0ccc96e[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Nov 28 09:59:54 2023 +0800
+
+    jiqioa
+
+[33mcommit 331ecf4f73df4df3aa973bc2460105445b240f1d[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Nov 27 15:59:10 2023 +0800
+
+    delete
+
+[33mcommit 3360b7fc328d4db06c4e478aa78cf6ac16775bfd[m
+Author: fhlsteven <1508727061@qq.com>
+Date:   Sat Nov 25 20:09:12 2023 +0800
+
+    done
+
+[33mcommit bad40380b66cd6bda39320b272c41357a53a956b[m
+Merge: 48b952a ec15d17
+Author: fhlsteven <1508727061@qq.com>
+Date:   Fri Nov 24 20:39:49 2023 +0800
+
+    Merge branch 'master' of https://github.com/fhlsteven/Learning
+
+[33mcommit 48b952af1ceb8af71c03782d711e3dea9c76b03e[m
+Author: fhlsteven <1508727061@qq.com>
+Date:   Fri Nov 24 20:39:47 2023 +0800
+
+    Update .gitignore
+
+[33mcommit ec15d176b950f1229b02e8aa50e1e8ef65201faa[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Nov 24 18:01:44 2023 +0800
+
+    commit
+
+[33mcommit 42c788c605e80e7fe96064d8b4cb1a4c96c72db9[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Nov 22 11:30:03 2023 +0800
+
+    修改公式
+
+[33mcommit 5ee1f2ddd63219592ff3fbea77a22ab583666e9d[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Nov 22 10:00:31 2023 +0800
+
+    2023xc_ds
+
+[33mcommit 9631d715f1c52b5d8d8eec8ec046c727b3489ef8[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Nov 20 17:46:41 2023 +0800
+
+    add reference
+
+[33mcommit 0835b32036c5d6f43f46c1f577ea560de2a70690[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Nov 20 17:04:23 2023 +0800
+
+    2020SL_DS
+
+[33mcommit 5e0a51e859b7305fe78ea7df723982283dce062a[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Oct 17 16:58:10 2023 +0800
+
+    add audio segment and check repeat
+
+[33mcommit 5ec1d90c43594bd89d70e45feb4380cd7d900009[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Oct 10 17:26:12 2023 +0800
+
+    download
+
+[33mcommit 459a8099f37a786bd7777fe61981ef96c079a304[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Sep 4 09:58:31 2023 +0800
+
+    VuePress 控制文件内的代码自动换行
+
+[33mcommit 4aec75b447e1755453ea965d194c314d9e14d240[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Aug 2 10:11:48 2023 +0800
+
+    npm install -D vuepress-plugin-md-enhance@1.31.0-beta.2
+    
+    npm install -D vuepress-plugin-md-enhance@1.31.0-beta.2 1.0用这个不太好使啊
+
+[33mcommit f1554fe694f59fb0f4b4e41bdd7e14af37d55e5b[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Jul 28 15:51:28 2023 +0800
+
+    vuepress2 use math
+
+[33mcommit 9bafb0b1b50790321467a766e7ef77b889fe2f74[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Jul 10 13:22:27 2023 +0800
+
+    fix bug
+
+[33mcommit ec8d0b9e78ff58396e35403789371813f6e04d7d[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Jun 13 13:50:41 2023 +0800
+
+    today is done
+
+[33mcommit fa0fbe98e484872739f5197357a95690ec9d45d2[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri May 26 17:10:10 2023 +0800
+
+    update
+
+[33mcommit 4e81632be41adce9f129f42d7d2574ec47a80471[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri May 26 16:57:53 2023 +0800
+
+    add new function
+
+[33mcommit 97195cd0d8b39c459a3cf2fbe57c807b03533484[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon May 22 09:22:00 2023 +0800
+
+    good
+
+[33mcommit d0b024be4cacdbeb1a34fb23f243045d7134b0d5[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu May 18 14:40:41 2023 +0800
+
+    优化
+    
+    add top hd
+
+[33mcommit 897d1a8fd5a7bb8d7a521f0b0af020c5c03b9e57[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Apr 27 16:39:04 2023 +0800
+
+    good afternoon
+
+[33mcommit c66cca671b515e1dff9cbdebd496cee9dfaa38cb[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Apr 24 12:41:54 2023 +0800
+
+    fix bug
+
+[33mcommit f31941745ef7f0dd7b0b4db6959fec99cb038343[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Apr 24 12:31:49 2023 +0800
+
+    optimize
+
+[33mcommit bab58f90982c2fdafe9684a3106bdcf44ae77aa5[m
+Author: FHL <1508727061@qq.com>
+Date:   Sun Apr 23 16:23:21 2023 +0800
+
+    optimize
+
+[33mcommit d9c1dc8b7b013e2bd3cc8278d04d9a0837d30df2[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Apr 14 18:05:13 2023 +0800
+
+    go
+
+[33mcommit bdfa5ffabdd364024b59ed8e630bbb72d8487fb2[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Apr 10 16:58:12 2023 +0800
+
+    go
+
+[33mcommit ff43605d8fff22497cd491ca9fa856b1b365bb2f[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Apr 7 09:30:29 2023 +0800
+
+    multiple account optimize
+
+[33mcommit 09e43e9f66bbf365eb20dbdc481eaffdc82fc522[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Mar 24 17:22:28 2023 +0800
+
+    xf -shop
+
+[33mcommit 10eacfbc8430961a848d6d65fb61f5732d615d11[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Mar 24 15:39:08 2023 +0800
+
+    opiiii
+
+[33mcommit 4bf52ac5252825c2c66d89afb280cfe77f23e1b6[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Mar 24 14:06:19 2023 +0800
+
+    real final
+
+[33mcommit 24dc67d49193b3104be5a26f14c52a7e8a5a1507[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Mar 24 10:14:12 2023 +0800
+
+    final
+
+[33mcommit 5e7c82bd0ec3a8dcdf2107f191378b89c2fd1598[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 22 16:50:44 2023 +0800
+
+    update
+
+[33mcommit aa5893ff94b663f53b651b30218f9b18e5172a27[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Mar 16 17:28:13 2023 +0800
+
+    wanshan
+
+[33mcommit e559280413db476038ef746e1b6365f0b0c43cea[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 15 14:17:09 2023 +0800
+
+    optimism
+
+[33mcommit 01cdfe67e156195a9ef6d3a5c87dc0f51dde0dc9[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Mar 14 13:46:41 2023 +0800
+
+    add monitor chuanqi and end
+
+[33mcommit 0cf13bb513d4635c5108325a8176a6d2ad569a3b[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Mar 10 17:59:36 2023 +0800
+
+    reset times
+
+[33mcommit 1a02e08769a2c72638205bf97871114ba203d877[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Mar 10 16:56:43 2023 +0800
+
+    optimism
+
+[33mcommit 61f6b4397ec0b6bbd241c9d0922ca62b736bc460[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Mar 9 18:04:18 2023 +0800
+
+    go
+
+[33mcommit dd099afaedf3c0b2d17b6f3bc23d382302bc1c56[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Mar 9 15:42:34 2023 +0800
+
+    fix
+
+[33mcommit 5da0d8da4ed594298afccbbf8637a9004fba77ca[m
+Author: fhlsteven <1508727061@qq.com>
+Date:   Wed Mar 8 21:37:50 2023 +0800
+
+    fix bugs
+
+[33mcommit 94ffaf9b1608807b5ba12c81b1c7dc5cedc6b2cb[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 8 17:04:06 2023 +0800
+
+    go
+
+[33mcommit 91e19feaa486a3a33bcc1d4a70c9e128852d06a0[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 8 09:52:26 2023 +0800
+
+    optimism
+
+[33mcommit f8dd1c076040654a0dfeeb303043414d7ff9d437[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Mar 7 15:02:42 2023 +0800
+
+    today fix go
+
+[33mcommit ff1e4bca8a49ed7ea148ee6d280640efa518140b[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Mar 6 17:01:34 2023 +0800
+
+    fix bugs and add new
+
+[33mcommit 9f6a55c6288e41198828ad919dcec26ab61437f6[m
+Author: fhlsteven <1508727061@qq.com>
+Date:   Sun Mar 5 22:08:16 2023 +0800
+
+    go
+
+[33mcommit 91ae315d7ea0146d6ba93d2923b9a6e1bf79e241[m
+Author: FHL <1508727061@qq.com>
+Date:   Sun Mar 5 20:13:03 2023 +0800
+
+    fix bugs
+
+[33mcommit 2cac628d4df9e46f1e6e0373c4df8b19569bc926[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Mar 2 14:43:13 2023 +0800
+
+    done
+
+[33mcommit baba620194b9e312a351096747385d38e54b5d6f[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 1 22:16:22 2023 +0800
+
+    exclude imgs
+
+[33mcommit 78d37b84ec5b138ae745dcc0cd4f04d2f5c0eb55[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 1 22:15:59 2023 +0800
+
+    fix bugs
+
+[33mcommit 67906f0acc3a6789bc094937184333aa2c38de3c[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 1 11:05:18 2023 +0800
+
+    add save function
+
+[33mcommit f66d2600e538a9e5b4aeb00275679585ccc4fce8[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Mar 1 10:34:13 2023 +0800
+
+    simple photo tools
+
+[33mcommit dfb41cb73474501f7bd1882898e80ba3a1518be6[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Feb 28 18:02:08 2023 +0800
+
+    go
+
+[33mcommit 3e0f0eb493fd2c80ee80a3c265259930d7f1bb85[m
+Author: FHL <1508727061@qq.com>
+Date:   Tue Feb 28 17:13:32 2023 +0800
+
+    fix bug and add new Image rectangle func
+
+[33mcommit 0d6ae928a6576a9f74aa573ee3ad20495356f24f[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Feb 27 14:37:04 2023 +0800
+
+    fix bug
+
+[33mcommit b727fc2b1a7a1a8ac6bb0ab110b9fccd49dcdd6b[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Feb 27 14:32:39 2023 +0800
+
+    go
+
+[33mcommit b03898030902991daec8ed0e16315d4de6f58da0[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Feb 23 17:52:17 2023 +0800
+
+    fix bug
+
+[33mcommit 4d4440967962ed91bcd90f3e438f71b84a48f198[m
+Author: FHL <1508727061@qq.com>
+Date:   Mon Feb 20 14:32:36 2023 +0800
+
+    optimization
+
+[33mcommit 5d1ff50a295fda3f84b271112d6fc9c4083b0152[m
+Author: FHL <1508727061@qq.com>
+Date:   Fri Feb 10 17:47:12 2023 +0800
+
+    small edit
+
+[33mcommit 3d0f233c2bb2efc7f4e23c60bf7213ba17828d13[m
+Author: FHL <1508727061@qq.com>
+Date:   Thu Feb 9 16:58:00 2023 +0800
+
+    optimization
+
+[33mcommit 4eca04446d36feea3e3f05f11c754208006e3a01[m
+Author: FHL <1508727061@qq.com>
+Date:   Wed Feb 8 18:03:19 2023 +0800
+
+    fix bug

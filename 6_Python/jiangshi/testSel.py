@@ -11,24 +11,23 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import os
 import platform
 
-# html node name
-ACCOUNT_KEY = "account"
-PWD_KEY = "password"
-LOGIN_BTN_KEY ="#gowan-ui>div>div.popbox.show.account-login>div>div>div.gowan-btns>div"
-# frame
-FIRST_FRAME="game-iframe"
-SECOND_FRAME="gameFrame"
-
 # Position
 BROWSER_POS=(configs.browser_pos.x, configs.browser_pos.y)
 
 # 放到根目录（MicrosoftWebDriver.exe）
 # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
 def get_driver(url="https://baidu.com"):
+    user_data_dir = os.path.abspath("chrome_profile")
+    print(user_data_dir)
+
     if configs.browser_type == "chrome":
         c_op = webdriver.ChromeOptions()
         c_op.add_argument("--mute-audio")
-        driver = webdriver.Chrome(options=c_op)
+
+        c_op.add_argument(f"--user-data-dir={user_data_dir}")
+        c_op.add_argument("--profile-directory=Default")
+
+        driver = webdriver.Chrome(options=c_op)    
     elif configs.browser_type == "edge":
         e_op = webdriver.EdgeOptions()
         e_op.add_argument("--mute-audio")
