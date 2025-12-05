@@ -342,3 +342,4 @@ healthchecksdb
 */*/dist/*.tar.gz
 6_Python/manhuang/imgs/.DS_Store
 6_Python/manhuang/imgs/mh_all.png
+.DS_Store
