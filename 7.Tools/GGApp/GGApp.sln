@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GGApp", "GGApp\GGApp.csproj", "{414D4BA1-EDBB-4BFE-86F6-AA33AE6348EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GGApp.Desktop", "GGApp.Desktop\GGApp.Desktop.csproj", "{C3FCF6F4-985D-4054-B241-D541CEADB537}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{414D4BA1-EDBB-4BFE-86F6-AA33AE6348EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{414D4BA1-EDBB-4BFE-86F6-AA33AE6348EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{414D4BA1-EDBB-4BFE-86F6-AA33AE6348EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{414D4BA1-EDBB-4BFE-86F6-AA33AE6348EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3FCF6F4-985D-4054-B241-D541CEADB537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3FCF6F4-985D-4054-B241-D541CEADB537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3FCF6F4-985D-4054-B241-D541CEADB537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3FCF6F4-985D-4054-B241-D541CEADB537}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

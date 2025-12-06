@@ -17,15 +17,16 @@ class PlayNormal(Base):
         #    wait_time(2)
         #else:
         #    print('palynormal not found start img')
-        
+        replay_times = 0
         while True:
-            if self.is_exists_image("select.png", confidence=0.7):
+            if self.is_exists_image_CV2("select.png", confidence=0.7):
                 self.click_pos(selectPos)
                 print('select click')
-            elif self.is_exists_image("replay.png",confidence=0.7):
-                print('replay click')
+            elif self.is_exists_image_CV2("replay.png",confidence=0.7, is_save_img=False):                
                 self.click_pos((250, 1040))
-            elif self.is_exists_image("boss_kill.png", confidence=0.7):
+                replay_times = replay_times + 1
+                print('replay click : '+ str(replay_times))
+            elif self.is_exists_image_CV2("boss_kill.png", confidence=0.7, is_save_img=False):
                 print('boss_kill click')
                 self.click_pos(selectPos)
             wait_time(3)
