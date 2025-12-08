@@ -18,7 +18,11 @@ namespace GGApp.ViewModels
         [RelayCommand]
         private void OpenChrome()
         {
-            _driver = DriverHelper.GetChromeDriver();                  
+            _driver = DriverHelper.GetChromeDriver();
+
+            _driver.Manage().Window.Size = new System.Drawing.Size(1140,1202);
+            _driver.Manage().Window.Position = new System.Drawing.Point(0, 0);
+            _driver.Navigate().GoToUrl("https://www.wanyiwan.top/login/xjskp2060170000353846");               
         }
     }
 }

@@ -14,5 +14,9 @@
   </Design.DataContext>
 
    <!--<ContentControl x:Name="MainContent" Margin="10"/>-->
-   <views:JiangShiView />
+   <views:JiangShiView>
+     <views:JiangShiView.DataContext>
+       <vm:JiangShiViewModel />
+     </views:JiangShiView.DataContext>
+   </views:JiangShiView>
 </UserControl>

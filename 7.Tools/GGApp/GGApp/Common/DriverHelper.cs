@@ -18,6 +18,7 @@ namespace GGApp.Common
             var options = new ChromeOptions();
             options.AddArgument("--disable-gpu");
             options.AddArgument("--no-sandbox");
+            options.AddArgument("--mute-audio");
             var service = ChromeDriverService.CreateDefaultService(driverPath);
             var driver = new ChromeDriver(service, options);
             return driver;
@@ -28,10 +29,10 @@ namespace GGApp.Common
             string baseDir = AppContext.BaseDirectory;
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return Path.Combine(baseDir, "selenium", "win");
+                return Path.Combine(baseDir,"Assets" ,"drivers", "win");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return Path.Combine(baseDir, "selenium", "mac");
+                return Path.Combine(baseDir,"Assets" ,"drivers", "mac");
 
             throw new NotSupportedException("Unsupported platform");
         }
