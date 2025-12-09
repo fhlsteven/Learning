@@ -29,10 +29,10 @@ namespace GGApp.Common
             string baseDir = AppContext.BaseDirectory;
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return Path.Combine(baseDir,"Assets" ,"drivers", "win");
+                return Path.Combine(baseDir, "Assets", "drivers", "win");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return Path.Combine(baseDir,"Assets" ,"drivers", "mac");
+                return Path.Combine(baseDir, "Assets", "drivers", "mac");
 
             throw new NotSupportedException("Unsupported platform");
         }
