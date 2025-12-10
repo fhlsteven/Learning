@@ -24,7 +24,7 @@ namespace GGApp.Common
             return driver;
         }
 
-        static string GetDriverPath()
+        public static string GetDriverPath()
         {
             string baseDir = AppContext.BaseDirectory;
 

@@ -16,6 +16,7 @@
 
   <StackPanel>
     <Button Command="{Binding OpenChromeCommand}" Content="Chrome"/>
+    <Button Command="{Binding NormalCommand}" Content="Normal"/>
     <Grid Margin="5" ColumnDefinitions="120, 100" RowDefinitions="Auto, Auto, Auto">
 
     </Grid>

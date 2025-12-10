@@ -1,9 +1,12 @@
 ﻿using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.Input;
 using GGApp.Common;
+using GGApp.Common.Drivers;
+using OpenCvSharp.Text;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,16 +16,21 @@ namespace GGApp.ViewModels
 {
     public partial class JiangShiViewModel : ViewModelBase
     {
-        private ChromeDriver? _driver;
+        private IBrowserAutomation? _webBro;
 
         [RelayCommand]
         private void OpenChrome()
         {
-            _driver = DriverHelper.GetChromeDriver();
+            _webBro = new ChromeAutomation();
+            _webBro.Init();
+            _webBro.SetWindow(1140, 1202, 0, 0);
+            _webBro.Navigate("https://www.bing.com");            
+        }
 
-            _driver.Manage().Window.Size = new System.Drawing.Size(1140,1202);
-            _driver.Manage().Window.Position = new System.Drawing.Point(0, 0);
-            _driver.Navigate().GoToUrl("https://www.wanyiwan.top/login/xjskp2060170000353846");               
+        [RelayCommand]
+        private void Normal() 
+        {
+            string re = _webBro.Screenshot(Path.Combine(AppContext.BaseDirectory, "Assets", "all.png"));            
         }
     }
 }
